@@ -1,0 +1,240 @@
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Primary Colors */
+    --color-primary: #8B4513; /* saddle-brown */
+    --color-primary-foreground: #FFFFFF; /* white */
+    
+    /* Secondary Colors */
+    --color-secondary: #2F4F4F; /* dark-slate-gray */
+    --color-secondary-foreground: #FFFFFF; /* white */
+    
+    /* Accent Colors */
+    --color-accent: #FF6B35; /* coral-orange */
+    --color-accent-foreground: #FFFFFF; /* white */
+    
+    /* Background Colors */
+    --color-background: #FEFCF8; /* warm-off-white */
+    --color-foreground: #2C2C2C; /* rich-charcoal */
+    
+    /* Surface Colors */
+    --color-card: #FFFFFF; /* white */
+    --color-card-foreground: #2C2C2C; /* rich-charcoal */
+    
+    /* Popover Colors */
+    --color-popover: #FFFFFF; /* white */
+    --color-popover-foreground: #2C2C2C; /* rich-charcoal */
+    
+    /* Muted Colors */
+    --color-muted: #F3F4F6; /* gray-100 */
+    --color-muted-foreground: #6B7280; /* gray-500 */
+    
+    /* Border & Input */
+    --color-border: rgba(139, 69, 19, 0.15); /* primary-opacity-15 */
+    --color-input: rgba(139, 69, 19, 0.15); /* primary-opacity-15 */
+    --color-ring: #FF6B35; /* coral-orange */
+    
+    /* Status Colors */
+    --color-success: #059669; /* emerald-600 */
+    --color-success-foreground: #FFFFFF; /* white */
+    
+    --color-warning: #D97706; /* amber-600 */
+    --color-warning-foreground: #FFFFFF; /* white */
+    
+    --color-error: #DC2626; /* red-600 */
+    --color-error-foreground: #FFFFFF; /* white */
+    
+    --color-destructive: #DC2626; /* red-600 */
+    --color-destructive-foreground: #FFFFFF; /* white */
+    
+    /* Radius */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+  }
+
+  .dark {
+    --color-primary: #C8663C;
+    --color-primary-foreground: #FFFFFF;
+    
+    --color-secondary: #5A7A7A;
+    --color-secondary-foreground: #FFFFFF;
+    
+    --color-accent: #FF8F66;
+    --color-accent-foreground: #1A1612;
+    
+    --color-background: #1A1612;
+    --color-foreground: #EBE5DE;
+    
+    --color-card: #2D2721;
+    --color-card-foreground: #EBE5DE;
+    
+    --color-popover: #2D2721;
+    --color-popover-foreground: #EBE5DE;
+    
+    --color-muted: #3D3630;
+    --color-muted-foreground: #A8A29E;
+    
+    --color-border: rgba(255, 143, 102, 0.12);
+    --color-input: rgba(255, 143, 102, 0.12);
+    --color-ring: #FF8F66;
+    
+    --color-success: #34D399;
+    --color-success-foreground: #1A1612;
+    
+    --color-warning: #FBBF24;
+    --color-warning-foreground: #1A1612;
+    
+    --color-error: #F87171;
+    --color-error-foreground: #1A1612;
+    
+    --color-destructive: #F87171;
+    --color-destructive-foreground: #1A1612;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Crimson Pro', serif;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-size: 2rem;
+    line-height: 1.25;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+
+  h4 {
+    font-size: 1.25rem;
+    line-height: 1.4;
+  }
+
+  h5 {
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+
+  caption, label, .caption {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    letter-spacing: 0.025em;
+  }
+
+  .data-text, .mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-feature-settings: 'tnum' on, 'lnum' on;
+  }
+
+  @media (max-width: 640px) {
+    body {
+      font-size: 15px;
+    }
+  }
+}
+
+@layer utilities {
+  .transition-smooth {
+    transition: all 250ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+
+  .transition-spring {
+    transition: all 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .shadow-warm-sm {
+    box-shadow: 0 2px 4px rgba(139, 69, 19, 0.1);
+  }
+
+  .shadow-warm {
+    box-shadow: 0 4px 6px rgba(139, 69, 19, 0.1);
+  }
+
+  .shadow-warm-md {
+    box-shadow: 0 6px 12px rgba(139, 69, 19, 0.15);
+  }
+
+  .shadow-warm-lg {
+    box-shadow: 0 12px 24px rgba(139, 69, 19, 0.15);
+  }
+
+  .shadow-warm-xl {
+    box-shadow: 0 20px 40px rgba(139, 69, 19, 0.2);
+  }
+
+  .shadow-warm-2xl {
+    box-shadow: 0 25px 50px -12px rgba(139, 69, 19, 0.2);
+  }
+
+  .dark .shadow-warm-sm {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .dark .shadow-warm {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  .dark .shadow-warm-md {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  .dark .shadow-warm-lg {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .dark .shadow-warm-xl {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .dark .shadow-warm-2xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  .hover-lift {
+    @apply transition-smooth;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(139, 69, 19, 0.15);
+  }
+
+  .dark .hover-lift:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  .active-press:active {
+    transform: scale(0.97);
+  }
+
+  .focus-ring {
+    @apply focus:outline-none focus:ring-3 focus:ring-accent focus:ring-offset-3;
+  }
+}
