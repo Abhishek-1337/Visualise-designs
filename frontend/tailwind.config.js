@@ -61,8 +61,8 @@ module.exports = {
         xl: 'var(--radius-xl)'
       },
       fontFamily: {
-        heading: ['Crimson Pro', 'serif'],
-        body: ['Source Sans 3', 'sans-serif'],
+        heading: ['Inter', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
         caption: ['Inter', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace']
       },

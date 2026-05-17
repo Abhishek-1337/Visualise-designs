@@ -13,6 +13,8 @@ import Register from './pages/register';
 import LeadClientFlow from './pages/lead-client-flow';
 import ClientProfile from './pages/client-profile';
 import CommunicationHub from './pages/communication-hub';
+import ClientMessaging from './pages/client-messaging';
+import ClientCRM from './pages/client-crm';
 import SettingsConfiguration from './pages/settings-configuration';
 
 const Routes = () => {
@@ -32,6 +34,8 @@ const Routes = () => {
           <Route path="/lead-client-flow" element={<ProtectedRoute><LeadClientFlow /></ProtectedRoute>} />
           <Route path="/client-profile" element={<ProtectedRoute><ClientProfile /></ProtectedRoute>} />
           <Route path="/communication-hub" element={<ProtectedRoute><CommunicationHub /></ProtectedRoute>} />
+          <Route path="/client-messaging" element={<ProtectedRoute><ClientMessaging /></ProtectedRoute>} />
+          <Route path="/client-crm" element={<ProtectedRoute><ClientCRM /></ProtectedRoute>} />
           <Route path="/settings-configuration" element={<ProtectedRoute><SettingsConfiguration /></ProtectedRoute>} />
           
           <Route path="*" element={<NotFound />} />

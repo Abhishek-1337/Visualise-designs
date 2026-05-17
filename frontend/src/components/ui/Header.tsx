@@ -38,6 +38,8 @@ export const Sidebar: React.FC = () => {
     { label: 'Projects', path: '/project-management', icon: 'FolderKanban', tooltip: 'Track project milestones' },
     { label: 'Team', path: '/team-workspace', icon: 'Users', tooltip: 'Collaborative workspace' },
     { label: 'Clients', path: '/client-profile', icon: 'UserCircle', tooltip: 'Client profiles & details' },
+    { label: 'Client Chat', path: '/client-messaging', icon: 'MessageSquare', tooltip: 'Slack-like client messaging' },
+    { label: 'Client CRM', path: '/client-crm', icon: 'UserCog', tooltip: 'Client profiles, projects & chat' },
     { label: 'Comms', path: '/communication-hub', icon: 'MessageCircle', tooltip: 'Communication hub' },
     { label: 'Settings', path: '/settings-configuration', icon: 'Settings', tooltip: 'App settings & configuration' }
   ];
@@ -57,80 +59,80 @@ export const Sidebar: React.FC = () => {
     <div className="flex flex-col h-full max-w-[240px]">
       <div className="flex items-center justify-between px-4 border-b border-border h-[60px]">
         <Link to="/home-dashboard" className="flex items-center gap-3 transition-smooth hover:opacity-80">
-          <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center transition-smooth">
-            <Icon name="Sparkles" size={24} color="var(--color-primary)" />
+          <div className="w-10 h-10 bg-foreground rounded-lg flex items-center justify-center transition-smooth">
+            <Icon name="Sparkles" size={22} color="var(--color-background)" />
           </div>
-          <span className="font-heading font-semibold text-xl text-foreground">
+          <span className="font-semibold text-lg text-foreground tracking-tight">
             Visualise CRM
           </span>
         </Link>
-        <button onClick={() => setIsMobileOpen(false)} className="md:hidden p-2 rounded-lg transition-smooth hover:bg-muted">
-          <Icon name="X" size={24} color="currentColor" />
+        <button onClick={() => setIsMobileOpen(false)} className="md:hidden p-2 rounded-md transition-smooth hover:bg-muted">
+          <Icon name="X" size={20} color="currentColor" />
         </button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto py-4 px-2 pt-10">
-        <div className="space-y-4">
+      <nav className="flex-1 overflow-y-auto py-4 px-2 pt-8">
+        <div className="space-y-0.5">
           {navigationItems?.map((item) => (
             <Link
               key={item?.path}
               to={item?.path}
               onClick={() => { setIsMobileOpen(false); setIsUserMenuOpen(false); }}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-smooth hover-lift active-press ${
+              className={`flex items-center gap-3 px-3 py-2 rounded-md transition-smooth active-press ${
                 isActivePath(item?.path)
-                  ? 'bg-primary text-primary-foreground shadow-warm-sm'
-                  : 'text-foreground hover:bg-muted'
+                  ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400'
+                  : 'text-muted-foreground hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50'
               }`}
               title={item?.tooltip}
             >
-              <Icon name={item?.icon} size={20} color={isActivePath(item?.path) ? 'var(--color-primary-foreground)' : 'currentColor'} />
-              <span className="font-medium text-sm">{item?.label}</span>
+              <Icon name={item?.icon} size={18} color="currentColor" />
+              <span className="text-sm font-medium">{item?.label}</span>
             </Link>
           ))}
         </div>
       </nav>
 
-      <div className="px-4 py-3 border-t border-border">
+      <div className="px-3 py-2 border-t border-border">
         <ThemeToggle />
       </div>
 
-      <div className="border-t border-border p-4">
+      <div className="border-t border-border p-3">
         <div className="relative">
           <button
             onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-smooth hover:bg-muted"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-md transition-smooth hover:bg-muted"
           >
-            <div className="w-9 h-9 bg-accent rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
               {user?.avatar ? (
-                <img src={user.avatar} alt={userName} className="w-9 h-9 rounded-full object-cover" />
+                <img src={user.avatar} alt={userName} className="w-8 h-8 rounded-full object-cover" />
               ) : (
-                <span className="text-sm font-medium text-accent-foreground">{userInitial}</span>
+                <span className="text-xs font-medium text-foreground">{userInitial}</span>
               )}
             </div>
             <div className="flex-1 text-left min-w-0">
-              <p className="text-sm font-medium text-popover-foreground truncate">{userName}</p>
+              <p className="text-sm font-medium text-foreground truncate">{userName}</p>
               <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
             </div>
-            <Icon name="ChevronDown" size={16} color="currentColor" />
+            <Icon name="ChevronDown" size={14} color="currentColor" />
           </button>
 
           {isUserMenuOpen && (
-            <div className="absolute bottom-full left-0 right-0 mb-2 bg-popover rounded-lg shadow-warm-lg z-[1010] border border-border">
-              <div className="p-2">
+            <div className="absolute bottom-full left-0 right-0 mb-2 bg-popover border border-border rounded-md shadow-warm-lg z-[1010]">
+              <div className="p-1">
                 <Link
                   to="/settings-configuration"
                   className="flex items-center gap-3 px-3 py-2 rounded-md transition-smooth hover:bg-muted"
                   onClick={() => setIsUserMenuOpen(false)}
                 >
-                  <Icon name="User" size={18} color="currentColor" />
-                  <span className="text-sm text-popover-foreground">Profile Settings</span>
+                  <Icon name="User" size={16} color="currentColor" />
+                  <span className="text-sm text-foreground">Profile Settings</span>
                 </Link>
                 <button
                   onClick={handleLogout}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-md transition-smooth hover:bg-muted text-left"
                 >
-                  <Icon name="LogOut" size={18} color="currentColor" />
-                  <span className="text-sm text-popover-foreground">Logout</span>
+                  <Icon name="LogOut" size={16} color="currentColor" />
+                  <span className="text-sm text-foreground">Logout</span>
                 </button>
               </div>
             </div>
@@ -148,8 +150,8 @@ export const Sidebar: React.FC = () => {
 
       {isMobileOpen && (
         <div className="fixed inset-0 z-[1020] md:hidden">
-          <div className="absolute inset-0 bg-background/50 backdrop-blur-sm" onClick={() => setIsMobileOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-[280px] bg-card shadow-xl">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setIsMobileOpen(false)} />
+          <div className="absolute left-0 top-0 bottom-0 w-[280px] bg-card border-r border-border shadow-lg">
             <SidebarContent />
           </div>
         </div>
@@ -168,21 +170,21 @@ export const TopBar: React.FC = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[900] h-[60px] bg-card border-b border-border flex items-center justify-between px-4 lg:px-6">
-      <button onClick={() => setIsMobileOpen(true)} className="md:hidden p-2 rounded-lg transition-smooth hover:bg-muted" aria-label="Toggle menu">
-        <Icon name="Menu" size={24} color="currentColor" />
+      <button onClick={() => setIsMobileOpen(true)} className="md:hidden p-2 rounded-md transition-smooth hover:bg-muted" aria-label="Toggle menu">
+        <Icon name="Menu" size={20} color="currentColor" />
       </button>
       <div className="flex-1 md:ml-4">
-        <h1 className="text-lg font-semibold text-foreground hidden md:block">Dashboard</h1>
+        <h1 className="text-base font-semibold text-foreground tracking-tight hidden md:block">Dashboard</h1>
       </div>
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 bg-accent rounded-full flex items-center justify-center">
+        <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
           {user?.avatar ? (
-            <img src={user.avatar} alt={userName} className="w-9 h-9 rounded-full object-cover" />
+            <img src={user.avatar} alt={userName} className="w-8 h-8 rounded-full object-cover" />
           ) : (
-            <span className="text-sm font-medium text-accent-foreground">{userInitial}</span>
+            <span className="text-xs font-medium text-foreground">{userInitial}</span>
           )}
         </div>
-        <span className="hidden sm:block text-sm font-medium text-foreground">{userName}</span>
+        <span className="hidden sm:block text-sm font-medium text-muted-foreground">{userName}</span>
       </div>
     </header>
   );

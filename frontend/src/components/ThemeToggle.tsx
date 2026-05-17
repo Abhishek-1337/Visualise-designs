@@ -18,15 +18,15 @@ const ThemeToggle: React.FC = () => {
   return (
     <button
       onClick={cycleTheme}
-      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-smooth hover:bg-muted text-muted-foreground hover:text-foreground"
+      className="w-full flex items-center gap-3 px-3 py-2 rounded-md transition-smooth hover:bg-muted text-muted-foreground hover:text-foreground"
       title={`Theme: ${mode}. Click to switch.`}
     >
       <Icon
         name={isDark ? 'Moon' : 'Sun'}
-        size={18}
+        size={16}
         color="currentColor"
       />
-      <span className="text-sm font-medium capitalize">{mode}</span>
+      <span className="text-sm capitalize">{mode}</span>
     </button>
   );
 };
