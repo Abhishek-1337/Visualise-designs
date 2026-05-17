@@ -5,6 +5,7 @@ import type { RootState } from '../../store';
 import Icon from '../AppIcon';
 import { logout } from '../../store/slices/authSlice';
 import ThemeToggle from '../ThemeToggle';
+import logo from "../../../public/Png.png";
 
 interface NavItem {
   label: string;
@@ -57,10 +58,10 @@ export const Sidebar: React.FC = () => {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full max-w-[240px]">
-      <div className="flex items-center justify-between px-4 border-b border-border h-[60px]">
-        <Link to="/home-dashboard" className="flex items-center gap-3 transition-smooth hover:opacity-80">
+      <div className="flex items-center gap-4 px-4 border-b border-border h-[60px]">
+        <Link to="/home-dashboard" className="flex items-center gap-0 transition-smooth hover:opacity-80">
           <div className="w-10 h-10 bg-foreground rounded-lg flex items-center justify-center transition-smooth">
-            <Icon name="Sparkles" size={22} color="var(--color-background)" />
+            <img src="../../public/Png.png" className="bg-white"/>
           </div>
           <span className="font-semibold text-lg text-foreground tracking-tight">
             Visualise CRM
