@@ -152,8 +152,11 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
                       <TeamMemberAvatars members={project.team} />
                     </div>
                     <div className="flex flex-col items-center  gap-1 text-xs text-muted-foreground">
-                      <Icon name="Calendar" size={14} color="#3B82F6" />
-                      <span className="whitespace-nowrap">{project.dueDate}</span>
+                      <span className="font-semibold">Due Date</span>
+                      <div className="flex gap-2">
+                        <Icon name="Calendar" size={14} color="#3B82F6" />
+                        <span className="whitespace-nowrap">{project.dueDate}</span>
+                      </div>
                     </div>
                   </div>
                     <Icon name="ChevronRight" size={16} color="#3B82F6" className="mt-2 flex-shrink-0 opacity-40" />

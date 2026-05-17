@@ -14,7 +14,7 @@ interface ProgressWithLabelProps {
 const ProgressWithLabel: React.FC<ProgressWithLabelProps> = ({ progress }) => (
   <div className="flex-1 w-full">
     <div className="flex items-center justify-between text-xs mb-1">
-      <span className="text-muted-foreground">Progress</span>
+      <span className="text-muted-foreground font-semibold">Progress</span>
     </div>
     <span className="font-medium text-foreground">{progress}%</span>
     <div className="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
