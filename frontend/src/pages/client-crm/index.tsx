@@ -174,7 +174,7 @@ const ClientCRM = () => {
     <div className="min-h-screen bg-background">
       <Sidebar />
       <TopBar />
-      <main className="md:ml-[240px] pt-[60px] h-screen flex flex-col">
+      <main className="fixed md:ml-[240px] pt-[60px] h-[calc(100vh - 60px)] flex flex-col">
         <div className="flex-1 flex overflow-hidden">
           {!selectedClientId ? (
             <AllClientsGrid

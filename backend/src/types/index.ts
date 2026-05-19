@@ -87,19 +87,3 @@ export enum ProjectStatus {
   COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED'
 }
-
-export enum CommunicationType {
-  CALL = 'CALL',
-  EMAIL = 'EMAIL',
-  MEETING = 'MEETING',
-  MESSAGE = 'MESSAGE',
-  ZOOM = 'ZOOM'
-}
-
-export enum InvoiceStatus {
-  DRAFT = 'DRAFT',
-  PENDING = 'PENDING',
-  PAID = 'PAID',
-  OVERDUE = 'OVERDUE',
-  CANCELLED = 'CANCELLED'
-}

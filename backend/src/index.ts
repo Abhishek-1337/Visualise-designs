@@ -11,21 +11,10 @@ import fs from 'fs';
 // Import routes
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
-import contactRoutes from './routes/contact.routes';
-import dealRoutes from './routes/deal.routes';
-import projectRoutes from './routes/project.routes';
-import taskRoutes from './routes/task.routes';
-import communicationRoutes from './routes/communication.routes';
-import invoiceRoutes from './routes/invoice.routes';
-import fileRoutes from './routes/file.routes';
-import activityRoutes from './routes/activity.routes';
-import notificationRoutes from './routes/notification.routes';
-import dashboardRoutes from './routes/dashboard.routes';
+import crmRoutes from './routes/crm.routes';
 
 // Initialize Passport config
 import './config/passport.config';
-
-console.log("Hello", process.env.DATABASE_URL);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -73,16 +62,7 @@ app.get('/health', (_req, res) => {
 // API Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
-app.use('/api/v1/contacts', contactRoutes);
-app.use('/api/v1/deals', dealRoutes);
-app.use('/api/v1/projects', projectRoutes);
-app.use('/api/v1/tasks', taskRoutes);
-app.use('/api/v1/communications', communicationRoutes);
-app.use('/api/v1/invoices', invoiceRoutes);
-app.use('/api/v1/files', fileRoutes);
-app.use('/api/v1/activities', activityRoutes);
-app.use('/api/v1/notifications', notificationRoutes);
-app.use('/api/v1/dashboard', dashboardRoutes);
+app.use('/api/v1', crmRoutes); // Handles /contacts, /deals, /projects, /tasks, /activities, /dashboard
 
 // 404 handler
 app.use((_req, res) => {

@@ -164,7 +164,7 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
   }
 
   return (
-    <div className="w-full lg:w-[380px] xl:w-[420px] flex flex-col bg-card border-l border-border">
+    <div className="w-full lg:w-[380px] xl:w-[420px] h-[93vh] flex flex-col bg-card border-l border-border">
       <div className="flex items-center justify-between px-5 py-4 border-b border-border">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-9 h-9 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center flex-shrink-0">

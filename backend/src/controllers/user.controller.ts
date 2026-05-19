@@ -6,12 +6,7 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
   try {
     const authReq = req as AuthenticatedRequest;
     const user = await prisma.user.findUnique({
-      where: { id: authReq.user.id },
-      include: {
-        teamMemberships: {
-          include: { team: true }
-        }
-      }
+      where: { id: authReq.user.id }
     });
 
     if (!user) {

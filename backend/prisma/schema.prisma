@@ -1,4 +1,4 @@
-// Visualise CRM - Prisma Schema
+// Visualise CRM - Minimalist Prisma Schema
 
 generator client {
   provider = "prisma-client-js"
@@ -54,22 +54,6 @@ enum ProjectStatus {
   CANCELLED
 }
 
-enum CommunicationType {
-  CALL
-  EMAIL
-  MEETING
-  MESSAGE
-  ZOOM
-}
-
-enum InvoiceStatus {
-  DRAFT
-  PENDING
-  PAID
-  OVERDUE
-  CANCELLED
-}
-
 enum PipelineStage {
   NEW_LEAD
   QUALIFIED
@@ -100,21 +84,15 @@ model User {
   oauthId       String?   @unique
 
   // Relations
-  ownedContacts     Contact[]
-  assignedTasks      Task[]          @relation("AssignedTasks")
-  createdTasks       Task[]          @relation("CreatedTasks")
-  assignedProjects   Project[]       @relation("ProjectMembers")
-  assignedDeals      Deal[]          @relation("AssignedDeals")
-  communications     Communication[]
-  activities         Activity[]
-  createdInvoices    Invoice[]       @relation("CreatedInvoices")
-  sessions           Session[]
-  teamMemberships    TeamMember[]
-  notifications      Notification[]
+  contacts          Contact[]
+  assignedTasks     Task[]          @relation("AssignedTasks")
+  createdTasks      Task[]          @relation("CreatedTasks")
+  projects          Project[]       @relation("ProjectMembers")
+  deals             Deal[]          @relation("AssignedDeals")
+  activities        Activity[]
 
   @@index([email])
   @@index([role])
-  @@index([isActive])
 }
 
 model Contact {
@@ -126,15 +104,10 @@ model Contact {
   company         String?
   jobTitle        String?
   status          ContactStatus  @default(LEAD)
-  source          String?        // LinkedIn, Referral, Website, etc.
-  website         String?
-  address         String?
-  city            String?
-  state           String?
+  source          String?        
   country         String?
-  postalCode      String?
   notes           String?
-  value           Float?         // Estimated deal value
+  value           Float?         
   isArchived      Boolean        @default(false)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
@@ -144,15 +117,11 @@ model Contact {
   owner           User           @relation(fields: [ownerId], references: [id])
   deals           Deal[]
   projects        Project[]
-  communications  Communication[]
   tasks           Task[]
-  invoices        Invoice[]
-  files           File[]
+  activities      Activity[]
 
   @@index([status])
   @@index([ownerId])
-  @@index([company])
-  @@index([country])
 }
 
 model Deal {
@@ -178,7 +147,6 @@ model Deal {
   @@index([status])
   @@index([stage])
   @@index([contactId])
-  @@index([expectedCloseDate])
 }
 
 model Project {
@@ -197,31 +165,11 @@ model Project {
   contactId       String
   contact         Contact        @relation(fields: [contactId], references: [id])
   members         User[]         @relation("ProjectMembers")
-  milestones      Milestone[]
   tasks           Task[]
-  files           File[]
   activities      Activity[]
 
   @@index([status])
   @@index([contactId])
-}
-
-model Milestone {
-  id          String    @id @default(uuid())
-  title       String
-  description String?
-  dueDate     DateTime?
-  isCompleted Boolean   @default(false)
-  completedAt DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  // Relations
-  projectId   String
-  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  @@index([projectId])
-  @@index([dueDate])
 }
 
 model Task {
@@ -246,132 +194,12 @@ model Task {
   createdBy     User         @relation("CreatedTasks", fields: [createdById], references: [id])
 
   @@index([status])
-  @@index([priority])
   @@index([assignedToId])
-  @@index([dueDate])
-}
-
-model Communication {
-  id          String            @id @default(uuid())
-  type        CommunicationType
-  subject     String?
-  content     String?
-  direction   String            @default("outbound")  // inbound/outbound
-  duration    Int?              // in minutes
-  outcome     String?
-  notes       String?
-  scheduledAt DateTime?
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-
-  // Relations
-  contactId   String
-  contact     Contact           @relation(fields: [contactId], references: [id])
-  userId      String
-  user        User              @relation(fields: [userId], references: [id])
-
-  @@index([contactId])
-  @@index([type])
-  @@index([createdAt])
-}
-
-model Invoice {
-  id              String        @id @default(uuid())
-  invoiceNumber   String        @unique
-  description     String?
-  amount          Float
-  tax             Float         @default(0)
-  total           Float
-  status          InvoiceStatus @default(DRAFT)
-  issueDate       DateTime      @default(now())
-  dueDate         DateTime
-  paidDate        DateTime?
-  notes           String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  // Relations
-  contactId       String
-  contact         Contact       @relation(fields: [contactId], references: [id])
-  createdById     String
-  createdBy       User          @relation("CreatedInvoices", fields: [createdById], references: [id])
-
-  @@index([status])
-  @@index([contactId])
-  @@index([dueDate])
-  @@index([invoiceNumber])
-}
-
-model File {
-  id          String    @id @default(uuid())
-  name        String
-  originalName String
-  mimeType    String
-  size        Int       // in bytes
-  path        String    // storage path
-  category    String?   // contract, proposal, invoice, etc.
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  // Relations
-  contactId   String?
-  contact     Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
-  projectId   String?
-  project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
-
-  @@index([contactId])
-  @@index([projectId])
-}
-
-model Team {
-  id          String    @id @default(uuid())
-  name        String
-  description String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  // Relations
-  members     TeamMember[]
-
-  @@index([name])
-}
-
-model TeamMember {
-  id        String   @id @default(uuid())
-  role      String   @default("member")  // admin, lead, member
-  joinedAt  DateTime @default(now())
-
-  // Relations
-  teamId    String
-  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([teamId, userId])
-  @@index([teamId])
-  @@index([userId])
-}
-
-model Session {
-  id           String    @id @default(uuid())
-  token        String    @unique
-  expiresAt    DateTime
-  ipAddress    String?
-  userAgent    String?
-  createdAt    DateTime  @default(now())
-
-  // Relations
-  userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([token])
-  @@index([expiresAt])
 }
 
 model Activity {
   id          String    @id @default(uuid())
-  type        String    // deal_moved, task_completed, communication_logged, etc.
+  type        String    // contact_created, deal_moved, task_completed, message_sent, etc.
   description String
   metadata    Json?     // Additional context-specific data
   createdAt   DateTime  @default(now())
@@ -379,6 +207,8 @@ model Activity {
   // Relations
   userId      String
   user        User      @relation(fields: [userId], references: [id])
+  contactId   String?
+  contact     Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
   dealId      String?
   deal        Deal?     @relation(fields: [dealId], references: [id], onDelete: SetNull)
   projectId   String?
@@ -387,49 +217,4 @@ model Activity {
   @@index([userId])
   @@index([type])
   @@index([createdAt(sort: Desc)])
-}
-
-model AutomationRule {
-  id          String    @id @default(uuid())
-  name        String
-  description String?
-  trigger     String    // lead_created, deal_won, task_due, etc.
-  conditions  Json      // Rule conditions
-  actions     Json      // Actions to perform
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  @@index([trigger])
-  @@index([isActive])
-}
-
-model Notification {
-  id          String    @id @default(uuid())
-  type        String
-  title       String
-  message     String
-  isRead      Boolean   @default(false)
-  link        String?   // URL to navigate to
-  createdAt   DateTime  @default(now())
-
-  // Relations
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([isRead])
-  @@index([createdAt(sort: Desc)])
-}
-
-model Integration {
-  id          String    @id @default(uuid())
-  name        String    @unique  // google-calendar, gmail, zoom, slack, etc.
-  isConnected Boolean   @default(false)
-  config      Json?     // Integration-specific configuration
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  @@index([name])
-  @@index([isConnected])
 }
