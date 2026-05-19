@@ -63,6 +63,19 @@ enum PipelineStage {
   CLOSED_LOST
 }
 
+model Tenant {
+  id              String    @id @default(uuid())
+  companyName     String    
+  users           User[]
+  contacts        Contact[]
+  deals           Deal[]
+  projects        Project[]
+  tasks           Task[]
+  activities      Activity[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
 // Models
 model User {
   id            String    @id @default(uuid())
@@ -78,6 +91,8 @@ model User {
   lastLogin     DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  tenantId      String
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
 
   // OAuth
   oauthProvider String?
@@ -93,6 +108,7 @@ model User {
 
   @@index([email])
   @@index([role])
+  @@index([tenantId])
 }
 
 model Contact {
@@ -113,6 +129,8 @@ model Contact {
   updatedAt       DateTime       @updatedAt
 
   // Relations
+  tenantId        String
+  tenant          Tenant         @relation(fields: [tenantId], references: [id])
   ownerId         String
   owner           User           @relation(fields: [ownerId], references: [id])
   deals           Deal[]
@@ -122,6 +140,7 @@ model Contact {
 
   @@index([status])
   @@index([ownerId])
+  @@index([tenantId])
 }
 
 model Deal {
@@ -138,6 +157,8 @@ model Deal {
   updatedAt       DateTime     @updatedAt
 
   // Relations
+  tenantId        String
+  tenant          Tenant       @relation(fields: [tenantId], references: [id])
   contactId       String
   contact         Contact      @relation(fields: [contactId], references: [id])
   assignedToId    String?
@@ -147,6 +168,7 @@ model Deal {
   @@index([status])
   @@index([stage])
   @@index([contactId])
+  @@index([tenantId])
 }
 
 model Project {
@@ -158,10 +180,12 @@ model Project {
   endDate         DateTime?
   budget          Float?
   progress        Int            @default(0)   // 0-100
-  createdAt       DateTime       @default(now())
+  createdAt       DateTime     @default(now())
   updatedAt       DateTime       @updatedAt
 
   // Relations
+  tenantId        String
+  tenant          Tenant         @relation(fields: [tenantId], references: [id])
   contactId       String
   contact         Contact        @relation(fields: [contactId], references: [id])
   members         User[]         @relation("ProjectMembers")
@@ -170,6 +194,7 @@ model Project {
 
   @@index([status])
   @@index([contactId])
+  @@index([tenantId])
 }
 
 model Task {
@@ -184,6 +209,8 @@ model Task {
   updatedAt     DateTime     @updatedAt
 
   // Relations
+  tenantId      String
+  tenant        Tenant       @relation(fields: [tenantId], references: [id])
   contactId     String?
   contact       Contact?     @relation(fields: [contactId], references: [id])
   projectId     String?
@@ -195,6 +222,7 @@ model Task {
 
   @@index([status])
   @@index([assignedToId])
+  @@index([tenantId])
 }
 
 model Activity {
@@ -205,6 +233,8 @@ model Activity {
   createdAt   DateTime  @default(now())
 
   // Relations
+  tenantId    String
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
   userId      String
   user        User      @relation(fields: [userId], references: [id])
   contactId   String?
@@ -216,5 +246,6 @@ model Activity {
 
   @@index([userId])
   @@index([type])
+  @@index([tenantId])
   @@index([createdAt(sort: Desc)])
 }

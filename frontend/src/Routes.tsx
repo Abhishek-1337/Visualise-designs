@@ -16,6 +16,7 @@ import CommunicationHub from './pages/communication-hub';
 import ClientMessaging from './pages/client-messaging';
 import ClientCRM from './pages/client-crm';
 import SettingsConfiguration from './pages/settings-configuration';
+import TenantSignup from './pages/tenant-signup';
 
 const Routes = () => {
   return (
@@ -25,6 +26,7 @@ const Routes = () => {
         <RouterRoutes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/tenant-signup" element={<TenantSignup />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           
           <Route path="/" element={<ProtectedRoute><HomeDashboard /></ProtectedRoute>} />

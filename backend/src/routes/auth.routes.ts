@@ -9,12 +9,14 @@ import {
   verifyToken,
   getOAuthConfig,
   register,
+  tenantRegister,
   login
 } from '../controllers/auth.controller';
 
 const router = express.Router();
 
 router.post('/register', register);
+router.post('/tenant/register', tenantRegister);
 router.post('/login', login);
 router.get('/google', googleAuth);
 router.get('/google/callback', googleCallback);

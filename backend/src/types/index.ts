@@ -7,6 +7,7 @@ declare global {
       email: string;
       name: string;
       role: Role;
+      tenantId: string;
       avatar?: string | null;
       isActive: boolean;
       timezone: string;

@@ -68,10 +68,10 @@ export const getOAuthConfig = (_req: Request, res: Response): void => {
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, tenantId } = req.body;
 
-    if (!name || !email || !password) {
-      res.status(400).json({ error: 'Name, email, and password are required' });
+    if (!name || !email || !password || !tenantId) {
+      res.status(400).json({ error: 'Name, email, password, and tenantId are required' });
       return;
     }
 
@@ -94,7 +94,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         name,
         email,
         password: hashedPassword,
-        role: role || 'EMPLOYEE'
+        role: role || 'EMPLOYEE',
+        tenantId
       }
     });
 
@@ -112,12 +113,71 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         email: user.email,
         role: user.role,
         avatar: user.avatar,
-        isActive: user.isActive
+        isActive: user.isActive,
+        tenantId: user.tenantId
       }
     });
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: 'Failed to create account' });
+  }
+};
+
+export const tenantRegister = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { companyName, name, email, password } = req.body;
+
+    if (!companyName || !name || !email || !password) {
+      res.status(400).json({ error: 'Company name, name, email, and password are required' });
+      return;
+    }
+
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      res.status(409).json({ error: 'An account with this email already exists' });
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const result = await prisma.$transaction(async (tx) => {
+      const tenant = await tx.tenant.create({
+        data: { companyName }
+      });
+
+      const user = await tx.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+          role: 'ADMIN',
+          tenantId: tenant.id
+        }
+      });
+
+      return { user, tenant };
+    });
+
+    const token = jwt.sign(
+      { userId: result.user.id, email: result.user.email, role: result.user.role as Role },
+      process.env.JWT_SECRET || 'secret',
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' } as jwt.SignOptions
+    );
+
+    res.status(201).json({
+      token,
+      user: {
+        id: result.user.id,
+        name: result.user.name,
+        email: result.user.email,
+        role: result.user.role,
+        tenantId: result.user.tenantId,
+        companyName: result.tenant.companyName
+      }
+    });
+  } catch (error) {
+    console.error('Tenant registration error:', error);
+    res.status(500).json({ error: 'Failed to create tenant account' });
   }
 };
 

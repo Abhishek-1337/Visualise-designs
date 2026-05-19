@@ -34,6 +34,11 @@ passport.use(new GoogleStrategy({
       let user = await prisma.user.findUnique({ where: { oauthId: profile.id } });
 
       if (!user) {
+        // Create a new tenant for the OAuth user
+        const tenant = await prisma.tenant.create({
+          data: { companyName: `${profile.displayName}'s Studio` }
+        });
+
         user = await prisma.user.create({
           data: {
             email: profile.emails?.[0]?.value || '',
@@ -41,7 +46,8 @@ passport.use(new GoogleStrategy({
             avatar: profile.photos?.[0]?.value,
             oauthProvider: 'google',
             oauthId: profile.id,
-            role: 'EMPLOYEE'
+            role: 'ADMIN',
+            tenantId: tenant.id
           }
         });
       }
@@ -70,6 +76,12 @@ passport.use(new GitHubStrategy({
 
       if (!user) {
         const email = profile.emails?.[0]?.value || `${profile.username}@github.com`;
+        
+        // Create a new tenant for the OAuth user
+        const tenant = await prisma.tenant.create({
+          data: { companyName: `${profile.displayName || profile.username}'s Studio` }
+        });
+
         user = await prisma.user.create({
           data: {
             email,
@@ -77,7 +89,8 @@ passport.use(new GitHubStrategy({
             avatar: profile.photos?.[0]?.value,
             oauthProvider: 'github',
             oauthId: profile.id,
-            role: 'EMPLOYEE'
+            role: 'ADMIN',
+            tenantId: tenant.id
           }
         });
       }
@@ -105,6 +118,11 @@ passport.use(new MicrosoftStrategy({
       let user = await prisma.user.findUnique({ where: { oauthId: profile.id } });
 
       if (!user) {
+        // Create a new tenant for the OAuth user
+        const tenant = await prisma.tenant.create({
+          data: { companyName: `${profile.displayName}'s Studio` }
+        });
+
         user = await prisma.user.create({
           data: {
             email: profile.emails?.[0]?.value || '',
@@ -112,7 +130,8 @@ passport.use(new MicrosoftStrategy({
             avatar: profile.photos?.[0]?.value,
             oauthProvider: 'microsoft',
             oauthId: profile.id,
-            role: 'EMPLOYEE'
+            role: 'ADMIN',
+            tenantId: tenant.id
           }
         });
       }

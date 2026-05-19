@@ -4,6 +4,7 @@ export const authService = {
   getOAuthConfig: () => api.get('/auth/config'),
   verifyToken: () => api.get('/auth/verify'),
   register: (data) => api.post('/auth/register', data),
+  tenantRegister: (data) => api.post('/auth/tenant/register', data),
   login: (data) => api.post('/auth/login', data),
   googleLogin: () => window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'}/auth/google`,
   githubLogin: () => window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'}/auth/github`,
