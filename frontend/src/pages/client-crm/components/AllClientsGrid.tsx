@@ -33,8 +33,8 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({ clients, onSelectClient
   }, [clients, searchQuery]);
 
   return (
-    <div className="flex-1 flex flex-col min-w-0">
-      <div className="px-6 py-6 border-b border-border">
+    <div className="flex-1 min-h-0 flex flex-col min-w-0 overflow-hidden">
+      <div className="px-6 py-6 border-b border-border shrink-0">
         <div>
           <h1 className="text-2xl font-heading font-bold text-foreground">Clients</h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -57,7 +57,7 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({ clients, onSelectClient
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 min-h-0 overflow-y-auto p-6">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-4">
@@ -103,7 +103,7 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({ clients, onSelectClient
         )}
       </div>
 
-      <div className="px-6 py-3 border-t border-border">
+      <div className="px-6 py-3 border-t border-border shrink-0">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Icon name="Users" size={14} color="#3B82F6" />
           <span>{clients.length} client{clients.length !== 1 ? 's' : ''}</span>

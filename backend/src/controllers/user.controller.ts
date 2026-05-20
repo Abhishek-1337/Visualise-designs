@@ -45,9 +45,10 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
 
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
   try {
+    const authReq = req as AuthenticatedRequest;
     const { page = '1', limit = '20', role, isActive } = req.query;
 
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = { tenantId: authReq.user.tenantId };
     if (role) where.role = role;
     if (isActive !== undefined) where.isActive = isActive === 'true';
 

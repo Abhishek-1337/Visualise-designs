@@ -64,7 +64,7 @@ enum PipelineStage {
 }
 
 model Tenant {
-  id              String    @id @default(uuid())
+  id              String        @id @default(uuid())
   companyName     String    
   users           User[]
   contacts        Contact[]
@@ -72,8 +72,9 @@ model Tenant {
   projects        Project[]
   tasks           Task[]
   activities      Activity[]
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  invitations     Invitation[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 // Models
@@ -105,6 +106,7 @@ model User {
   projects          Project[]       @relation("ProjectMembers")
   deals             Deal[]          @relation("AssignedDeals")
   activities        Activity[]
+  invitedInvitations Invitation[]   @relation("InvitedBy")
 
   @@index([email])
   @@index([role])
@@ -222,6 +224,34 @@ model Task {
 
   @@index([status])
   @@index([assignedToId])
+  @@index([tenantId])
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
+
+model Invitation {
+  id              String            @id @default(uuid())
+  email           String
+  role            Role              @default(EMPLOYEE)
+  token           String            @unique
+  status          InvitationStatus  @default(PENDING)
+  expiresAt       DateTime
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  // Relations
+  tenantId        String
+  tenant          Tenant            @relation(fields: [tenantId], references: [id])
+  invitedById     String
+  invitedBy       User              @relation("InvitedBy", fields: [invitedById], references: [id])
+
+  @@index([email])
+  @@index([token])
   @@index([tenantId])
 }
 

@@ -19,6 +19,9 @@ export const userService = {
   updateProfile: (data) => api.put('/users/me', data),
   getAllUsers: (params) => api.get('/users', { params }),
   getUserById: (id) => api.get(`/users/${id}`),
+  updateRole: (id, data) => api.patch(`/users/${id}/role`, data),
+  deactivateUser: (id) => api.patch(`/users/${id}/deactivate`),
+  activateUser: (id) => api.patch(`/users/${id}/activate`),
 };
 
 export const contactService = {
@@ -110,6 +113,14 @@ export const notificationService = {
   markAsRead: (id) => api.patch(`/notifications/${id}/read`),
   markAllAsRead: () => api.patch('/notifications/read-all'),
   delete: (id) => api.delete(`/notifications/${id}`),
+};
+
+export const inviteService = {
+  create: (data) => api.post('/invites', data),
+  getAll: () => api.get('/invites'),
+  getByToken: (token) => api.get(`/invites/${token}`),
+  accept: (token, data) => api.post(`/invites/${token}/accept`, data),
+  cancel: (id) => api.patch(`/invites/${id}/cancel`),
 };
 
 export const fileService = {

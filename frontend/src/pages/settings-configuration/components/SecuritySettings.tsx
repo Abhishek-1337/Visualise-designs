@@ -137,7 +137,7 @@ const SecuritySettings = () => {
           className="mt-4 flex items-center gap-2 text-sm text-primary font-medium hover:opacity-80 transition-smooth"
         >
           <Icon name="Key" size={14} color="currentColor" />
-          Change Password
+          
         </button>
         {showPasswordForm && (
           <div className="mt-4 space-y-3 p-4 bg-muted/30 rounded-lg">

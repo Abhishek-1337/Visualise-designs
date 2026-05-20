@@ -17,6 +17,7 @@ import ClientMessaging from './pages/client-messaging';
 import ClientCRM from './pages/client-crm';
 import SettingsConfiguration from './pages/settings-configuration';
 import TenantSignup from './pages/tenant-signup';
+import AcceptInvite from './pages/accept-invite';
 
 const Routes = () => {
   return (
@@ -27,6 +28,7 @@ const Routes = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/tenant-signup" element={<TenantSignup />} />
+          <Route path="/accept-invite" element={<AcceptInvite />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           
           <Route path="/" element={<ProtectedRoute><HomeDashboard /></ProtectedRoute>} />

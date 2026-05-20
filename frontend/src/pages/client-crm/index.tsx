@@ -150,11 +150,11 @@ const ClientCRM = () => {
 
   if (isClientRole) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="h-screen overflow-hidden bg-background">
         <Sidebar />
         <TopBar />
-        <main className="md:ml-[240px] pt-[60px]">
-          <div className="flex items-center justify-center h-[calc(100vh-60px)]">
+        <main className="md:ml-[240px] h-screen pt-[60px] overflow-hidden">
+          <div className="flex items-center justify-center h-full">
             <div className="text-center max-w-md px-8">
               <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Icon name="Lock" size={36} color="var(--color-muted-foreground)" />
@@ -171,11 +171,11 @@ const ClientCRM = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen overflow-hidden bg-background">
       <Sidebar />
       <TopBar />
-      <main className="fixed md:ml-[240px] pt-[60px] h-[calc(100vh - 60px)] flex flex-col">
-        <div className="flex-1 flex overflow-hidden">
+      <main className="md:ml-[240px] h-screen pt-[60px] flex flex-col overflow-hidden">
+        <div className="flex-1 min-h-0 flex overflow-hidden">
           {!selectedClientId ? (
             <AllClientsGrid
               clients={mockClients}
@@ -183,7 +183,7 @@ const ClientCRM = () => {
             />
           ) : (
             <>
-              <div className={`flex-1 flex flex-col min-w-0 ${showChatPanel ? 'hidden lg:flex' : 'flex'}`}>
+              <div className={`flex-1 flex flex-col min-w-0 min-h-0 ${showChatPanel ? 'hidden lg:flex' : 'flex'}`}>
                 <ClientWorkspace
                   client={selectedClient}
                   projects={clientProjects}
@@ -193,7 +193,7 @@ const ClientCRM = () => {
                 />
               </div>
 
-              <div className={`${showChatPanel ? 'flex' : 'hidden'} lg:flex`}>
+              <div className={`${showChatPanel ? 'flex' : 'hidden'} lg:flex min-h-0`}>
                 <ProjectChatPanel
                   project={selectedProject}
                   messages={currentMessages}

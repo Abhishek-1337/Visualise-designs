@@ -11,6 +11,7 @@ import fs from 'fs';
 // Import routes
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
+import inviteRoutes from './routes/invite.routes';
 import crmRoutes from './routes/crm.routes';
 
 // Initialize Passport config
@@ -62,6 +63,7 @@ app.get('/health', (_req, res) => {
 // API Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/invites', inviteRoutes);
 app.use('/api/v1', crmRoutes); // Handles /contacts, /deals, /projects, /tasks, /activities, /dashboard
 
 // 404 handler

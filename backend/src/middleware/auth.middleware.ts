@@ -24,7 +24,8 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
         avatar: true,
         isActive: true,
         timezone: true,
-        language: true
+        language: true,
+        tenantId: true
       }
     });
 
@@ -81,7 +82,8 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
         name: true,
         role: true,
         avatar: true,
-        isActive: true
+        isActive: true,
+        tenantId: true
       }
     });
 
