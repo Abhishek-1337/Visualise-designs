@@ -1,10 +1,11 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Sidebar, { TopBar } from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import AllClientsGrid from './components/AllClientsGrid';
 import ClientWorkspace from './components/ClientWorkspace';
 import ProjectChatPanel from './components/ProjectChatPanel';
+import { contactService, inviteService } from '../../services';
 import type { RootState } from '../../store';
 import type { Client } from './components/AllClientsGrid';
 import type { Project } from './components/ClientWorkspace';
@@ -16,6 +17,12 @@ interface Message {
   timestamp: Date;
   senderName?: string;
   senderAvatar?: string;
+}
+
+interface PendingInvite {
+  id: string;
+  email: string;
+  createdAt: string;
 }
 
 const now = new Date();
@@ -95,12 +102,43 @@ const mockMessages: Record<number, Message[]> = {
   ],
 };
 
+const statusMap = {
+  ACTIVE: 'active',
+  VIP: 'vip',
+  LEAD: 'lead',
+  PROSPECT: 'prospect',
+  INACTIVE: 'inactive',
+};
+
 const ClientCRM = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
   const [showChatPanel, setShowChatPanel] = useState(false);
   const [messages, setMessages] = useState<Record<number, Message[]>>(mockMessages);
+
+  // Invite state
+  const [showInviteForm, setShowInviteForm] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [sending, setSending] = useState(false);
+  const [inviteError, setInviteError] = useState('');
+  const [inviteSuccess, setInviteSuccess] = useState('');
+  const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
+
+  useEffect(() => {
+    inviteService.getAll()
+      .then((res) => {
+        const clientInvites = (res.data.invites || [])
+          .filter((inv: any) => inv.role === 'CLIENT' && inv.status === 'PENDING')
+          .map((inv: any) => ({
+            id: inv.id,
+            email: inv.email,
+            createdAt: inv.createdAt,
+          }));
+        setPendingInvites(clientInvites);
+      })
+      .catch(() => {});
+  }, []);
 
   const isClientRole = user?.role === 'CLIENT';
 
@@ -110,7 +148,7 @@ const ClientCRM = () => {
   const currentMessages = selectedProjectId ? (messages[selectedProjectId] || []) : [];
 
   const handleSelectClient = useCallback((client: Client) => {
-    setSelectedClientId(client.id);
+    setSelectedClientId(client.id as number);
     setSelectedProjectId(null);
     setShowChatPanel(false);
   }, []);
@@ -148,6 +186,39 @@ const ClientCRM = () => {
     setShowChatPanel(false);
   }, []);
 
+  const handleInviteClient = useCallback(() => {
+    setShowInviteForm((prev) => !prev);
+    setInviteError('');
+    setInviteSuccess('');
+  }, []);
+
+  const handleSendInvite = useCallback(async () => {
+    if (!inviteEmail) return;
+    setSending(true);
+    setInviteError('');
+    setInviteSuccess('');
+    try {
+      const res = await inviteService.create({ email: inviteEmail, role: 'CLIENT' });
+      setPendingInvites((prev) => [
+        { id: res.data.id, email: res.data.email, createdAt: res.data.createdAt },
+        ...prev,
+      ]);
+      setInviteEmail('');
+      setInviteSuccess(`Invitation sent! Share this link: ${res.data.inviteUrl}`);
+    } catch (err: any) {
+      setInviteError(err.response?.data?.error || 'Failed to send invitation');
+    } finally {
+      setSending(false);
+    }
+  }, [inviteEmail]);
+
+  const handleCancelInvite = useCallback(async (inviteId: string) => {
+    try {
+      await inviteService.cancel(inviteId);
+      setPendingInvites((prev) => prev.filter((inv) => inv.id !== inviteId));
+    } catch {}
+  }, []);
+
   if (isClientRole) {
     return (
       <div className="h-screen overflow-hidden bg-background">
@@ -180,6 +251,16 @@ const ClientCRM = () => {
             <AllClientsGrid
               clients={mockClients}
               onSelectClient={handleSelectClient}
+              pendingInvites={pendingInvites}
+              onInviteClient={handleInviteClient}
+              showInviteForm={showInviteForm}
+              inviteEmail={inviteEmail}
+              onInviteEmailChange={setInviteEmail}
+              onSendInvite={handleSendInvite}
+              onCancelInvite={handleCancelInvite}
+              sending={sending}
+              inviteError={inviteError}
+              inviteSuccess={inviteSuccess}
             />
           ) : (
             <>

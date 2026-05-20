@@ -3,7 +3,7 @@ import Icon from '../../../components/AppIcon';
 import { AvatarCircle, StatusBadge, Card } from '../../../components/shared';
 
 export interface Client {
-  id: number;
+  id: number | string;
   name: string;
   company: string;
   email: string;
@@ -13,12 +13,41 @@ export interface Client {
   avatar?: string;
 }
 
+interface PendingInvite {
+  id: string;
+  email: string;
+  createdAt: string;
+}
+
 interface AllClientsGridProps {
   clients: Client[];
   onSelectClient: (client: Client) => void;
+  pendingInvites?: PendingInvite[];
+  onInviteClient?: () => void;
+  showInviteForm?: boolean;
+  inviteEmail?: string;
+  onInviteEmailChange?: (email: string) => void;
+  onSendInvite?: () => void;
+  onCancelInvite?: (inviteId: string) => void;
+  sending?: boolean;
+  inviteError?: string;
+  inviteSuccess?: string;
 }
 
-const AllClientsGrid: React.FC<AllClientsGridProps> = ({ clients, onSelectClient }) => {
+const AllClientsGrid: React.FC<AllClientsGridProps> = ({
+  clients,
+  onSelectClient,
+  pendingInvites = [],
+  onInviteClient,
+  showInviteForm = false,
+  inviteEmail = '',
+  onInviteEmailChange,
+  onSendInvite,
+  onCancelInvite,
+  sending = false,
+  inviteError = '',
+  inviteSuccess = '',
+}) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const filtered = useMemo(() => {
@@ -35,12 +64,50 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({ clients, onSelectClient
   return (
     <div className="flex-1 min-h-0 flex flex-col min-w-0 overflow-hidden">
       <div className="px-6 py-6 border-b border-border shrink-0">
-        <div>
-          <h1 className="text-2xl font-heading font-bold text-foreground">Clients</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Select a client to view their profile, projects, and conversations.
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-heading font-bold text-foreground">Clients</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Select a client to view their profile, projects, and conversations.
+            </p>
+          </div>
+          <button
+            onClick={onInviteClient}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 shadow-warm-sm"
+          >
+            <Icon name="UserPlus" size={16} color="currentColor" />
+            Invite Client
+          </button>
         </div>
+
+        {showInviteForm && (
+          <div className="mt-4 p-4 bg-card rounded-xl border border-primary/20 shadow-warm-sm">
+            <h4 className="font-medium text-foreground mb-3">Invite New Client</h4>
+            <div className="flex gap-3">
+              <input
+                type="email"
+                placeholder="Client email address"
+                value={inviteEmail}
+                onChange={(e) => onInviteEmailChange?.(e.target.value)}
+                className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
+              />
+              <button
+                onClick={onSendInvite}
+                disabled={sending}
+                className="px-4 py-2 bg-accent text-accent-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 disabled:opacity-50"
+              >
+                {sending ? 'Sending...' : 'Send Invite'}
+              </button>
+            </div>
+            {inviteError && <p className="text-xs text-error mt-2">{inviteError}</p>}
+            {inviteSuccess && (
+              <div className="mt-3 p-3 bg-success/10 border border-success/20 rounded-lg">
+                <p className="text-xs text-success break-all">{inviteSuccess}</p>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="relative mt-4 max-w-md">
           <Icon name="Search" size={16} color="var(--color-muted-foreground)" className="absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -58,7 +125,36 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({ clients, onSelectClient
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto p-6">
-        {filtered.length === 0 ? (
+        {pendingInvites.length > 0 && (
+          <div className="mb-6 space-y-2">
+            <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Pending Invitations</h4>
+            {pendingInvites.map((inv) => (
+              <div key={inv.id} className="flex items-center gap-3 bg-card rounded-xl border border-border shadow-warm-sm p-4">
+                <div className="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center">
+                  <Icon name="Clock" size={16} color="var(--color-warning)" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">{inv.email}</p>
+                  <p className="text-xs text-muted-foreground">Invited to join as client</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-warning/10 text-warning">
+                    Pending
+                  </span>
+                  <button
+                    onClick={() => onCancelInvite?.(inv.id)}
+                    className="p-1.5 rounded-lg text-muted-foreground hover:text-error hover:bg-error/10 transition-smooth"
+                  >
+                    <Icon name="X" size={14} color="currentColor" />
+                  </button>
+                </div>
+              </div>
+            ))}
+            <hr className="border-border my-4" />
+          </div>
+        )}
+
+        {filtered.length === 0 && pendingInvites.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-4">
               <Icon name="Users" size={28} color="#3B82F6" />
@@ -66,6 +162,14 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({ clients, onSelectClient
             <p className="text-sm text-muted-foreground">
               {searchQuery ? 'No clients match your search' : 'No clients available'}
             </p>
+            {!searchQuery && (
+              <button
+                onClick={onInviteClient}
+                className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90"
+              >
+                Invite Your First Client
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -107,6 +211,12 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({ clients, onSelectClient
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Icon name="Users" size={14} color="#3B82F6" />
           <span>{clients.length} client{clients.length !== 1 ? 's' : ''}</span>
+          {pendingInvites.length > 0 && (
+            <>
+              <span className="text-muted-foreground/40">•</span>
+              <span>{pendingInvites.length} pending invite{pendingInvites.length !== 1 ? 's' : ''}</span>
+            </>
+          )}
         </div>
       </div>
     </div>

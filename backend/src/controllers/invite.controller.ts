@@ -19,9 +19,9 @@ export const createInvite = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    const validRoles = ['ADMIN', 'MANAGER', 'EMPLOYEE'];
+    const validRoles = ['ADMIN', 'MANAGER', 'EMPLOYEE', 'CLIENT'];
     if (role && !validRoles.includes(role)) {
-      res.status(400).json({ error: 'Role must be ADMIN, MANAGER, or EMPLOYEE' });
+      res.status(400).json({ error: 'Role must be ADMIN, MANAGER, EMPLOYEE, or CLIENT' });
       return;
     }
 
@@ -208,6 +208,23 @@ export const acceptInvite = async (req: Request, res: Response): Promise<void> =
           tenantId: invite.tenantId
         }
       });
+
+      if (invite.role === 'CLIENT') {
+        const nameParts = name.trim().split(/\s+/);
+        const firstName = nameParts[0];
+        const lastName = nameParts.slice(1).join(' ') || '';
+
+        await tx.contact.create({
+          data: {
+            firstName,
+            lastName,
+            email: invite.email,
+            tenantId: invite.tenantId,
+            ownerId: invite.invitedById,
+            status: 'ACTIVE'
+          }
+        });
+      }
 
       await tx.invitation.update({
         where: { id: invite.id },
