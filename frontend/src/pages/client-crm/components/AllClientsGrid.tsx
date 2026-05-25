@@ -24,14 +24,7 @@ interface AllClientsGridProps {
   onSelectClient: (client: Client) => void;
   pendingInvites?: PendingInvite[];
   onInviteClient?: () => void;
-  showInviteForm?: boolean;
-  inviteEmail?: string;
-  onInviteEmailChange?: (email: string) => void;
-  onSendInvite?: () => void;
   onCancelInvite?: (inviteId: string) => void;
-  sending?: boolean;
-  inviteError?: string;
-  inviteSuccess?: string;
 }
 
 const AllClientsGrid: React.FC<AllClientsGridProps> = ({
@@ -39,14 +32,7 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({
   onSelectClient,
   pendingInvites = [],
   onInviteClient,
-  showInviteForm = false,
-  inviteEmail = '',
-  onInviteEmailChange,
-  onSendInvite,
   onCancelInvite,
-  sending = false,
-  inviteError = '',
-  inviteSuccess = '',
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -79,34 +65,6 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({
             Invite Client
           </button>
         </div>
-
-        {showInviteForm && (
-          <div className="mt-4 p-4 bg-card rounded-xl border border-primary/20 shadow-warm-sm">
-            <h4 className="font-medium text-foreground mb-3">Invite New Client</h4>
-            <div className="flex gap-3">
-              <input
-                type="email"
-                placeholder="Client email address"
-                value={inviteEmail}
-                onChange={(e) => onInviteEmailChange?.(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
-              />
-              <button
-                onClick={onSendInvite}
-                disabled={sending}
-                className="px-4 py-2 bg-accent text-accent-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 disabled:opacity-50"
-              >
-                {sending ? 'Sending...' : 'Send Invite'}
-              </button>
-            </div>
-            {inviteError && <p className="text-xs text-error mt-2">{inviteError}</p>}
-            {inviteSuccess && (
-              <div className="mt-3 p-3 bg-success/10 border border-success/20 rounded-lg">
-                <p className="text-xs text-success break-all">{inviteSuccess}</p>
-              </div>
-            )}
-          </div>
-        )}
 
         <div className="relative mt-4 max-w-md">
           <Icon name="Search" size={16} color="var(--color-muted-foreground)" className="absolute left-3 top-1/2 -translate-y-1/2" />

@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Sidebar, { TopBar } from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
+import Button from '../../components/ui/Button';
 import AllClientsGrid from './components/AllClientsGrid';
 import ClientWorkspace from './components/ClientWorkspace';
 import ProjectChatPanel from './components/ProjectChatPanel';
@@ -53,6 +54,76 @@ const mapProject = (p: any): Project => ({
   team: (p.members || []).map((m: any) => ({ name: m.name })),
 });
 
+const InviteClientModal = ({
+  isOpen,
+  onClose,
+  onSend,
+  sending,
+  error,
+  success,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSend: (email: string) => void;
+  sending: boolean;
+  error: string;
+  success: string;
+}) => {
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    if (isOpen) { setEmail(''); }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="bg-card rounded-xl shadow-warm-2xl w-full max-w-md border border-border"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+          <h2 className="font-heading font-semibold text-lg text-foreground">Invite New Client</h2>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-muted transition-smooth">
+            <Icon name="X" size={18} color="currentColor" />
+          </button>
+        </div>
+        <div className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">Client Email</label>
+            <input
+              type="email"
+              placeholder="Enter client email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
+              autoFocus
+            />
+          </div>
+          {error && <p className="text-xs text-error">{error}</p>}
+          {success && (
+            <div className="p-3 bg-success/10 border border-success/20 rounded-lg">
+              <p className="text-xs text-success break-all">{success}</p>
+            </div>
+          )}
+          <div className="flex gap-3 pt-2">
+            <Button variant="outline" onClick={onClose} className="flex-1">Cancel</Button>
+            <Button
+              variant="default"
+              onClick={() => onSend(email)}
+              disabled={sending || !email.trim()}
+              className="flex-1"
+            >
+              {sending ? 'Sending...' : 'Send Invite'}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ClientCRM = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
@@ -63,7 +134,7 @@ const ClientCRM = () => {
   const [projectsByClient, setProjectsByClient] = useState<Record<string, any[]>>({});
   const [loading, setLoading] = useState(true);
 
-  const [showInviteForm, setShowInviteForm] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [inviteError, setInviteError] = useState('');
@@ -156,30 +227,37 @@ const ClientCRM = () => {
   }, []);
 
   const handleInviteClient = useCallback(() => {
-    setShowInviteForm((prev) => !prev);
+    setShowInviteModal(true);
+    setInviteError('');
+    setInviteSuccess('');
+    setInviteEmail('');
+  }, []);
+
+  const handleCloseInviteModal = useCallback(() => {
+    setShowInviteModal(false);
     setInviteError('');
     setInviteSuccess('');
   }, []);
 
-  const handleSendInvite = useCallback(async () => {
-    if (!inviteEmail) return;
+  const handleSendInvite = useCallback(async (email: string) => {
+    if (!email) return;
     setSending(true);
     setInviteError('');
     setInviteSuccess('');
     try {
-      const res = await inviteService.create({ email: inviteEmail, role: 'CLIENT' });
+      const res = await inviteService.create({ email, role: 'CLIENT' });
       setPendingInvites((prev) => [
         { id: res.data.id, email: res.data.email, createdAt: res.data.createdAt },
         ...prev,
       ]);
-      setInviteEmail('');
+      setInviteEmail(email);
       setInviteSuccess(`Invitation sent! Share this link: ${res.data.inviteUrl}`);
     } catch (err: any) {
       setInviteError(err.response?.data?.error || 'Failed to send invitation');
     } finally {
       setSending(false);
     }
-  }, [inviteEmail]);
+  }, []);
 
   const handleCancelInvite = useCallback(async (inviteId: string) => {
     try {
@@ -237,14 +315,7 @@ const ClientCRM = () => {
               onSelectClient={handleSelectClient}
               pendingInvites={pendingInvites}
               onInviteClient={handleInviteClient}
-              showInviteForm={showInviteForm}
-              inviteEmail={inviteEmail}
-              onInviteEmailChange={setInviteEmail}
-              onSendInvite={handleSendInvite}
               onCancelInvite={handleCancelInvite}
-              sending={sending}
-              inviteError={inviteError}
-              inviteSuccess={inviteSuccess}
             />
           ) : (
             <>
@@ -270,6 +341,15 @@ const ClientCRM = () => {
           )}
         </div>
       </main>
+
+      <InviteClientModal
+        isOpen={showInviteModal}
+        onClose={handleCloseInviteModal}
+        onSend={handleSendInvite}
+        sending={sending}
+        error={inviteError}
+        success={inviteSuccess}
+      />
     </div>
   );
 };
