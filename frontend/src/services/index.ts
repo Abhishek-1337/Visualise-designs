@@ -134,3 +134,17 @@ export const fileService = {
   getByContact: (contactId) => api.get(`/files/contact/${contactId}`),
   getByProject: (projectId) => api.get(`/files/project/${projectId}`),
 };
+
+export const paymentService = {
+  getPayments: (params) => api.get('/payments', { params }),
+  createCheckoutSession: (data) => api.post('/payments/create-checkout-session', data),
+};
+
+export const taskSummaryService = {
+  getDailySummaries: (params) => api.get('/tasks/summary', { params }),
+};
+
+export const seedService = {
+  seed: () => api.post('/seed'),
+  forceSeed: () => api.post('/seed/force'),
+};

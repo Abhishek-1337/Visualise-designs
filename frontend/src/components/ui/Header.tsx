@@ -1,7 +1,8 @@
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, createContext, useContext, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../../store';
+import type { Role } from '../../types';
 import Icon from '../AppIcon';
 import { logout } from '../../store/slices/authSlice';
 import ThemeToggle from '../ThemeToggle';
@@ -12,7 +13,19 @@ interface NavItem {
   path: string;
   icon: string;
   tooltip: string;
+  roles: Role[];
 }
+
+const navItemConfig: NavItem[] = [
+  { label: 'Dashboard', path: '/home-dashboard', icon: 'LayoutDashboard', tooltip: 'Your daily command center', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  { label: 'Pipeline', path: '/lead-client-flow', icon: 'GitBranch', tooltip: 'Visual lead and client flow', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  { label: 'Projects', path: '/project-management', icon: 'FolderKanban', tooltip: 'Track project milestones', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  { label: 'Team', path: '/team-workspace', icon: 'Users', tooltip: 'Collaborative workspace', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  { label: 'Clients', path: '/client-profile', icon: 'UserCircle', tooltip: 'Client profiles & details', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  { label: 'Client Chat', path: '/client-messaging', icon: 'MessageSquare', tooltip: 'Slack-like client messaging', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  { label: 'Client CRM', path: '/client-crm', icon: 'UserCog', tooltip: 'Client profiles, projects & chat', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  { label: 'Comms', path: '/communication-hub', icon: 'MessageCircle', tooltip: 'Communication hub', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] }
+];
 
 interface SidebarContextType {
   isMobileOpen: boolean;
@@ -33,17 +46,10 @@ export const Sidebar: React.FC = () => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const navigationItems: NavItem[] = [
-    { label: 'Dashboard', path: '/home-dashboard', icon: 'LayoutDashboard', tooltip: 'Your daily command center' },
-    { label: 'Pipeline', path: '/lead-client-flow', icon: 'GitBranch', tooltip: 'Visual lead and client flow' },
-    { label: 'Projects', path: '/project-management', icon: 'FolderKanban', tooltip: 'Track project milestones' },
-    { label: 'Team', path: '/team-workspace', icon: 'Users', tooltip: 'Collaborative workspace' },
-    { label: 'Clients', path: '/client-profile', icon: 'UserCircle', tooltip: 'Client profiles & details' },
-    { label: 'Client Chat', path: '/client-messaging', icon: 'MessageSquare', tooltip: 'Slack-like client messaging' },
-    { label: 'Client CRM', path: '/client-crm', icon: 'UserCog', tooltip: 'Client profiles, projects & chat' },
-    { label: 'Comms', path: '/communication-hub', icon: 'MessageCircle', tooltip: 'Communication hub' },
-    { label: 'Settings', path: '/settings-configuration', icon: 'Settings', tooltip: 'App settings & configuration' }
-  ];
+  const navigationItems = useMemo(() => {
+    const role = user?.role || 'EMPLOYEE';
+    return navItemConfig.filter((item) => item.roles.includes(role));
+  }, [user?.role]);
 
   const isActivePath = (path: string) => location?.pathname === path;
 
@@ -58,7 +64,7 @@ export const Sidebar: React.FC = () => {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full max-w-[240px]">
-      <div className="flex items-center gap-4 px-4 border-b border-border h-[60px]">
+      <div className="flex items-center gap-6 px-4 border-b border-border h-[60px]">
         <Link to="/home-dashboard" className="flex items-center gap-0 transition-smooth hover:opacity-80">
           <div className="w-10 h-10 bg-foreground rounded-lg flex items-center justify-center transition-smooth">
             <img src="../../public/Png.png" className="bg-white"/>
@@ -73,7 +79,7 @@ export const Sidebar: React.FC = () => {
       </div>
 
       <nav className="flex-1 overflow-y-auto py-4 px-2 pt-8">
-        <div className="space-y-0.5">
+        <div className="space-y-2">
           {navigationItems?.map((item) => (
             <Link
               key={item?.path}
@@ -113,6 +119,17 @@ export const Sidebar: React.FC = () => {
             <div className="flex-1 text-left min-w-0">
               <p className="text-sm font-medium text-foreground truncate">{userName}</p>
               <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
+              {user?.role && (
+                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium mt-0.5 ${
+                  user.role === 'ADMIN'
+                    ? 'bg-primary/10 text-primary'
+                    : user.role === 'MANAGER'
+                    ? 'bg-accent/10 text-accent'
+                    : 'bg-muted text-muted-foreground'
+                }`}>
+                  {user.role}
+                </span>
+              )}
             </div>
             <Icon name="ChevronDown" size={14} color="currentColor" />
           </button>
@@ -178,6 +195,15 @@ export const TopBar: React.FC = () => {
         <h1 className="text-base font-semibold text-foreground tracking-tight hidden md:block">Dashboard</h1>
       </div>
       <div className="flex items-center gap-3">
+        {user?.role && user.role !== 'EMPLOYEE' && (
+          <span className={`hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${
+            user.role === 'ADMIN'
+              ? 'bg-primary/10 text-primary'
+              : 'bg-accent/10 text-accent'
+          }`}>
+            {user.role}
+          </span>
+        )}
         <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
           {user?.avatar ? (
             <img src={user.avatar} alt={userName} className="w-8 h-8 rounded-full object-cover" />

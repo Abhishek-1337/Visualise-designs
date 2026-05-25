@@ -13,6 +13,7 @@ import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import inviteRoutes from './routes/invite.routes';
 import crmRoutes from './routes/crm.routes';
+import seedRoutes from './routes/seed.routes';
 
 // Initialize Passport config
 import './config/passport.config';
@@ -65,6 +66,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/invites', inviteRoutes);
 app.use('/api/v1', crmRoutes); // Handles /contacts, /deals, /projects, /tasks, /activities, /dashboard
+app.use('/api/v1/seed', seedRoutes);
 
 // 404 handler
 app.use((_req, res) => {

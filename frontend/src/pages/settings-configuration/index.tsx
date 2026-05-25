@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../store';
 import Sidebar, { TopBar } from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import GeneralSettings from './components/GeneralSettings';
@@ -7,17 +9,29 @@ import AutomationSettings from './components/AutomationSettings';
 import IntegrationsSettings from './components/IntegrationsSettings';
 import SecuritySettings from './components/SecuritySettings';
 
-const tabs = [
-  { id: 'general', label: 'General', icon: 'Settings', description: 'App preferences & display' },
-  { id: 'team', label: 'Team', icon: 'Users', description: 'Roles & permissions' },
-  { id: 'automation', label: 'Automation', icon: 'Zap', description: 'Workflow rules' },
-  { id: 'integrations', label: 'Integrations', icon: 'Plug', description: 'Connected services' },
-  { id: 'security', label: 'Security', icon: 'Shield', description: 'Auth & sessions' },
+interface Tab {
+  id: string;
+  label: string;
+  icon: string;
+  description: string;
+  roles: string[];
+}
+
+const allTabs: Tab[] = [
+  { id: 'general', label: 'General', icon: 'Settings', description: 'App preferences & display', roles: ['ADMIN', 'MANAGER'] },
+  { id: 'team', label: 'Team', icon: 'Users', description: 'Roles & permissions', roles: ['ADMIN', 'MANAGER'] },
+  { id: 'automation', label: 'Automation', icon: 'Zap', description: 'Workflow rules', roles: ['ADMIN'] },
+  { id: 'integrations', label: 'Integrations', icon: 'Plug', description: 'Connected services', roles: ['ADMIN'] },
+  { id: 'security', label: 'Security', icon: 'Shield', description: 'Auth & sessions', roles: ['ADMIN'] },
 ];
 
 const SettingsConfiguration = () => {
+  const { user } = useSelector((state: RootState) => state.auth);
+  const role = user?.role || 'EMPLOYEE';
   const [activeTab, setActiveTab] = useState('general');
   const [mobileTabOpen, setMobileTabOpen] = useState(false);
+
+  const tabs = useMemo(() => allTabs.filter((t) => t.roles.includes(role)), [role]);
 
   const activeTabData = tabs?.find(t => t?.id === activeTab);
 

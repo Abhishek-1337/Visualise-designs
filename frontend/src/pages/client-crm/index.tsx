@@ -1,11 +1,11 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Sidebar, { TopBar } from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import AllClientsGrid from './components/AllClientsGrid';
 import ClientWorkspace from './components/ClientWorkspace';
 import ProjectChatPanel from './components/ProjectChatPanel';
-import { contactService, inviteService } from '../../services';
+import { contactService, projectService, inviteService } from '../../services';
 import type { RootState } from '../../store';
 import type { Client } from './components/AllClientsGrid';
 import type { Project } from './components/ClientWorkspace';
@@ -25,99 +25,44 @@ interface PendingInvite {
   createdAt: string;
 }
 
-const now = new Date();
-const hoursAgo = (h: number) => new Date(now.getTime() - h * 60 * 60 * 1000);
-const daysAgo = (d: number) => new Date(now.getTime() - d * 24 * 60 * 60 * 1000);
-
-const mockClients: Client[] = [
-  { id: 1, name: 'Alexandra Morrison', company: 'Morrison Interiors', email: 'alexandra@morrisoninteriors.com', phone: '+1 (555) 123-4567', location: 'New York, NY', status: 'active' },
-  { id: 2, name: 'David Chen', company: 'Chen & Associates', email: 'david@chenassociates.com', phone: '+1 (555) 234-5678', location: 'San Francisco, CA', status: 'vip' },
-  { id: 3, name: 'Priya Sharma', company: 'Sharma Design Studio', email: 'priya@sharmadesign.com', phone: '+1 (555) 345-6789', location: 'Austin, TX', status: 'active' },
-  { id: 4, name: 'Marcus Johnson', company: 'Johnson Development', email: 'marcus@johnsondev.com', phone: '+1 (555) 456-7890', location: 'Chicago, IL', status: 'active' },
-  { id: 5, name: 'Elena Vasquez', company: 'Vasquez Architecture', email: 'elena@vasquezarch.com', phone: '+1 (555) 567-8901', location: 'Miami, FL', status: 'vip' },
-  { id: 6, name: 'Robert Kim', company: 'Kim Construction', email: 'robert@kimconstruction.com', phone: '+1 (555) 678-9012', location: 'Seattle, WA', status: 'active' },
-  { id: 7, name: 'Sarah Williams', company: 'Williams Creative', email: 'sarah@williamscreative.com', phone: '+1 (555) 789-0123', location: 'Denver, CO', status: 'inactive' },
-  { id: 8, name: 'James Rodriguez', company: 'Rodriguez Realty', email: 'james@rodriguezrealty.com', phone: '+1 (555) 890-1234', location: 'Los Angeles, CA', status: 'active' },
-  { id: 9, name: 'Emily Thompson', company: 'Thompson & Co.', email: 'emily@thompsonco.com', phone: '+1 (555) 901-2345', location: 'Boston, MA', status: 'prospect' },
-  { id: 10, name: 'Michael Park', company: 'Park Developments', email: 'michael@parkdev.com', phone: '+1 (555) 012-3456', location: 'Portland, OR', status: 'active' },
-];
-
-const mockProjects: Record<number, Project[]> = {
-  1: [
-    { id: 101, name: 'Website Redesign', description: 'Complete overhaul of the corporate website with modern UI/UX', status: 'In Progress', progress: 65, dueDate: 'Jun 15, 2026', team: [{ name: 'Sarah M.' }, { name: 'Alex K.' }, { name: 'Jordan P.' }] },
-    { id: 102, name: 'Brand Identity Package', description: 'Logo, color palette, typography, and brand guidelines', status: 'Completed', progress: 100, dueDate: 'Mar 1, 2026', team: [{ name: 'Lisa R.' }, { name: 'Tom W.' }] },
-    { id: 103, name: 'Mobile App MVP', description: 'Cross-platform mobile application for client portal', status: 'Planning', progress: 15, dueDate: 'Sep 30, 2026', team: [{ name: 'Mike C.' }, { name: 'Emma L.' }, { name: 'David S.' }] },
-  ],
-  2: [
-    { id: 201, name: 'Office Renovation', description: 'Full interior redesign of downtown office space', status: 'In Progress', progress: 45, dueDate: 'Aug 20, 2026', team: [{ name: 'Chris B.' }, { name: 'Nina T.' }] },
-    { id: 202, name: 'Lobby Art Installation', description: 'Curated art pieces for main lobby area', status: 'Pending', progress: 0, dueDate: 'Jul 1, 2026', team: [{ name: 'Anna P.' }] },
-  ],
-  3: [
-    { id: 301, name: 'Residential Villa', description: 'Modern villa design with sustainable materials', status: 'In Progress', progress: 72, dueDate: 'Oct 10, 2026', team: [{ name: 'Raj M.' }, { name: 'Sophia L.' }] },
-  ],
-  5: [
-    { id: 501, name: 'Commercial Tower', description: '40-story commercial tower architectural design', status: 'In Progress', progress: 30, dueDate: 'Dec 15, 2026', team: [{ name: 'Carlos R.' }, { name: 'Maya K.' }, { name: 'John D.' }] },
-    { id: 502, name: 'Park Plaza Hotel', description: 'Boutique hotel design with rooftop garden', status: 'Planning', progress: 8, dueDate: 'Mar 2027', team: [{ name: 'Isabel F.' }, { name: 'George L.' }] },
-  ],
-  8: [
-    { id: 801, name: 'Sunset Towers', description: 'Luxury condominium complex with 3 towers', status: 'In Progress', progress: 55, dueDate: 'Nov 30, 2026', team: [{ name: 'Diana P.' }, { name: 'Frank H.' }, { name: 'Lucy Z.' }] },
-  ],
+const STATUS_MAP: Record<string, string> = {
+  ACTIVE: 'active', VIP: 'vip', LEAD: 'lead', PROSPECT: 'prospect', INACTIVE: 'inactive',
 };
 
-const mockMessages: Record<number, Message[]> = {
-  101: [
-    { id: '101-1', content: 'Hi team! I just reviewed the latest homepage mockups. The hero section looks fantastic.', sender: 'client', timestamp: hoursAgo(3), senderName: 'Alexandra Morrison' },
-    { id: '101-2', content: 'Thanks Alexandra! We incorporated the feedback from the last review. Glad you like it.', sender: 'me', timestamp: hoursAgo(2.5), senderName: 'You' },
-    { id: '101-3', content: 'Can we add a video background option for the hero section?', sender: 'client', timestamp: hoursAgo(2), senderName: 'Alexandra Morrison' },
-    { id: '101-4', content: 'Absolutely! We have a few stock video options we can use, or we can use your brand video.', sender: 'me', timestamp: hoursAgo(1.5), senderName: 'You' },
-    { id: '101-5', content: 'Let me check with our video team and get back to you.', sender: 'client', timestamp: hoursAgo(0.8), senderName: 'Alexandra Morrison' },
-    { id: '101-6', content: 'Sounds good. In the meantime, I\'ll prepare the remaining page templates.', sender: 'me', timestamp: hoursAgo(0.5), senderName: 'You' },
-    { id: '101-7', content: 'Also, the mobile responsiveness is looking much better. The navigation collapse works perfectly now.', sender: 'team', timestamp: hoursAgo(0.3), senderName: 'Sarah M.' },
-  ],
-  102: [
-    { id: '102-1', content: 'The brand guidelines document is ready for review.', sender: 'me', timestamp: daysAgo(5), senderName: 'You' },
-    { id: '102-2', content: 'Great work! The color palette is exactly what we envisioned.', sender: 'client', timestamp: daysAgo(4), senderName: 'Alexandra Morrison' },
-    { id: '102-3', content: 'I\'ve shared the final files with your marketing team.', sender: 'me', timestamp: daysAgo(3), senderName: 'You' },
-  ],
-  103: [
-    { id: '103-1', content: 'Kickoff meeting scheduled for next Monday at 10am.', sender: 'me', timestamp: hoursAgo(6), senderName: 'You' },
-    { id: '103-2', content: 'Perfect, I\'ll have my product team ready.', sender: 'client', timestamp: hoursAgo(5), senderName: 'Alexandra Morrison' },
-  ],
-  201: [
-    { id: '201-1', content: 'The demolition is complete. Ready for the next phase.', sender: 'team', timestamp: hoursAgo(48), senderName: 'Chris B.' },
-    { id: '201-2', content: 'Excellent! Keep me updated on the electrical work schedule.', sender: 'client', timestamp: hoursAgo(24), senderName: 'David Chen' },
-    { id: '201-3', content: 'Electricians start next Monday. We\'re on track.', sender: 'me', timestamp: hoursAgo(12), senderName: 'You' },
-  ],
-  301: [
-    { id: '301-1', content: 'The foundation work is complete. Framing starts next week.', sender: 'team', timestamp: daysAgo(2), senderName: 'Raj M.' },
-    { id: '301-2', content: 'Wonderful! The sustainable material order has been confirmed.', sender: 'client', timestamp: daysAgo(1), senderName: 'Priya Sharma' },
-  ],
-  501: [
-    { id: '501-1', content: 'Preliminary structural analysis is done. Ready for the design review.', sender: 'team', timestamp: hoursAgo(6), senderName: 'Carlos R.' },
-    { id: '501-2', content: 'Let\'s schedule the design review for Thursday.', sender: 'client', timestamp: hoursAgo(4), senderName: 'Elena Vasquez' },
-  ],
-  801: [
-    { id: '801-1', content: 'Phase 1 foundation permit has been approved!', sender: 'me', timestamp: hoursAgo(8), senderName: 'You' },
-    { id: '801-2', content: 'That\'s great news! Let\'s break ground next month.', sender: 'client', timestamp: hoursAgo(5), senderName: 'James Rodriguez' },
-  ],
+const STATUS_MAP_PROJECT: Record<string, string> = {
+  PLANNING: 'Planning', ACTIVE: 'In Progress', ON_HOLD: 'On Hold', COMPLETED: 'Completed', CANCELLED: 'Cancelled',
 };
 
-const statusMap = {
-  ACTIVE: 'active',
-  VIP: 'vip',
-  LEAD: 'lead',
-  PROSPECT: 'prospect',
-  INACTIVE: 'inactive',
-};
+const mapContactToClient = (c: any): Client => ({
+  id: c.id,
+  name: `${c.firstName} ${c.lastName}`,
+  company: c.company || '',
+  email: c.email,
+  phone: c.phone || '',
+  location: c.country || '',
+  status: STATUS_MAP[c.status] || 'active',
+});
+
+const mapProject = (p: any): Project => ({
+  id: p.id,
+  name: p.name,
+  description: p.description || '',
+  status: STATUS_MAP_PROJECT[p.status] || p.status,
+  progress: p.progress,
+  dueDate: p.endDate ? new Date(p.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+  team: (p.members || []).map((m: any) => ({ name: m.name })),
+});
 
 const ClientCRM = () => {
   const { user } = useSelector((state: RootState) => state.auth);
-  const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
-  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [showChatPanel, setShowChatPanel] = useState(false);
-  const [messages, setMessages] = useState<Record<number, Message[]>>(mockMessages);
+  const [messages, setMessages] = useState<Record<string, Message[]>>({});
+  const [clients, setClients] = useState<Client[]>([]);
+  const [projectsByClient, setProjectsByClient] = useState<Record<string, any[]>>({});
+  const [loading, setLoading] = useState(true);
 
-  // Invite state
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [sending, setSending] = useState(false);
@@ -126,35 +71,59 @@ const ClientCRM = () => {
   const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
 
   useEffect(() => {
-    inviteService.getAll()
-      .then((res) => {
-        const clientInvites = (res.data.invites || [])
-          .filter((inv: any) => inv.role === 'CLIENT' && inv.status === 'PENDING')
-          .map((inv: any) => ({
-            id: inv.id,
-            email: inv.email,
-            createdAt: inv.createdAt,
-          }));
-        setPendingInvites(clientInvites);
-      })
-      .catch(() => {});
+    loadData();
+    loadInvites();
   }, []);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [contactsRes, projectsRes] = await Promise.all([
+        contactService.getAll({ limit: '100' }),
+        projectService.getAll({ limit: '100' }),
+      ]);
+      const contacts = (contactsRes.data.contacts || []).map(mapContactToClient);
+      setClients(contacts);
+
+      const grouped: Record<string, any[]> = {};
+      for (const p of projectsRes.data.projects || []) {
+        const cid = p.contactId;
+        if (!grouped[cid]) grouped[cid] = [];
+        grouped[cid].push(p);
+      }
+      setProjectsByClient(grouped);
+    } catch {
+      console.error('Failed to load client data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadInvites = async () => {
+    try {
+      const res = await inviteService.getAll();
+      const clientInvites = (res.data.invites || [])
+        .filter((inv: any) => inv.role === 'CLIENT' && inv.status === 'PENDING')
+        .map((inv: any) => ({ id: inv.id, email: inv.email, createdAt: inv.createdAt }));
+      setPendingInvites(clientInvites);
+    } catch {}
+  };
 
   const isClientRole = user?.role === 'CLIENT';
 
-  const selectedClient = mockClients.find((c) => c.id === selectedClientId) || null;
-  const clientProjects = selectedClientId ? (mockProjects[selectedClientId] || []) : [];
+  const selectedClient = clients.find((c) => c.id === selectedClientId) || null;
+  const clientProjects: Project[] = (selectedClientId ? projectsByClient[selectedClientId] || [] : []).map(mapProject);
   const selectedProject = clientProjects.find((p) => p.id === selectedProjectId) || null;
   const currentMessages = selectedProjectId ? (messages[selectedProjectId] || []) : [];
 
   const handleSelectClient = useCallback((client: Client) => {
-    setSelectedClientId(client.id as number);
+    setSelectedClientId(client.id as string);
     setSelectedProjectId(null);
     setShowChatPanel(false);
   }, []);
 
   const handleSelectProject = useCallback((project: Project) => {
-    setSelectedProjectId(project.id);
+    setSelectedProjectId(project.id as string);
     setShowChatPanel(true);
   }, []);
 
@@ -241,6 +210,21 @@ const ClientCRM = () => {
     );
   }
 
+  if (loading) {
+    return (
+      <div className="h-screen overflow-hidden bg-background">
+        <Sidebar />
+        <TopBar />
+        <main className="md:ml-[240px] h-screen pt-[60px] flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading clients...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen overflow-hidden bg-background">
       <Sidebar />
@@ -249,7 +233,7 @@ const ClientCRM = () => {
         <div className="flex-1 min-h-0 flex overflow-hidden">
           {!selectedClientId ? (
             <AllClientsGrid
-              clients={mockClients}
+              clients={clients}
               onSelectClient={handleSelectClient}
               pendingInvites={pendingInvites}
               onInviteClient={handleInviteClient}
