@@ -27,6 +27,7 @@ export const forceSeedData = async (_req: Request, res: Response): Promise<void>
     const authReq = _req as AuthenticatedRequest;
     const tenantId = authReq.user.tenantId;
 
+    try { await prisma.message.deleteMany({ where: { tenantId } }); } catch { /* table may not exist */ }
     await prisma.activity.deleteMany({ where: { tenantId } });
     await prisma.task.deleteMany({ where: { tenantId } });
     await prisma.project.deleteMany({ where: { tenantId } });
@@ -100,7 +101,50 @@ async function seedTenantData(tenantId: string, adminUserId: string) {
     },
   });
 
-  const users = [adminUserId, manager.id, emp1.id, emp2.id, emp3.id];
+  const client1 = await prisma.user.upsert({
+    where: { email: 'alexandra@morrisoninteriors.com' },
+    update: {},
+    create: {
+      email: 'alexandra@morrisoninteriors.com',
+      name: 'Alexandra Morrison',
+      password: hashedPassword,
+      role: 'CLIENT',
+      tenantId,
+      phone: '+1 (555) 123-4567',
+      timezone: 'America/New_York',
+    },
+  });
+
+  const client2 = await prisma.user.upsert({
+    where: { email: 'david@chenassociates.com' },
+    update: {},
+    create: {
+      email: 'david@chenassociates.com',
+      name: 'David Chen',
+      password: hashedPassword,
+      role: 'CLIENT',
+      tenantId,
+      phone: '+1 (555) 234-5678',
+      timezone: 'America/New_York',
+    },
+  });
+
+  const client3 = await prisma.user.upsert({
+    where: { email: 'priya@sharmadesign.com' },
+    update: {},
+    create: {
+      email: 'priya@sharmadesign.com',
+      name: 'Priya Sharma',
+      password: hashedPassword,
+      role: 'CLIENT',
+      tenantId,
+      phone: '+1 (555) 345-6789',
+      timezone: 'America/Chicago',
+    },
+  });
+
+  const seededClientIds = [client1.id, client2.id, client3.id];
+  const users = [adminUserId, manager.id, emp1.id, emp2.id, emp3.id, ...seededClientIds];
 
   const contactsData = [
     { firstName: 'Alexandra', lastName: 'Morrison', email: 'alexandra@morrisoninteriors.com', phone: '+1 (555) 123-4567', company: 'Morrison Interiors', jobTitle: 'CEO', status: 'ACTIVE' as const, country: 'USA', value: 150000 },
@@ -257,6 +301,33 @@ async function seedTenantData(tenantId: string, adminUserId: string) {
           dealId: a.dealIdx !== null ? deals[a.dealIdx].id : null,
           projectId: (a as any).projectIdx !== undefined && (a as any).projectIdx !== null ? projects[(a as any).projectIdx].id : null,
           tenantId,
+        },
+      })
+    )
+  );
+
+  const messagesData = [
+    { content: 'Hi Alexandra! I just finished the revised renders for the living room concept.', senderIdx: 0, receiverIdx: 5 },
+    { content: "That's great! I've been excited to see how they turned out.", senderIdx: 5, receiverIdx: 0 },
+    { content: 'The revised renders look amazing! Can we schedule a call to discuss Phase 2?', senderIdx: 5, receiverIdx: 0 },
+    { content: "Hello David, I've prepared the budget breakdown for Phase 2 as discussed.", senderIdx: 0, receiverIdx: 6 },
+    { content: 'Perfect timing. Our finance team just approved the budget expansion.', senderIdx: 6, receiverIdx: 0 },
+    { content: 'Budget confirmed for Phase 2. Let\'s move forward with the exterior scope.', senderIdx: 6, receiverIdx: 0 },
+    { content: 'Hello Priya, I\'ve attached the revised proposal with updated pricing.', senderIdx: 0, receiverIdx: 7 },
+    { content: "Thanks for sending the proposal. I'll review it with my team and get back to you.", senderIdx: 7, receiverIdx: 0 },
+  ];
+
+  const nowDate = new Date();
+
+  await Promise.all(
+    messagesData.map((m, i) =>
+      prisma.message.create({
+        data: {
+          content: m.content,
+          senderId: users[m.senderIdx],
+          receiverId: seededClientIds[m.receiverIdx - 5],
+          tenantId,
+          createdAt: new Date(nowDate.getTime() - (messagesData.length - i) * 30 * 60 * 1000),
         },
       })
     )

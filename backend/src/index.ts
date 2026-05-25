@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import http from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -14,11 +15,15 @@ import userRoutes from './routes/user.routes';
 import inviteRoutes from './routes/invite.routes';
 import crmRoutes from './routes/crm.routes';
 import seedRoutes from './routes/seed.routes';
+import messageRoutes from './routes/message.routes';
+import { createSocketServer } from './socket';
 
 // Initialize Passport config
 import './config/passport.config';
 
 const app = express();
+const server = http.createServer(app);
+const io = createSocketServer(server);
 const PORT = process.env.PORT || 4000;
 
 // Create uploads directory if it doesn't exist
@@ -67,6 +72,7 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/invites', inviteRoutes);
 app.use('/api/v1', crmRoutes); // Handles /contacts, /deals, /projects, /tasks, /activities, /dashboard
 app.use('/api/v1/seed', seedRoutes);
+app.use('/api/v1/messages', messageRoutes);
 
 // 404 handler
 app.use((_req, res) => {
@@ -83,7 +89,7 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 });
 
 // Start server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });

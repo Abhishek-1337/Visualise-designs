@@ -148,3 +148,9 @@ export const seedService = {
   seed: () => api.post('/seed'),
   forceSeed: () => api.post('/seed/force'),
 };
+
+export const messageService = {
+  getConversations: () => api.get('/messages/conversations'),
+  getMessages: (userId: string) => api.get(`/messages/${userId}`),
+  send: (data: { receiverId: string; content: string }) => api.post('/messages', data),
+};

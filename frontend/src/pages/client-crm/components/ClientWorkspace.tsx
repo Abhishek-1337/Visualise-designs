@@ -16,7 +16,7 @@ interface Project {
 interface ClientWorkspaceProps {
   client: Client;
   projects: Project[];
-  selectedProjectId: number | null;
+  selectedProjectId: string | null;
   onSelectProject: (project: Project) => void;
   onBack: () => void;
 }
@@ -129,12 +129,12 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
                     variant="bordered"
                     padding="md"
                     hover
-                    selected={project.id === selectedProjectId}
+                    selected={String(project.id) === selectedProjectId}
                     onClick={() => onSelectProject(project)}
                     className="flex items-start gap-4 w-full"
                   >
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      project.id === selectedProjectId
+                      String(project.id) === selectedProjectId
                         ? 'bg-blue-600 text-white'
                         : 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400'
                     }`}>

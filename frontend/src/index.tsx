@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import { AuthProvider } from './contexts/AuthContext';
+import { SocketProvider } from './contexts/SocketContext';
 import App from './App';
 import './styles/tailwind.css';
 import './styles/index.css';
@@ -13,7 +14,9 @@ const root = createRoot(container);
 root.render(
   <Provider store={store}>
     <AuthProvider>
-      <App />
+      <SocketProvider>
+        <App />
+      </SocketProvider>
     </AuthProvider>
   </Provider>
 );

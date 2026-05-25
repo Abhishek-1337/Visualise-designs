@@ -184,7 +184,7 @@ const ClientCRM = () => {
 
   const selectedClient = clients.find((c) => c.id === selectedClientId) || null;
   const clientProjects: Project[] = (selectedClientId ? projectsByClient[selectedClientId] || [] : []).map(mapProject);
-  const selectedProject = clientProjects.find((p) => p.id === selectedProjectId) || null;
+  const selectedProject = clientProjects.find((p) => String(p.id) === selectedProjectId) || null;
   const currentMessages = selectedProjectId ? (messages[selectedProjectId] || []) : [];
 
   const handleSelectClient = useCallback((client: Client) => {
@@ -194,7 +194,7 @@ const ClientCRM = () => {
   }, []);
 
   const handleSelectProject = useCallback((project: Project) => {
-    setSelectedProjectId(project.id as string);
+    setSelectedProjectId(String(project.id) as string);
     setShowChatPanel(true);
   }, []);
 

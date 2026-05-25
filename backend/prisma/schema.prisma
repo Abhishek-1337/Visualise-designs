@@ -73,6 +73,7 @@ model Tenant {
   tasks           Task[]
   activities      Activity[]
   invitations     Invitation[]
+  messages        Message[]
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 }
@@ -107,6 +108,8 @@ model User {
   deals             Deal[]          @relation("AssignedDeals")
   activities        Activity[]
   invitedInvitations Invitation[]   @relation("InvitedBy")
+  sentMessages      Message[]       @relation("SentMessages")
+  receivedMessages  Message[]       @relation("ReceivedMessages")
 
   @@index([email])
   @@index([role])
@@ -253,6 +256,24 @@ model Invitation {
   @@index([email])
   @@index([token])
   @@index([tenantId])
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  content    String
+  senderId   String
+  receiverId String
+  tenantId   String
+  createdAt  DateTime @default(now())
+
+  sender   User   @relation("SentMessages", fields: [senderId], references: [id])
+  receiver User   @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([tenantId])
+  @@index([createdAt])
 }
 
 model Activity {
