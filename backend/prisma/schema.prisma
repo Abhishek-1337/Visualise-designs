@@ -196,6 +196,7 @@ model Project {
   members         User[]         @relation("ProjectMembers")
   tasks           Task[]
   activities      Activity[]
+  messages        Message[]
 
   @@index([status])
   @@index([contactId])
@@ -264,15 +265,19 @@ model Message {
   senderId   String
   receiverId String
   tenantId   String
+  projectId  String?
+  isRead     Boolean  @default(false)
   createdAt  DateTime @default(now())
 
   sender   User   @relation("SentMessages", fields: [senderId], references: [id])
   receiver User   @relation("ReceivedMessages", fields: [receiverId], references: [id])
   tenant   Tenant @relation(fields: [tenantId], references: [id])
+  project  Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([senderId])
   @@index([receiverId])
   @@index([tenantId])
+  @@index([projectId])
   @@index([createdAt])
 }
 

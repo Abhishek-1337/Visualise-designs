@@ -4,11 +4,13 @@ import Icon from '../../../components/AppIcon';
 interface MessageInputProps {
   onSend: (content: string) => void;
   disabled?: boolean;
+  onTyping?: (isTyping: boolean) => void;
 }
 
-const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled }) => {
+const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled, onTyping }) => {
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -17,9 +19,33 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled }) => {
     }
   }, [message]);
 
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessage(e.target.value);
+    
+    if (onTyping) {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      } else {
+        onTyping(true);
+      }
+
+      typingTimeoutRef.current = setTimeout(() => {
+        onTyping(false);
+        typingTimeoutRef.current = null;
+      }, 2000);
+    }
+  };
+
   const handleSend = () => {
     const trimmed = message.trim();
     if (!trimmed || disabled) return;
+    
+    if (onTyping && typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      onTyping(false);
+      typingTimeoutRef.current = null;
+    }
+
     onSend(trimmed);
     setMessage('');
     if (textareaRef.current) {
@@ -46,7 +72,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled }) => {
         <textarea
           ref={textareaRef}
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={handleChange}
           onKeyDown={handleKeyDown}
           placeholder="Type a message... (Shift+Enter for new line)"
           rows={1}

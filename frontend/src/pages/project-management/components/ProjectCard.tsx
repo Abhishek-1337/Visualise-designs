@@ -70,9 +70,9 @@ const ProjectCard = ({ project, onStatusUpdate, onViewDetails }) => {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Icon name="Calendar" size={16} />
             <span className="whitespace-nowrap">
-              {new Date(project.startDate)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              {project.startDate ? new Date(project.startDate)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD'}
               {' → '}
-              {new Date(project.deadline)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              {project.deadline ? new Date(project.deadline)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD'}
             </span>
           </div>
 

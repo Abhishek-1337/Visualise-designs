@@ -37,24 +37,29 @@ const chatTabs = [
 
 const MessageBubble: React.FC<{ message: Message; showSender: boolean }> = ({ message, showSender }) => {
   const isMe = message.sender === 'me';
+  const isTeam = message.sender === 'team';
   const time = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const initials = message.senderName?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'CL';
+  const initials = message.senderName?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || (isTeam ? 'TM' : 'CL');
 
   return (
     <div className={`flex gap-3 ${isMe ? 'flex-row-reverse' : ''} ${showSender ? 'mb-4' : 'mb-1'}`}>
       {showSender && (
         <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-0.5 ${
-          isMe ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300'
+          isMe ? 'bg-blue-600 text-white' : (isTeam ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400' : 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400')
         }`}>
-          <span className="text-[9px] font-semibold">{isMe ? 'ME' : initials}</span>
+          {message.senderAvatar ? (
+            <img src={message.senderAvatar} alt={message.senderName} className="w-7 h-7 rounded-full object-cover" />
+          ) : (
+            <span className="text-[9px] font-semibold">{isMe ? 'ME' : initials}</span>
+          )}
         </div>
       )}
       {!showSender && <div className="w-7 flex-shrink-0" />}
       <div className={`max-w-[80%] ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
         {showSender && (
           <div className={`flex items-center gap-2 mb-0.5 ${isMe ? 'flex-row-reverse' : ''}`}>
-            <span className="text-[11px] font-semibold text-foreground">
-              {isMe ? 'You' : message.senderName || 'Client'}
+            <span className={`text-[11px] font-semibold ${isMe ? 'text-blue-600' : (isTeam ? 'text-indigo-600' : 'text-emerald-600')}`}>
+              {isMe ? 'You' : message.senderName || (isTeam ? 'Team Member' : 'Client')}
             </span>
             <span className="text-[10px] text-muted-foreground">{time}</span>
           </div>
@@ -65,14 +70,9 @@ const MessageBubble: React.FC<{ message: Message; showSender: boolean }> = ({ me
         <div className={`rounded-xl px-3.5 py-2 text-sm leading-relaxed ${
           isMe
             ? 'bg-blue-600 text-white rounded-tr-sm'
-            : 'bg-blue-50 dark:bg-blue-950/30 text-foreground rounded-tl-sm border border-blue-100 dark:border-blue-900/50'
+            : (isTeam ? 'bg-indigo-50 dark:bg-indigo-950/30 text-foreground border border-indigo-100 dark:border-indigo-900/50 rounded-tl-sm' : 'bg-emerald-50 dark:bg-emerald-950/30 text-foreground border border-emerald-100 dark:border-emerald-900/50 rounded-tl-sm')
         }`}>
           <p className="whitespace-pre-wrap break-words">{message.content}</p>
-        </div>
-        <div className={`flex items-center gap-1 mt-0.5 ${isMe ? 'justify-end' : 'justify-start'}`}>
-          <button className="text-muted-foreground/30 hover:text-blue-500 transition-smooth">
-            <Icon name="Smile" size={12} color="currentColor" />
-          </button>
         </div>
       </div>
     </div>

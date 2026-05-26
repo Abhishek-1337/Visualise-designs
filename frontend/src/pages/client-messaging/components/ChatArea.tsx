@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
 import ChatHeader from './ChatHeader';
 import MessageInput from './MessageInput';
+import { Check, CheckCheck } from 'lucide-react';
 
 interface Message {
   id: string | number;
@@ -10,6 +11,7 @@ interface Message {
   timestamp: Date;
   senderName?: string;
   senderAvatar?: string;
+  isRead?: boolean;
 }
 
 interface ChatAreaProps {
@@ -25,6 +27,8 @@ interface ChatAreaProps {
   messages: Message[];
   onSend: (content: string) => void;
   onToggleClientList: () => void;
+  isTyping?: boolean;
+  onTyping?: (isTyping: boolean) => void;
 }
 
 const MessageBubble: React.FC<{ message: Message; showSender: boolean }> = ({ message, showSender }) => {
@@ -51,18 +55,30 @@ const MessageBubble: React.FC<{ message: Message; showSender: boolean }> = ({ me
             {/* <span className="text-xs font-semibold text-foreground">
               {isMe ? 'You' : message.senderName || 'Client'}
             </span> */}
-            <span className="text-[10px] text-muted-foreground">{time}</span>
+            {/* <span className="text-[10px] text-muted-foreground">{time}</span> */}
           </div>
         )}
-        {!showSender && (
+        {/* {!showSender && (
           <span className="text-[10px] text-muted-foreground/50 mb-0.5 ml-0.5">{time}</span>
-        )}
-        <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+        )} */}
+        <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed relative ${
           isMe
             ? 'bg-primary text-primary-foreground rounded-tr-md'
             : 'bg-muted text-foreground rounded-tl-md'
         }`}>
-          <p className="whitespace-pre-wrap break-words">{message.content}</p>
+          <div className="whitespace-pre-wrap break-words flex items-end gap-2">
+            {message.content}
+            <span className="text-[8px] text-gray-300 font-semibold ml-0.5">{time}</span>
+            {
+              isMe && (message.isRead  ? (
+                <CheckCheck className="w-3 h-3"/>
+                ) : 
+                (
+                  <Check className="w-3 h-3" />
+                ))
+            }
+  
+          </div>
         </div>
       </div>
     </div>
@@ -108,7 +124,18 @@ const EmptyState: React.FC = () => (
   </div>
 );
 
-const ChatArea: React.FC<ChatAreaProps> = ({ client, messages, onSend, onToggleClientList }) => {
+const TypingIndicator: React.FC<{ name: string }> = ({ name }) => (
+  <div className="flex gap-3 mb-6">
+    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-accent flex items-center justify-center mt-0.5 animate-pulse" />
+    <div className="bg-muted rounded-2xl px-4 py-3 flex items-center gap-1">
+      <div className="w-1.5 h-1.5 bg-muted-foreground/40 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+      <div className="w-1.5 h-1.5 bg-muted-foreground/40 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+      <div className="w-1.5 h-1.5 bg-muted-foreground/40 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+    </div>
+  </div>
+);
+
+const ChatArea: React.FC<ChatAreaProps> = ({ client, messages, onSend, onToggleClientList, isTyping, onTyping }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -116,7 +143,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ client, messages, onSend, onToggleC
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, [messages, isTyping]);
 
   const groupedMessages: { date: Date; messages: Message[] }[] = [];
   let currentDate: string | null = null;
@@ -144,7 +171,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ client, messages, onSend, onToggleC
     <div className="flex-1 flex flex-col bg-background min-w-0">
       <ChatHeader client={client} onToggleClientList={onToggleClientList} />
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-1 scroll-smooth">
-        {groupedMessages.length === 0 ? (
+        {groupedMessages.length === 0 && !isTyping ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
@@ -155,20 +182,23 @@ const ChatArea: React.FC<ChatAreaProps> = ({ client, messages, onSend, onToggleC
             </div>
           </div>
         ) : (
-          groupedMessages.map((group, gi) => (
-            <div key={gi}>
-              <DateSeparator date={group.date} />
-              {group.messages.map((msg, mi) => {
-                const prevMsg = mi > 0 ? group.messages[mi - 1] : null;
-                const showSender = !prevMsg || prevMsg.sender !== msg.sender;
-                return <MessageBubble key={msg.id} message={msg} showSender={showSender} />;
-              })}
-            </div>
-          ))
+          <>
+            {groupedMessages.map((group, gi) => (
+              <div key={gi}>
+                <DateSeparator date={group.date} />
+                {group.messages.map((msg, mi) => {
+                  const prevMsg = mi > 0 ? group.messages[mi - 1] : null;
+                  const showSender = !prevMsg || prevMsg.sender !== msg.sender;
+                  return <MessageBubble key={msg.id} message={msg} showSender={showSender} />;
+                })}
+              </div>
+            ))}
+            {isTyping && <TypingIndicator name={client.name} />}
+          </>
         )}
         <div ref={messagesEndRef} />
       </div>
-      <MessageInput onSend={onSend} disabled={false} />
+      <MessageInput onSend={onSend} disabled={false} onTyping={onTyping} />
     </div>
   );
 };

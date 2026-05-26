@@ -152,5 +152,7 @@ export const seedService = {
 export const messageService = {
   getConversations: () => api.get('/messages/conversations'),
   getMessages: (userId: string) => api.get(`/messages/${userId}`),
-  send: (data: { receiverId: string; content: string }) => api.post('/messages', data),
+  getProjectMessages: (projectId: string) => api.get(`/messages/project/${projectId}`),
+  send: (data: { receiverId?: string; content: string; projectId?: string }) => api.post('/messages', data),
+  markRead: (data: { senderId?: string; projectId?: string }) => api.post('/messages/mark-read', data),
 };
