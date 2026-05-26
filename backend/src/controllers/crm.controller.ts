@@ -348,13 +348,15 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
 export const createProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
-    const { name, description, status, budget, contactId, memberIds } = req.body;
+    const { name, description, status, budget, contactId, memberIds, startDate, endDate } = req.body;
 
     const project = await prisma.project.create({
       data: {
         name, description,
         status: status || 'PLANNING',
         budget: budget ? parseFloat(budget) : null,
+        startDate: startDate ? new Date(startDate) : null,
+        endDate: endDate ? new Date(endDate) : null,
         contactId,
         tenantId: authReq.user.tenantId,
         members: memberIds ? { connect: memberIds.map((id: string) => ({ id })) } : undefined

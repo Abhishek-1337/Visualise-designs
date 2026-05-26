@@ -19,6 +19,7 @@ interface ClientWorkspaceProps {
   selectedProjectId: string | null;
   onSelectProject: (project: Project) => void;
   onBack: () => void;
+  onNewProject: () => void;
 }
 
 const tabs = [
@@ -36,6 +37,7 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
   selectedProjectId,
   onSelectProject,
   onBack,
+  onNewProject,
 }) => {
   const [activeTab, setActiveTab] = useState('projects');
 
@@ -111,18 +113,46 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
 
       
 
-      <div className="flex-1 min-h-0 p-6 overflow-hidden">
+      <div className="flex-1 min-h-0 p-6 overflow-y-auto">
+        {activeTab === 'overview' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card variant="bordered" padding="lg" className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-blue-600 mb-2">
+                <Icon name="Folder" size={20} color="currentColor" />
+                <h3 className="font-semibold">Projects</h3>
+              </div>
+              <p className="text-3xl font-bold">{projects.length}</p>
+              <p className="text-sm text-muted-foreground">Active and planning projects</p>
+            </Card>
+            <Card variant="bordered" padding="lg" className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-emerald-600 mb-2">
+                <Icon name="CheckSquare" size={20} color="currentColor" />
+                <h3 className="font-semibold">Tasks</h3>
+              </div>
+              <p className="text-3xl font-bold">12</p>
+              <p className="text-sm text-muted-foreground">Pending tasks across projects</p>
+            </Card>
+            <Card variant="bordered" padding="lg" className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-amber-600 mb-2">
+                <Icon name="Clock" size={20} color="currentColor" />
+                <h3 className="font-semibold">Recent Activity</h3>
+              </div>
+              <p className="text-sm text-muted-foreground italic">No recent activity found</p>
+            </Card>
+          </div>
+        )}
+
         {activeTab === 'projects' && (
           <Card variant="bordered" padding="lg" className="h-full flex flex-col overflow-hidden">
             <CardHeader
               title={`Projects (${projects.length})`}
-              action={<ActionButton icon="Plus">New Project</ActionButton>}
+              action={<ActionButton icon="Plus" onClick={onNewProject}>New Project</ActionButton>}
             />
 
             {projects.length === 0 ? (
               <EmptyState icon="FolderKanban" title="No projects yet for this client" />
             ) : (
-              <div className="flex-1 min-h-0 space-y-3 overflow-y-auto">
+              <div className="flex-1 min-h-0 space-y-3 overflow-y-auto pr-2">
                 {projects.map((project) => (
                   <Card
                     key={project.id}
@@ -131,7 +161,7 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
                     hover
                     selected={String(project.id) === selectedProjectId}
                     onClick={() => onSelectProject(project)}
-                    className="flex items-start gap-4 w-full"
+                    className="flex items-start gap-4 w-full cursor-pointer"
                   >
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                       String(project.id) === selectedProjectId
@@ -140,26 +170,25 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
                     }`}>
                       <Icon name="Folder" size={18} color="currentColor" />
                     </div>
-                    {/* <div className="flex-1 min-w-0"> */}
-                  <div className="grid grid-cols-[1fr_1fr_1fr] gap-6 w-full">
-                    <div className="flex flex-col gap-2 ">
-                      <h4 className="font-semibold text-foreground truncate text-sm">{project.name}</h4>
-                      <p className="text-muted-foreground text-xs">{project.description}</p>
-                      <StatusBadge status={project.status} className='max-w-max'/>
-                    </div>
-                    <div className="flex flex-col  gap-3 w-full">
-                      <ProgressWithLabel progress={project.progress} />
-                      <TeamMemberAvatars members={project.team} />
-                    </div>
-                    <div className="flex flex-col items-center  gap-1 text-xs text-muted-foreground">
-                      <span className="font-semibold">Due Date</span>
-                      <div className="flex gap-2">
-                        <Icon name="Calendar" size={14} color="#3B82F6" />
-                        <span className="whitespace-nowrap">{project.dueDate}</span>
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr] gap-6 w-full">
+                      <div className="flex flex-col gap-1">
+                        <h4 className="font-semibold text-foreground truncate text-sm">{project.name}</h4>
+                        <p className="text-muted-foreground text-xs line-clamp-1">{project.description}</p>
+                        <StatusBadge status={project.status} className='max-w-max mt-1'/>
+                      </div>
+                      <div className="flex flex-col gap-3 w-full justify-center">
+                        <ProgressWithLabel progress={project.progress} />
+                        <TeamMemberAvatars members={project.team} />
+                      </div>
+                      <div className="flex flex-col items-start md:items-center justify-center gap-1 text-xs text-muted-foreground">
+                        <span className="font-semibold">Due Date</span>
+                        <div className="flex gap-2 items-center">
+                          <Icon name="Calendar" size={14} color="#3B82F6" />
+                          <span className="whitespace-nowrap">{project.dueDate}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                    <Icon name="ChevronRight" size={16} color="#3B82F6" className="mt-2 flex-shrink-0 opacity-40" />
+                    <Icon name="ChevronRight" size={16} color="#3B82F6" className="mt-2 flex-shrink-0 opacity-40 self-center" />
                   </Card>
                 ))}
               </div>
@@ -167,11 +196,51 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
           </Card>
         )}
 
-        {activeTab !== 'projects' && (
-          <EmptyState
-            icon={tabs.find(t => t.id === activeTab)?.icon || 'FileText'}
-            title={`${activeTab} content coming soon`}
-          />
+        {activeTab === 'invoices' && (
+          <Card variant="bordered" padding="lg">
+            <CardHeader
+              title="Invoices"
+              action={<ActionButton icon="Plus">Create Invoice</ActionButton>}
+            />
+            <EmptyState icon="CreditCard" title="No invoices found" description="Create an invoice to get started" />
+          </Card>
+        )}
+
+        {activeTab === 'files' && (
+          <Card variant="bordered" padding="lg">
+            <CardHeader
+              title="Files & Documents"
+              action={<ActionButton icon="Upload">Upload File</ActionButton>}
+            />
+            <EmptyState icon="File" title="No files uploaded" description="Upload project documents or contracts" />
+          </Card>
+        )}
+
+        {activeTab === 'notes' && (
+          <Card variant="bordered" padding="lg">
+            <CardHeader
+              title="Client Notes"
+              action={<ActionButton icon="Plus">Add Note</ActionButton>}
+            />
+            <EmptyState icon="FileText" title="No notes yet" description="Keep track of client preferences and meeting minutes" />
+          </Card>
+        )}
+
+        {activeTab === 'activity' && (
+          <Card variant="bordered" padding="lg">
+            <CardHeader title="Activity Log" />
+            <div className="space-y-4">
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                  <Icon name="UserPlus" size={14} color="#3B82F6" />
+                </div>
+                <div>
+                  <p className="text-sm text-foreground">Client added to the system</p>
+                  <p className="text-xs text-muted-foreground">May 20, 2026 · 10:25 AM</p>
+                </div>
+              </div>
+            </div>
+          </Card>
         )}
       </div>
     </div>

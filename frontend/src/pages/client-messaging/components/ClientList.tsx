@@ -8,11 +8,13 @@ interface ClientConversation {
     avatar?: string;
     status?: string;
     company?: string;
+    role?: string;
   };
   lastMessage?: {
     content: string;
     timestamp: Date;
     unread: boolean;
+    unreadCount?: number;
   };
 }
 
@@ -141,7 +143,12 @@ const ClientList: React.FC<ClientListProps> = ({ conversations, selectedClientId
                     }`}>
                       {conv.lastMessage?.content || (conv.client.company || 'Click to start chatting')}
                     </span>
-                    {conv.lastMessage?.unread && (
+                    {conv.lastMessage?.unread && conv.lastMessage?.unreadCount && conv.lastMessage.unreadCount > 0 && (
+                      <span className="flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-primary text-[10px] font-bold text-primary-foreground px-1 flex-shrink-0">
+                        {conv.lastMessage.unreadCount}
+                      </span>
+                    )}
+                    {conv.lastMessage?.unread && (!conv.lastMessage?.unreadCount || conv.lastMessage.unreadCount <= 0) && (
                       <span className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
                     )}
                   </div>

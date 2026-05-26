@@ -7,7 +7,8 @@ import ProjectDetailPanel from './components/ProjectDetailPanel';
 import FilterBar from './components/FilterBar';
 import StatsOverview from './components/StatsOverview';
 import EmptyState from './components/EmptyState';
-import { projectService } from '../../services';
+import CreateProjectModal from '../client-crm/components/CreateProjectModal';
+import { projectService, contactService } from '../../services';
 
 const STATUS_MAP: Record<string, string> = {
   PLANNING: 'Planning',
@@ -50,8 +51,14 @@ const ProjectManagement = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [creatingProject, setCreatingProject] = useState(false);
+  const [allClients, setAllClients] = useState<any[]>([]);
+  const [selectedClientId, setSelectedClientId] = useState<string>('');
+
   useEffect(() => {
     loadProjects();
+    loadClients();
   }, []);
 
   const loadProjects = async () => {
@@ -63,6 +70,19 @@ const ProjectManagement = () => {
       console.error('Failed to load projects');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadClients = async () => {
+    try {
+      const res = await contactService.getAll({ limit: '100' });
+      const clients = res.data.contacts || [];
+      setAllClients(clients);
+      if (clients.length > 0) {
+        setSelectedClientId(clients[0].id);
+      }
+    } catch {
+      console.error('Failed to load clients');
     }
   };
 
@@ -121,8 +141,28 @@ const ProjectManagement = () => {
     console.log('Toggle task:', taskId, 'in project:', projectId);
   };
 
+  const handleCreateProjectSubmit = async (data: any) => {
+    try {
+      setCreatingProject(true);
+      const res = await projectService.create(data);
+      // Fetch full project details for the card
+      const fullRes = await projectService.getById(res.data.id);
+      setProjects(prev => [mapProject(fullRes.data), ...prev]);
+      setShowProjectModal(false);
+      setSelectedClientId('');
+    } catch (err) {
+      console.error('Failed to create project:', err);
+    } finally {
+      setCreatingProject(false);
+    }
+  };
+
   const handleCreateProject = () => {
-    console.log('Create new project');
+    if (allClients.length > 0) {
+      setShowProjectModal(true);
+    } else {
+      alert('Please create a client first before creating a project.');
+    }
   };
 
   return (
@@ -185,6 +225,42 @@ const ProjectManagement = () => {
             project={selectedProject}
             onClose={handleCloseDetails}
             onTaskUpdate={handleTaskUpdate}
+          />
+        )}
+
+        {showProjectModal && !selectedClientId && allClients.length > 0 && (
+          <div className="fixed inset-0 z-[1999] flex items-center justify-center p-4 bg-background/60 backdrop-blur-sm">
+             <div className="bg-card p-6 rounded-xl border border-border shadow-2xl w-full max-w-sm">
+                <h3 className="text-lg font-bold mb-4">Select Client</h3>
+                <p className="text-sm text-muted-foreground mb-4">Select a client to associate with this new project.</p>
+                <select 
+                  className="w-full p-2.5 border border-border rounded-lg bg-background mb-6 text-sm"
+                  value={selectedClientId}
+                  onChange={(e) => setSelectedClientId(e.target.value)}
+                >
+                  <option value="" disabled>Choose a client...</option>
+                  {allClients.map(c => (
+                    <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>
+                  ))}
+                </select>
+                <div className="flex gap-3">
+                  <Button variant="outline" fullWidth onClick={() => setShowProjectModal(false)}>Cancel</Button>
+                  <Button variant="default" fullWidth onClick={() => {}} disabled={!selectedClientId}>Continue</Button>
+                </div>
+             </div>
+          </div>
+        )}
+
+        {showProjectModal && selectedClientId && (
+          <CreateProjectModal
+            isOpen={showProjectModal}
+            onClose={() => {
+              setShowProjectModal(false);
+              setSelectedClientId('');
+            }}
+            onCreate={handleCreateProjectSubmit}
+            loading={creatingProject}
+            contactId={selectedClientId}
           />
         )}
       </div>

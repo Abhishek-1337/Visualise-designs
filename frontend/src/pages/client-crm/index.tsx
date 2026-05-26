@@ -6,7 +6,9 @@ import Button from '../../components/ui/Button';
 import AllClientsGrid from './components/AllClientsGrid';
 import ClientWorkspace from './components/ClientWorkspace';
 import ProjectChatPanel from './components/ProjectChatPanel';
-import { contactService, projectService, inviteService } from '../../services';
+import CreateProjectModal from './components/CreateProjectModal';
+import { contactService, projectService, inviteService, messageService } from '../../services';
+import { useSocket } from '../../contexts/SocketContext';
 import type { RootState } from '../../store';
 import type { Client } from './components/AllClientsGrid';
 import type { Project } from './components/ClientWorkspace';
@@ -126,6 +128,7 @@ const InviteClientModal = ({
 
 const ClientCRM = () => {
   const { user } = useSelector((state: RootState) => state.auth);
+  const { socket, isConnected } = useSocket();
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [showChatPanel, setShowChatPanel] = useState(false);
@@ -140,6 +143,9 @@ const ClientCRM = () => {
   const [inviteError, setInviteError] = useState('');
   const [inviteSuccess, setInviteSuccess] = useState('');
   const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
+
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [creatingProject, setCreatingProject] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -193,33 +199,84 @@ const ClientCRM = () => {
     setShowChatPanel(false);
   }, []);
 
+  const fetchProjectMessages = useCallback(async (projectId: string) => {
+    try {
+      const res = await messageService.getProjectMessages(projectId);
+      setMessages((prev) => ({ ...prev, [projectId]: res.data?.messages || [] }));
+    } catch (err) {
+      console.error('Failed to load project messages:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!socket || !user) return;
+
+    const projectMessageHandler = (msg: any) => {
+      if (msg.projectId) {
+        setMessages((prev) => {
+          const projectMsgs = prev[msg.projectId] || [];
+          if (projectMsgs.some((m) => m.id === msg.id)) return prev;
+          return {
+            ...prev,
+            [msg.projectId]: [...projectMsgs, msg],
+          };
+        });
+      }
+    };
+
+    socket.on('new:project-message', projectMessageHandler);
+
+    return () => {
+      socket.off('new:project-message', projectMessageHandler);
+    };
+  }, [socket, user]);
+
   const handleSelectProject = useCallback((project: Project) => {
-    setSelectedProjectId(String(project.id) as string);
+    const pid = String(project.id);
+    setSelectedProjectId(pid);
     setShowChatPanel(true);
+    if (!messages[pid]) {
+      fetchProjectMessages(pid);
+    }
+    socket?.emit('join:project', { projectId: pid });
+  }, [messages, fetchProjectMessages, socket]);
+
+  const handleCreateProject = useCallback(async (data: any) => {
+    try {
+      setCreatingProject(true);
+      const res = await projectService.create(data);
+      
+      setProjectsByClient(prev => ({
+        ...prev,
+        [data.contactId]: [res.data, ...(prev[data.contactId] || [])]
+      }));
+      
+      setShowProjectModal(false);
+    } catch (err) {
+      console.error('Failed to create project:', err);
+    } finally {
+      setCreatingProject(false);
+    }
   }, []);
 
   const handleBack = useCallback(() => {
+    if (selectedProjectId) {
+      socket?.emit('leave:project', { projectId: selectedProjectId });
+    }
     setSelectedClientId(null);
     setSelectedProjectId(null);
     setShowChatPanel(false);
-  }, []);
+  }, [selectedProjectId, socket]);
 
   const handleSend = useCallback(
     (content: string) => {
-      if (!selectedProjectId) return;
-      const newMsg: Message = {
-        id: `msg-${Date.now()}`,
-        content,
-        sender: 'me',
-        timestamp: new Date(),
-        senderName: 'You',
-      };
-      setMessages((prev) => ({
-        ...prev,
-        [selectedProjectId]: [...(prev[selectedProjectId] || []), newMsg],
-      }));
+      if (!selectedProjectId || !socket) return;
+      socket.emit('send:message', { 
+        projectId: selectedProjectId, 
+        content 
+      });
     },
-    [selectedProjectId]
+    [selectedProjectId, socket]
   );
 
   const handleCloseChat = useCallback(() => {
@@ -326,6 +383,7 @@ const ClientCRM = () => {
                   selectedProjectId={selectedProjectId}
                   onSelectProject={handleSelectProject}
                   onBack={handleBack}
+                  onNewProject={() => setShowProjectModal(true)}
                 />
               </div>
 
@@ -350,6 +408,16 @@ const ClientCRM = () => {
         error={inviteError}
         success={inviteSuccess}
       />
+
+      {selectedClientId && (
+        <CreateProjectModal
+          isOpen={showProjectModal}
+          onClose={() => setShowProjectModal(false)}
+          onCreate={handleCreateProject}
+          loading={creatingProject}
+          contactId={selectedClientId}
+        />
+      )}
     </div>
   );
 };
