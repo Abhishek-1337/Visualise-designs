@@ -36,7 +36,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled }) => {
 
   return (
     <div className="border-t border-border bg-card px-6 py-4">
-      <div className="flex items-end gap-3 bg-muted rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary/50 transition-all">
+      <div className="flex items-center gap-3 bg-muted rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary/50 transition-all">
         <button
           className="p-1.5 rounded-lg hover:bg-background transition-smooth text-muted-foreground hover:text-foreground flex-shrink-0 mb-0.5"
           title="Attach file"

@@ -20,7 +20,7 @@ interface Message {
 }
 
 const ClientMessaging = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth.user);
   const { socket, isConnected } = useSocket();
   const [conversations, setConversations] = useState<ClientConversation[]>([]);
   const [messages, setMessages] = useState<Record<string | number, Message[]>>({});

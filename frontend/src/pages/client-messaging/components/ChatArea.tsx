@@ -48,9 +48,9 @@ const MessageBubble: React.FC<{ message: Message; showSender: boolean }> = ({ me
       <div className={`max-w-[75%] ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
         {showSender && (
           <div className={`flex items-center gap-2 mb-1 ${isMe ? 'flex-row-reverse' : ''}`}>
-            <span className="text-xs font-semibold text-foreground">
+            {/* <span className="text-xs font-semibold text-foreground">
               {isMe ? 'You' : message.senderName || 'Client'}
-            </span>
+            </span> */}
             <span className="text-[10px] text-muted-foreground">{time}</span>
           </div>
         )}
