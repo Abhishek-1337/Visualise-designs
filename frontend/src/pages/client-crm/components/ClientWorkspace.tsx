@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import type { Client } from './AllClientsGrid';
 import { AvatarCircle, StatusBadge, ActionButton, ProgressWithLabel, TeamMemberAvatars, EmptyState, Card, CardHeader } from '../../../components/shared';
+import { dealService } from '../../../services';
 
 interface Project {
   id: number;
@@ -16,14 +17,18 @@ interface Project {
 interface ClientWorkspaceProps {
   client: Client;
   projects: Project[];
+  deals?: any[];
   selectedProjectId: string | null;
   onSelectProject: (project: Project) => void;
   onBack: () => void;
   onNewProject: () => void;
+  onNewDeal?: () => void;
+  onRefresh?: () => void;
 }
 
 const tabs = [
   { id: 'overview', label: 'Overview', icon: 'LayoutDashboard' },
+  { id: 'deals', label: 'Deals', icon: 'Briefcase' },
   { id: 'projects', label: 'Projects', icon: 'FolderKanban' },
   { id: 'invoices', label: 'Invoices', icon: 'CreditCard' },
   { id: 'files', label: 'Files', icon: 'Paperclip' },
@@ -34,12 +39,29 @@ const tabs = [
 const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
   client,
   projects,
+  deals = [],
   selectedProjectId,
   onSelectProject,
   onBack,
   onNewProject,
+  onNewDeal,
+  onRefresh,
 }) => {
-  const [activeTab, setActiveTab] = useState('projects');
+  const [activeTab, setActiveTab] = useState('deals');
+  const [convertingDealId, setConvertingDealId] = useState<string | null>(null);
+
+  const handleConvertToProject = async (dealId: string) => {
+    try {
+      setConvertingDealId(dealId);
+      await dealService.convertToProject(dealId);
+      if (onRefresh) onRefresh();
+      setActiveTab('projects');
+    } catch (error) {
+      console.error('Failed to convert deal:', error);
+    } finally {
+      setConvertingDealId(null);
+    }
+  };
 
   return (
     <div className="flex-1 min-h-0 flex flex-col min-w-0 bg-background overflow-hidden">
@@ -118,6 +140,14 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card variant="bordered" padding="lg" className="flex flex-col gap-2">
               <div className="flex items-center gap-2 text-blue-600 mb-2">
+                <Icon name="Briefcase" size={20} color="currentColor" />
+                <h3 className="font-semibold">Deals</h3>
+              </div>
+              <p className="text-3xl font-bold">{deals.length}</p>
+              <p className="text-sm text-muted-foreground">Active proposals and opportunities</p>
+            </Card>
+            <Card variant="bordered" padding="lg" className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-blue-600 mb-2">
                 <Icon name="Folder" size={20} color="currentColor" />
                 <h3 className="font-semibold">Projects</h3>
               </div>
@@ -129,17 +159,59 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
                 <Icon name="CheckSquare" size={20} color="currentColor" />
                 <h3 className="font-semibold">Tasks</h3>
               </div>
-              <p className="text-3xl font-bold">12</p>
-              <p className="text-sm text-muted-foreground">Pending tasks across projects</p>
-            </Card>
-            <Card variant="bordered" padding="lg" className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-amber-600 mb-2">
-                <Icon name="Clock" size={20} color="currentColor" />
-                <h3 className="font-semibold">Recent Activity</h3>
-              </div>
-              <p className="text-sm text-muted-foreground italic">No recent activity found</p>
+              <p className="text-3xl font-bold">{projects.reduce((acc, p) => acc + p.progress < 100 ? 1 : 0, 0)}</p>
+              <p className="text-sm text-muted-foreground">Pending projects</p>
             </Card>
           </div>
+        )}
+
+        {activeTab === 'deals' && (
+          <Card variant="bordered" padding="lg" className="h-full flex flex-col overflow-hidden">
+            <CardHeader
+              title={`Deals (${deals.length})`}
+              action={<ActionButton icon="Plus" onClick={onNewDeal}>New Deal</ActionButton>}
+            />
+
+            {deals.length === 0 ? (
+              <EmptyState icon="Briefcase" title="No deals yet for this client" />
+            ) : (
+              <div className="flex-1 min-h-0 space-y-3 overflow-y-auto pr-2">
+                {deals.map((deal) => (
+                  <Card
+                    key={deal.id}
+                    variant="bordered"
+                    padding="md"
+                    className="flex items-center justify-between gap-4 w-full"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                        <Icon name="Briefcase" size={18} color="currentColor" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground text-sm">{deal.title}</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <StatusBadge status={deal.status} />
+                          <span className="text-xs text-muted-foreground">${deal.value.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {deal.status === 'ACCEPTED' && (
+                        <button
+                          onClick={() => handleConvertToProject(deal.id)}
+                          disabled={convertingDealId === deal.id}
+                          className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 disabled:opacity-50 transition-smooth"
+                        >
+                          {convertingDealId === deal.id ? 'Converting...' : 'Convert to Project'}
+                        </button>
+                      )}
+                      <ActionButton variant="icon" icon="ChevronRight" iconSize={16} />
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </Card>
         )}
 
         {activeTab === 'projects' && (

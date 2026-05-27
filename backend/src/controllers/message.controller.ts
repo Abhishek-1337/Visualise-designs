@@ -138,7 +138,26 @@ export const getProjectMessages = async (req: Request, res: Response): Promise<v
     const authReq = req as AuthenticatedRequest;
     const tenantId = authReq.user.tenantId;
     const userId = authReq.user.id;
-    const { projectId } = req.params;
+    const projectId = req.params.projectId as string;
+
+    // Verify access
+    if (authReq.user.role === 'CLIENT') {
+      const project = await prisma.project.findFirst({
+        where: { id: projectId, tenantId, contact: { email: authReq.user.email } }
+      });
+      if (!project) {
+        res.status(403).json({ error: 'Access denied to project chat' });
+        return;
+      }
+    } else if (authReq.user.role === 'EMPLOYEE') {
+      const project = await prisma.project.findFirst({
+        where: { id: projectId, tenantId, members: { some: { id: userId } } }
+      });
+      if (!project) {
+        res.status(403).json({ error: 'Access denied to project chat' });
+        return;
+      }
+    }
 
     const messages = await prisma.message.findMany({
       where: {
@@ -158,7 +177,7 @@ export const getProjectMessages = async (req: Request, res: Response): Promise<v
       },
     });
 
-    const messagesFormatted = messages.map((msg) => ({
+    const messagesFormatted = messages.map((msg: any) => ({
       id: msg.id,
       content: msg.content,
       sender: msg.senderId === userId ? ('me' as const) : (msg.sender.role === 'CLIENT' ? 'client' as const : 'team' as const),
@@ -216,6 +235,26 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
     if (!receiverId && !projectId) {
       res.status(400).json({ error: 'receiverId or projectId is required' });
       return;
+    }
+
+    if (projectId) {
+      if (authReq.user.role === 'CLIENT') {
+        const project = await prisma.project.findFirst({
+          where: { id: projectId, tenantId, contact: { email: authReq.user.email } }
+        });
+        if (!project) {
+          res.status(403).json({ error: 'Access denied to project chat' });
+          return;
+        }
+      } else if (authReq.user.role === 'EMPLOYEE') {
+        const project = await prisma.project.findFirst({
+          where: { id: projectId, tenantId, members: { some: { id: senderId } } }
+        });
+        if (!project) {
+          res.status(403).json({ error: 'Access denied to project chat' });
+          return;
+        }
+      }
     }
 
     // If projectId is provided, we might need a receiverId if it's a 1-on-1 within a project context, 

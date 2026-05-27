@@ -45,7 +45,7 @@ const ClientProfile = () => {
     lifetimeValue: selectedContact.value ? `$${(selectedContact.value / 1000).toFixed(0)}K` : '$0',
     assignedTo: selectedContact.owner?.name || 'Unassigned',
     avatar: selectedContact.avatar || '',
-    avatarAlt: client.name,
+    avatarAlt: `${selectedContact.firstName} ${selectedContact.lastName}`,
   } : null;
 
   const tabs = [
@@ -98,7 +98,7 @@ const ClientProfile = () => {
             </div>
           ) : client ? (
             <>
-              <ClientHeader client={client} />
+              <ClientHeader client={client} onEdit={() => {}} />
 
               <div className="flex gap-1 mb-6 border-b border-border overflow-x-auto">
                 {tabs.map((tab) => (
@@ -117,7 +117,7 @@ const ClientProfile = () => {
                 ))}
               </div>
 
-              {activeTab === 'overview' && <OverviewTab />}
+              {activeTab === 'overview' && <OverviewTab client={client} />}
               {activeTab === 'files' && <FilesTab />}
               {activeTab === 'payments' && <PaymentsTab />}
               {(activeTab === 'projects' || activeTab === 'communications') && (

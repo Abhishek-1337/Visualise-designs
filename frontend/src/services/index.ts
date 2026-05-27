@@ -43,6 +43,7 @@ export const dealService = {
   create: (data) => api.post('/deals', data),
   update: (id, data) => api.put(`/deals/${id}`, data),
   updateStage: (id, data) => api.patch(`/deals/${id}/stage`, data),
+  convertToProject: (id) => api.post(`/deals/${id}/convert`),
   delete: (id) => api.delete(`/deals/${id}`),
 };
 

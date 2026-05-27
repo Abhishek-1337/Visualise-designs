@@ -6,7 +6,6 @@ import type { Role } from '../../types';
 import Icon from '../AppIcon';
 import { logout } from '../../store/slices/authSlice';
 import ThemeToggle from '../ThemeToggle';
-import logo from "../../../public/Png.png";
 
 interface NavItem {
   label: string;
@@ -24,7 +23,13 @@ const navItemConfig: NavItem[] = [
   { label: 'Clients', path: '/client-profile', icon: 'UserCircle', tooltip: 'Client profiles & details', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
   { label: 'Client Chat', path: '/client-messaging', icon: 'MessageSquare', tooltip: 'Slack-like client messaging', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
   { label: 'Client CRM', path: '/client-crm', icon: 'UserCog', tooltip: 'Client profiles, projects & chat', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
-  { label: 'Comms', path: '/communication-hub', icon: 'MessageCircle', tooltip: 'Communication hub', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] }
+  { label: 'Comms', path: '/communication-hub', icon: 'MessageCircle', tooltip: 'Communication hub', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  
+  // Client Portal Items
+  { label: 'Portal Home', path: '/client-portal', icon: 'LayoutDashboard', tooltip: 'Your collaboration portal', roles: ['CLIENT'] },
+  { label: 'My Deals', path: '/client-portal/deals', icon: 'Briefcase', tooltip: 'View your deals', roles: ['CLIENT'] },
+  { label: 'My Projects', path: '/client-portal/projects', icon: 'FolderKanban', tooltip: 'View your projects', roles: ['CLIENT'] },
+  { label: 'Messages', path: '/client-portal/messages', icon: 'MessageSquare', tooltip: 'Chat with the team', roles: ['CLIENT'] },
 ];
 
 interface SidebarContextType {
@@ -65,7 +70,7 @@ export const Sidebar: React.FC = () => {
   const SidebarContent = () => (
     <div className="flex flex-col h-full max-w-[240px]">
       <div className="flex items-center gap-6 px-4 border-b border-border h-[60px]">
-        <Link to="/home-dashboard" className="flex items-center gap-0 transition-smooth hover:opacity-80">
+        <Link to={user?.role === 'CLIENT' ? '/client-portal' : '/home-dashboard'} className="flex items-center gap-0 transition-smooth hover:opacity-80">
           <div className="w-10 h-10 bg-foreground rounded-lg flex items-center justify-center transition-smooth">
             <img src="../../public/Png.png" className="bg-white"/>
           </div>

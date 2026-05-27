@@ -10,7 +10,7 @@ interface MessageInputProps {
 const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled, onTyping }) => {
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const typingTimeoutRef = useRef<any>(null);
 
   useEffect(() => {
     if (textareaRef.current) {

@@ -46,6 +46,10 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
+    if (authReq.user.role === 'CLIENT') {
+      res.status(403).json({ error: 'Access denied' });
+      return;
+    }
     const { page = '1', limit = '20', role, isActive } = req.query;
 
     const where: Record<string, unknown> = { tenantId: authReq.user.tenantId };

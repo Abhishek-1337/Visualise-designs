@@ -120,7 +120,7 @@ const ClientMessaging = () => {
 
         if (msg.senderId === selectedClientId) {
           socket.emit('mark:read', { senderId: selectedClientId });
-          messageService.markRead(selectedClientId as string);
+          messageService.markRead({ senderId: selectedClientId as string });
         }
       }
 
@@ -226,7 +226,7 @@ const ClientMessaging = () => {
       }
       // Mark as read
       socket?.emit('mark:read', { senderId: client.id });
-      messageService.markRead(client.id as string);
+      messageService.markRead({ senderId: client.id as string });
     },
     [messages, fetchMessages, socket]
   );

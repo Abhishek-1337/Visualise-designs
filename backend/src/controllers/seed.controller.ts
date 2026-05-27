@@ -174,16 +174,16 @@ async function seedTenantData(tenantId: string, adminUserId: string) {
   );
 
   const dealsData = [
-    { title: 'Website Redesign - Morrison Interiors', value: 45000, probability: 80, stage: 'NEGOTIATION' as const, status: 'OPEN' as const, contactIdx: 0, assignedIdx: 1, expectedClose: '2026-07-15' },
-    { title: 'Brand Identity Package - Chen & Assoc', value: 25000, probability: 90, stage: 'CLOSED_WON' as const, status: 'WON' as const, contactIdx: 1, assignedIdx: 2, expectedClose: '2026-05-01' },
-    { title: 'Mobile App MVP - Morrison Interiors', value: 80000, probability: 60, stage: 'PROPOSAL_SENT' as const, status: 'OPEN' as const, contactIdx: 0, assignedIdx: 3, expectedClose: '2026-08-30' },
-    { title: 'Residential Villa Design - Sharma Design', value: 120000, probability: 75, stage: 'NEGOTIATION' as const, status: 'OPEN' as const, contactIdx: 2, assignedIdx: 0, expectedClose: '2026-09-01' },
-    { title: 'Office Renovation - Chen & Assoc', value: 65000, probability: 85, stage: 'QUALIFIED' as const, status: 'OPEN' as const, contactIdx: 1, assignedIdx: 4, expectedClose: '2026-06-20' },
-    { title: 'Commercial Tower Design - Vasquez Arch', value: 350000, probability: 40, stage: 'NEW_LEAD' as const, status: 'OPEN' as const, contactIdx: 4, assignedIdx: 0, expectedClose: '2026-12-15' },
-    { title: 'Sunset Towers - Rodriguez Realty', value: 180000, probability: 55, stage: 'QUALIFIED' as const, status: 'OPEN' as const, contactIdx: 7, assignedIdx: 1, expectedClose: '2026-10-01' },
-    { title: 'Park Plaza Hotel - Vasquez Arch', value: 280000, probability: 30, stage: 'NEW_LEAD' as const, status: 'OPEN' as const, contactIdx: 4, assignedIdx: 2, expectedClose: '2027-01-15' },
-    { title: 'Lobby Art Installation - Chen & Assoc', value: 15000, probability: 95, stage: 'CLOSED_WON' as const, status: 'WON' as const, contactIdx: 1, assignedIdx: 3, expectedClose: '2026-04-15' },
-    { title: 'Residential Complex - Johnson Development', value: 220000, probability: 45, stage: 'PROPOSAL_SENT' as const, status: 'OPEN' as const, contactIdx: 3, assignedIdx: 4, expectedClose: '2026-11-01' },
+    { title: 'Website Redesign - Morrison Interiors', value: 45000, probability: 80, stage: 'NEGOTIATION' as const, status: 'SENT' as const, contactIdx: 0, assignedIdx: 1, expectedClose: '2026-07-15' },
+    { title: 'Brand Identity Package - Chen & Assoc', value: 25000, probability: 90, stage: 'CLOSED_WON' as const, status: 'ACCEPTED' as const, contactIdx: 1, assignedIdx: 2, expectedClose: '2026-05-01' },
+    { title: 'Mobile App MVP - Morrison Interiors', value: 80000, probability: 60, stage: 'PROPOSAL_SENT' as const, status: 'SENT' as const, contactIdx: 0, assignedIdx: 3, expectedClose: '2026-08-30' },
+    { title: 'Residential Villa Design - Sharma Design', value: 120000, probability: 75, stage: 'NEGOTIATION' as const, status: 'CHANGES_REQUESTED' as const, contactIdx: 2, assignedIdx: 0, expectedClose: '2026-09-01' },
+    { title: 'Office Renovation - Chen & Assoc', value: 65000, probability: 85, stage: 'QUALIFIED' as const, status: 'DRAFT' as const, contactIdx: 1, assignedIdx: 4, expectedClose: '2026-06-20' },
+    { title: 'Commercial Tower Design - Vasquez Arch', value: 350000, probability: 40, stage: 'NEW_LEAD' as const, status: 'DRAFT' as const, contactIdx: 4, assignedIdx: 0, expectedClose: '2026-12-15' },
+    { title: 'Sunset Towers - Rodriguez Realty', value: 180000, probability: 55, stage: 'QUALIFIED' as const, status: 'SENT' as const, contactIdx: 7, assignedIdx: 1, expectedClose: '2026-10-01' },
+    { title: 'Park Plaza Hotel - Vasquez Arch', value: 280000, probability: 30, stage: 'NEW_LEAD' as const, status: 'SENT' as const, contactIdx: 4, assignedIdx: 2, expectedClose: '2027-01-15' },
+    { title: 'Lobby Art Installation - Chen & Assoc', value: 15000, probability: 95, stage: 'CLOSED_WON' as const, status: 'CONVERTED_TO_PROJECT' as const, contactIdx: 1, assignedIdx: 3, expectedClose: '2026-04-15' },
+    { title: 'Residential Complex - Johnson Development', value: 220000, probability: 45, stage: 'PROPOSAL_SENT' as const, status: 'SENT' as const, contactIdx: 3, assignedIdx: 4, expectedClose: '2026-11-01' },
   ];
 
   const deals = await Promise.all(
