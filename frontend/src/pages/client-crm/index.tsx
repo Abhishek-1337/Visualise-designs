@@ -7,7 +7,8 @@ import AllClientsGrid from './components/AllClientsGrid';
 import ClientWorkspace from './components/ClientWorkspace';
 import ProjectChatPanel from './components/ProjectChatPanel';
 import CreateProjectModal from './components/CreateProjectModal';
-import { contactService, projectService, inviteService, messageService } from '../../services';
+import CreateDealModal from './components/CreateDealModal';
+import { contactService, projectService, inviteService, messageService, dealService } from '../../services';
 import { useSocket } from '../../contexts/SocketContext';
 import type { RootState } from '../../store';
 import type { Client } from './components/AllClientsGrid';
@@ -135,6 +136,7 @@ const ClientCRM = () => {
   const [messages, setMessages] = useState<Record<string, Message[]>>({});
   const [clients, setClients] = useState<Client[]>([]);
   const [projectsByClient, setProjectsByClient] = useState<Record<string, any[]>>({});
+  const [dealsByClient, setDealsByClient] = useState<Record<string, any[]>>({});
   const [loading, setLoading] = useState(true);
 
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -147,6 +149,9 @@ const ClientCRM = () => {
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [creatingProject, setCreatingProject] = useState(false);
 
+  const [showDealModal, setShowDealModal] = useState(false);
+  const [creatingDeal, setCreatingDeal] = useState(false);
+
   useEffect(() => {
     loadData();
     loadInvites();
@@ -155,22 +160,37 @@ const ClientCRM = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [contactsRes, projectsRes] = await Promise.all([
-        contactService.getAll({ limit: '100' }),
-        projectService.getAll({ limit: '100' }),
-      ]);
+      
+      // Load contacts first as they are primary
+      const contactsRes = await contactService.getAll({ limit: '100' });
       const contacts = (contactsRes.data.contacts || []).map(mapContactToClient);
       setClients(contacts);
 
-      const grouped: Record<string, any[]> = {};
-      for (const p of projectsRes.data.projects || []) {
-        const cid = p.contactId;
-        if (!grouped[cid]) grouped[cid] = [];
-        grouped[cid].push(p);
-      }
-      setProjectsByClient(grouped);
-    } catch {
-      console.error('Failed to load client data');
+      // Load others sequentially to avoid total failure if one fails
+      try {
+        const projectsRes = await projectService.getAll({ limit: '100' });
+        const groupedProjects: Record<string, any[]> = {};
+        for (const p of projectsRes.data.projects || []) {
+          const cid = p.contactId;
+          if (!groupedProjects[cid]) groupedProjects[cid] = [];
+          groupedProjects[cid].push(p);
+        }
+        setProjectsByClient(groupedProjects);
+      } catch (e) { console.error('Failed to load projects', e); }
+
+      try {
+        const dealsRes = await dealService.getAll({ limit: '100' });
+        const groupedDeals: Record<string, any[]> = {};
+        for (const d of dealsRes.data.deals || []) {
+          const cid = d.contactId;
+          if (!groupedDeals[cid]) groupedDeals[cid] = [];
+          groupedDeals[cid].push(d);
+        }
+        setDealsByClient(groupedDeals);
+      } catch (e) { console.error('Failed to load deals', e); }
+
+    } catch (err) {
+      console.error('Failed to load primary client data', err);
     } finally {
       setLoading(false);
     }
@@ -190,6 +210,7 @@ const ClientCRM = () => {
 
   const selectedClient = clients.find((c) => c.id === selectedClientId) || null;
   const clientProjects: Project[] = (selectedClientId ? projectsByClient[selectedClientId] || [] : []).map(mapProject);
+  const clientDeals = selectedClientId ? dealsByClient[selectedClientId] || [] : [];
   const selectedProject = clientProjects.find((p) => String(p.id) === selectedProjectId) || null;
   const currentMessages = selectedProjectId ? (messages[selectedProjectId] || []) : [];
 
@@ -256,6 +277,24 @@ const ClientCRM = () => {
       console.error('Failed to create project:', err);
     } finally {
       setCreatingProject(false);
+    }
+  }, []);
+
+  const handleCreateDeal = useCallback(async (data: any) => {
+    try {
+      setCreatingDeal(true);
+      const res = await dealService.create(data);
+      
+      setDealsByClient(prev => ({
+        ...prev,
+        [data.contactId]: [res.data, ...(prev[data.contactId] || [])]
+      }));
+      
+      setShowDealModal(false);
+    } catch (err) {
+      console.error('Failed to create deal:', err);
+    } finally {
+      setCreatingDeal(false);
     }
   }, []);
 
@@ -380,10 +419,13 @@ const ClientCRM = () => {
                 <ClientWorkspace
                   client={selectedClient}
                   projects={clientProjects}
+                  deals={clientDeals}
                   selectedProjectId={selectedProjectId}
                   onSelectProject={handleSelectProject}
                   onBack={handleBack}
                   onNewProject={() => setShowProjectModal(true)}
+                  onNewDeal={() => setShowDealModal(true)}
+                  onRefresh={loadData}
                 />
               </div>
 
@@ -415,6 +457,16 @@ const ClientCRM = () => {
           onClose={() => setShowProjectModal(false)}
           onCreate={handleCreateProject}
           loading={creatingProject}
+          contactId={selectedClientId}
+        />
+      )}
+
+      {showDealModal && selectedClientId && (
+        <CreateDealModal
+          isOpen={showDealModal}
+          onClose={() => setShowDealModal(false)}
+          onCreate={handleCreateDeal}
+          loading={creatingDeal}
           contactId={selectedClientId}
         />
       )}

@@ -52,10 +52,12 @@ export enum ContactStatus {
 }
 
 export enum DealStatus {
-  OPEN = 'OPEN',
-  WON = 'WON',
-  LOST = 'LOST',
-  DRAFT = 'DRAFT'
+  DRAFT = 'DRAFT',
+  SENT = 'SENT',
+  CHANGES_REQUESTED = 'CHANGES_REQUESTED',
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED',
+  CONVERTED_TO_PROJECT = 'CONVERTED_TO_PROJECT'
 }
 
 export enum PipelineStage {

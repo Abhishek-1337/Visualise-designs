@@ -26,10 +26,12 @@ enum ContactStatus {
 }
 
 enum DealStatus {
-  OPEN
-  WON
-  LOST
   DRAFT
+  SENT
+  CHANGES_REQUESTED
+  ACCEPTED
+  REJECTED
+  CONVERTED_TO_PROJECT
 }
 
 enum TaskPriority {
@@ -154,7 +156,7 @@ model Deal {
   description     String?
   value           Float
   probability     Int          @default(0)   // 0-100
-  status          DealStatus   @default(OPEN)
+  status          DealStatus   @default(DRAFT)
   stage           PipelineStage @default(NEW_LEAD)
   expectedCloseDate DateTime?
   closedDate      DateTime?
@@ -168,6 +170,7 @@ model Deal {
   contact         Contact      @relation(fields: [contactId], references: [id])
   assignedToId    String?
   assignedTo      User?        @relation("AssignedDeals", fields: [assignedToId], references: [id])
+  project         Project?
   activities      Activity[]
 
   @@index([status])
@@ -193,6 +196,8 @@ model Project {
   tenant          Tenant         @relation(fields: [tenantId], references: [id])
   contactId       String
   contact         Contact        @relation(fields: [contactId], references: [id])
+  dealId          String?        @unique
+  deal            Deal?          @relation(fields: [dealId], references: [id])
   members         User[]         @relation("ProjectMembers")
   tasks           Task[]
   activities      Activity[]

@@ -22,10 +22,12 @@ Status of a contact in the CRM:
 
 ### DealStatus
 Status of a deal:
-- `OPEN` - Active deal
-- `WON` - Successfully closed
-- `LOST` - Lost deal
-- `DRAFT` - Draft deal
+- `DRAFT` - Initial draft
+- `SENT` - Sent to client
+- `CHANGES_REQUESTED` - Client requested changes
+- `ACCEPTED` - Client accepted proposal
+- `REJECTED` - Client rejected proposal
+- `CONVERTED_TO_PROJECT` - Deal converted to active project
 
 ### TaskPriority
 Priority levels for tasks:
@@ -189,6 +191,7 @@ Represents a client project.
 | budget | Float? | Project budget |
 | progress | Int | Progress percentage (0-100) |
 | contactId | String | Client contact |
+| dealId | String? | Associated deal ID (if converted) |
 | createdAt | DateTime | Creation timestamp |
 | updatedAt | DateTime | Last update timestamp |
 

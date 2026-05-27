@@ -23,6 +23,7 @@ router.get('/deals/:id', crmController.getDealById);
 router.post('/deals', crmController.createDeal);
 router.put('/deals/:id', crmController.updateDeal);
 router.patch('/deals/:id/stage', crmController.updateDeal);
+router.post('/deals/:id/convert', crmController.convertDealToProject);
 router.delete('/deals/:id', crmController.deleteDeal);
 
 // Projects

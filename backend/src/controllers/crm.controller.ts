@@ -9,6 +9,10 @@ import { AuthenticatedRequest } from '../types';
 export const getAllContacts = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
+    if (authReq.user.role === 'CLIENT') {
+      res.status(403).json({ error: 'Access denied' });
+      return;
+    }
     const { page = '1', limit = '20', status, country, search } = req.query;
 
     const where: any = { isArchived: false, tenantId: authReq.user.tenantId };
@@ -171,6 +175,19 @@ export const getAllDeals = async (req: Request, res: Response): Promise<void> =>
     if (stage) where.stage = stage;
     if (assignedTo) where.assignedToId = assignedTo;
 
+    if (authReq.user.role === 'CLIENT') {
+      const contact = await prisma.contact.findFirst({
+        where: { email: authReq.user.email, tenantId: authReq.user.tenantId }
+      });
+      where.contactId = contact?.id || 'none';
+      // Clients should not see DRAFT deals
+      if (where.status === 'DRAFT') {
+        where.status = 'none';
+      } else if (!where.status) {
+        where.status = { not: 'DRAFT' };
+      }
+    }
+
     const [deals, total] = await Promise.all([
       prisma.deal.findMany({
         where,
@@ -197,13 +214,18 @@ export const getDealById = async (req: Request, res: Response): Promise<void> =>
     const deal = await prisma.deal.findFirst({
       where: { id: req.params.id as string, tenantId: authReq.user.tenantId },
       include: {
-        contact: { select: { id: true, firstName: true, lastName: true, company: true } },
+        contact: { select: { id: true, firstName: true, lastName: true, email: true, company: true } },
         assignedTo: { select: { id: true, name: true, avatar: true } },
         activities: { orderBy: { createdAt: 'desc' }, take: 10, include: { user: { select: { id: true, name: true } } } }
       }
     });
     if (!deal) {
       res.status(404).json({ error: 'Deal not found' });
+      return;
+    }
+
+    if (authReq.user.role === 'CLIENT' && deal.contact.email !== authReq.user.email) {
+      res.status(403).json({ error: 'Not authorized to view this deal' });
       return;
     }
     res.json(deal);
@@ -215,6 +237,10 @@ export const getDealById = async (req: Request, res: Response): Promise<void> =>
 export const createDeal = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
+    if (authReq.user.role === 'CLIENT') {
+      res.status(403).json({ error: 'Clients cannot create deals' });
+      return;
+    }
     const { title, description, value, stage, contactId, assignedToId } = req.body;
 
     const deal = await prisma.deal.create({
@@ -247,24 +273,50 @@ export const createDeal = async (req: Request, res: Response): Promise<void> => 
 export const updateDeal = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
-    const { stage } = req.body;
+    const { stage, status } = req.body;
     
-    const updated = await prisma.deal.updateMany({
+    const deal = await prisma.deal.findFirst({
       where: { id: req.params.id as string, tenantId: authReq.user.tenantId },
-      data: {
-        ...req.body,
-        value: req.body.value ? parseFloat(req.body.value) : undefined
-      }
+      include: { contact: { select: { email: true } } }
     });
 
-    // Note: updateMany returns count, if we need updated object we'd need another query
-    // For simplicity, we assume it worked.
-    
-    if (stage) {
+    if (!deal) {
+      res.status(404).json({ error: 'Deal not found' });
+      return;
+    }
+
+    const data: any = { ...req.body };
+    if (data.value) data.value = parseFloat(data.value);
+
+    if (authReq.user.role === 'CLIENT') {
+      if (deal.contact.email !== authReq.user.email) {
+        res.status(403).json({ error: 'Not authorized' });
+        return;
+      }
+      // Clients can only update status to ACCEPTED or CHANGES_REQUESTED
+      const allowedStatuses = ['ACCEPTED', 'CHANGES_REQUESTED'];
+      if (status && !allowedStatuses.includes(status)) {
+        res.status(400).json({ error: 'Invalid status update for client' });
+        return;
+      }
+      // Restrict fields for clients
+      delete data.value;
+      delete data.stage;
+      delete data.title;
+      delete data.assignedToId;
+      delete data.contactId;
+    }
+
+    const updated = await prisma.deal.update({
+      where: { id: req.params.id as string },
+      data
+    });
+
+    if (stage || status) {
       await prisma.activity.create({
         data: {
-          type: 'deal_stage_changed',
-          description: `Deal moved to ${stage}`,
+          type: status ? 'deal_status_changed' : 'deal_stage_changed',
+          description: `Deal ${status ? 'status' : 'stage'} changed to ${status || stage}`,
           userId: authReq.user.id,
           dealId: req.params.id as string,
           tenantId: authReq.user.tenantId
@@ -272,9 +324,68 @@ export const updateDeal = async (req: Request, res: Response): Promise<void> => 
       });
     }
 
-    res.json({ message: 'Deal updated' });
+    res.json(updated);
   } catch {
     res.status(500).json({ error: 'Failed to update deal' });
+  }
+};
+
+export const convertDealToProject = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const authReq = req as AuthenticatedRequest;
+    const id = req.params.id as string;
+
+    const deal = await prisma.deal.findFirst({
+      where: { id, tenantId: authReq.user.tenantId },
+      include: { contact: true }
+    });
+
+    if (!deal) {
+      res.status(404).json({ error: 'Deal not found' });
+      return;
+    }
+
+    if (deal.status !== 'ACCEPTED') {
+      res.status(400).json({ error: 'Only accepted deals can be converted to projects' });
+      return;
+    }
+
+    const project = await prisma.$transaction(async (tx) => {
+      const newProject = await tx.project.create({
+        data: {
+          name: deal.title,
+          description: deal.description,
+          budget: deal.value,
+          contactId: deal.contactId,
+          tenantId: deal.tenantId,
+          dealId: deal.id,
+          status: 'PLANNING'
+        }
+      });
+
+      await tx.deal.update({
+        where: { id: deal.id },
+        data: { status: 'CONVERTED_TO_PROJECT' }
+      });
+
+      await tx.activity.create({
+        data: {
+          type: 'deal_converted',
+          description: `Deal "${deal.title}" converted to project`,
+          userId: authReq.user.id,
+          dealId: deal.id,
+          projectId: newProject.id,
+          tenantId: deal.tenantId
+        }
+      });
+
+      return newProject;
+    });
+
+    res.status(201).json(project);
+  } catch (error) {
+    console.error('Convert deal error:', error);
+    res.status(500).json({ error: 'Failed to convert deal to project' });
   }
 };
 
@@ -301,6 +412,12 @@ export const getAllProjects = async (req: Request, res: Response): Promise<void>
     if (status) where.status = status;
     if (contactId) where.contactId = contactId;
     if (authReq.user.role === 'EMPLOYEE') where.members = { some: { id: authReq.user.id } };
+    if (authReq.user.role === 'CLIENT') {
+      const contact = await prisma.contact.findFirst({
+        where: { email: authReq.user.email, tenantId: authReq.user.tenantId }
+      });
+      where.contactId = contact?.id || 'none';
+    }
 
     const [projects, total] = await Promise.all([
       prisma.project.findMany({
@@ -309,7 +426,7 @@ export const getAllProjects = async (req: Request, res: Response): Promise<void>
         take: Number(limit),
         orderBy: { updatedAt: 'desc' },
         include: {
-          contact: { select: { id: true, firstName: true, lastName: true, company: true } },
+          contact: { select: { id: true, firstName: true, lastName: true, email: true, company: true } },
           members: { select: { id: true, name: true, avatar: true } },
           _count: { select: { tasks: true } }
         }
@@ -329,7 +446,7 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
     const project = await prisma.project.findFirst({
       where: { id: req.params.id as string, tenantId: authReq.user.tenantId },
       include: {
-        contact: { select: { id: true, firstName: true, lastName: true, company: true } },
+        contact: { select: { id: true, firstName: true, lastName: true, email: true, company: true } },
         members: { select: { id: true, name: true, avatar: true } },
         tasks: { orderBy: { createdAt: 'desc' }, take: 10 },
         activities: { orderBy: { createdAt: 'desc' }, take: 10, include: { user: { select: { id: true, name: true } } } }
@@ -337,6 +454,11 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
     });
     if (!project) {
       res.status(404).json({ error: 'Project not found' });
+      return;
+    }
+
+    if (authReq.user.role === 'CLIENT' && project.contact.email !== authReq.user.email) {
+      res.status(403).json({ error: 'Not authorized to view this project' });
       return;
     }
     res.json(project);
@@ -348,6 +470,10 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
 export const createProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
+    if (authReq.user.role === 'CLIENT') {
+      res.status(403).json({ error: 'Clients cannot create projects' });
+      return;
+    }
     const { name, description, status, budget, contactId, memberIds, startDate, endDate } = req.body;
 
     const project = await prisma.project.create({
@@ -422,6 +548,12 @@ export const getAllTasks = async (req: Request, res: Response): Promise<void> =>
     if (projectId) where.projectId = projectId;
     if (contactId) where.contactId = contactId;
     if (authReq.user.role === 'EMPLOYEE' && !assignedTo) where.assignedToId = authReq.user.id;
+    if (authReq.user.role === 'CLIENT') {
+      const contact = await prisma.contact.findFirst({
+        where: { email: authReq.user.email, tenantId: authReq.user.tenantId }
+      });
+      where.contactId = contact?.id || 'none';
+    }
 
     const tasks = await prisma.task.findMany({
       where,
@@ -440,6 +572,10 @@ export const getAllTasks = async (req: Request, res: Response): Promise<void> =>
 export const createTask = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
+    if (authReq.user.role === 'CLIENT') {
+      res.status(403).json({ error: 'Clients cannot create tasks' });
+      return;
+    }
     const { title, description, priority, dueDate, contactId, projectId, assignedToId } = req.body;
     const task = await prisma.task.create({
       data: {
@@ -513,17 +649,22 @@ export const getActivities = async (req: Request, res: Response): Promise<void> 
 export const getCRMStats = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
+    if (authReq.user.role === 'CLIENT') {
+      res.status(403).json({ error: 'Access denied' });
+      return;
+    }
     const where = { tenantId: authReq.user.tenantId };
+    const activeStatuses: any[] = ['DRAFT', 'SENT', 'CHANGES_REQUESTED', 'ACCEPTED'];
     const [contacts, deals, projects, tasks] = await Promise.all([
       prisma.contact.count({ where: { ...where, isArchived: false } }),
-      prisma.deal.count({ where: { ...where, status: 'OPEN' } }),
+      prisma.deal.count({ where: { ...where, status: { in: activeStatuses } } }),
       prisma.project.count({ where: { ...where, status: 'ACTIVE' } }),
       prisma.task.count({ where: { ...where, status: 'TODO' } })
     ]);
 
     const dealValue = await prisma.deal.aggregate({
       _sum: { value: true },
-      where: { ...where, status: 'OPEN' }
+      where: { ...where, status: { in: activeStatuses } }
     });
 
     res.json({
@@ -541,6 +682,10 @@ export const getCRMStats = async (req: Request, res: Response): Promise<void> =>
 export const getDashboard = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
+    if (authReq.user.role === 'CLIENT') {
+      res.status(403).json({ error: 'Access denied' });
+      return;
+    }
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
@@ -569,7 +714,7 @@ export const getDashboard = async (req: Request, res: Response): Promise<void> =
       prisma.deal.aggregate({
         _sum: { value: true },
         _count: true,
-        where: { ...where, status: 'OPEN' }
+        where: { ...where, status: { in: ['DRAFT', 'SENT', 'CHANGES_REQUESTED', 'ACCEPTED'] } }
       })
     ]);
 
