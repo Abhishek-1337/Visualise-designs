@@ -51,12 +51,12 @@ const SettingsConfiguration = () => {
       <Sidebar />
       <TopBar />
       <main className="md:ml-[260px] pt-[60px]">
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 animate-fade-in">
           {/* Page Header */}
           <div className="mb-6 md:mb-8">
             <div className="flex items-center gap-3 mb-1">
-              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                <Icon name="Settings" size={20} color="var(--color-primary)" />
+              <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-soft-sm">
+                <Icon name="Settings" size={20} color="var(--color-primary-foreground)" />
               </div>
               <div>
                 <h1 className="text-2xl md:text-3xl font-heading font-bold text-foreground">Settings</h1>
@@ -75,7 +75,7 @@ const SettingsConfiguration = () => {
                     onClick={() => setActiveTab(tab?.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-smooth ${
                       activeTab === tab?.id
-                        ? 'bg-primary text-primary-foreground shadow-warm-sm'
+                        ? 'bg-primary text-primary-foreground shadow-soft-sm'
                         : 'text-foreground hover:bg-muted'
                     }`}
                   >
@@ -99,7 +99,7 @@ const SettingsConfiguration = () => {
             <div className="lg:hidden">
               <button
                 onClick={() => setMobileTabOpen(!mobileTabOpen)}
-                className="w-full flex items-center justify-between px-4 py-3 bg-card rounded-xl border border-border shadow-warm-sm"
+                className="w-full flex items-center justify-between px-4 py-3 bg-card border border-border rounded-xl shadow-soft-sm"
               >
                 <div className="flex items-center gap-3">
                   <Icon name={activeTabData?.icon || 'Settings'} size={18} color="var(--color-primary)" />
@@ -111,7 +111,7 @@ const SettingsConfiguration = () => {
                 <Icon name={mobileTabOpen ? 'ChevronUp' : 'ChevronDown'} size={18} color="var(--color-muted-foreground)" />
               </button>
               {mobileTabOpen && (
-                <div className="mt-2 bg-card rounded-xl border border-border shadow-warm-md overflow-hidden">
+                <div className="mt-2 bg-card border border-border rounded-xl shadow-soft-md overflow-hidden">
                   {tabs?.map((tab) => (
                     <button
                       key={tab?.id}

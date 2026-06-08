@@ -29,9 +29,9 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[1030] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-      <div className="bg-card rounded-xl shadow-warm-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="flex items-center justify-between p-4 md:p-6 border-b border-border">
+    <div className="fixed inset-0 z-[1030] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-fade-in">
+      <div className="bg-card rounded-lg shadow-soft-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col border border-border/50 animate-slide-up">
+        <div className="flex items-center justify-between p-5 md:p-6 border-b border-border">
           <div className="flex-1 min-w-0">
             <h2 className="font-heading font-semibold text-xl md:text-2xl text-foreground mb-1 line-clamp-1">
               {project?.name}
@@ -56,7 +56,7 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
                 className={`
                   flex items-center gap-2 px-4 py-2 rounded-lg transition-smooth flex-shrink-0
                   ${activeTab === tab?.id
-                    ? 'bg-primary text-primary-foreground shadow-warm-sm'
+                    ? 'gradient-primary text-white shadow-soft-sm'
                     : 'text-foreground hover:bg-muted'
                   }
                 `}
@@ -64,7 +64,7 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
                 <Icon
                   name={tab?.icon}
                   size={18}
-                  color={activeTab === tab?.id ? 'var(--color-primary-foreground)' : 'currentColor'}
+                  color={activeTab === tab?.id ? '#FFFFFF' : 'currentColor'}
                 />
                 <span className="font-medium text-sm">{tab?.label}</span>
               </button>
@@ -72,11 +72,11 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 md:p-6">
+        <div className="flex-1 overflow-y-auto p-5 md:p-6 scrollbar-thin">
           {activeTab === 'timeline' && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-muted/50 rounded-lg p-4">
+                <div className="bg-background rounded-lg p-4 border border-border/50">
                   <div className="flex items-center gap-2 mb-2">
                     <Icon name="Calendar" size={18} color="var(--color-primary)" />
                     <span className="text-sm font-medium text-muted-foreground">Start Date</span>
@@ -85,7 +85,7 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
                     {new Date(project.startDate)?.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
-                <div className="bg-muted/50 rounded-lg p-4">
+                <div className="bg-background rounded-lg p-4 border border-border/50">
                   <div className="flex items-center gap-2 mb-2">
                     <Icon name="Flag" size={18} color="var(--color-accent)" />
                     <span className="text-sm font-medium text-muted-foreground">Deadline</span>
@@ -94,7 +94,7 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
                     {new Date(project.deadline)?.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
-                <div className="bg-muted/50 rounded-lg p-4">
+                <div className="bg-background rounded-lg p-4 border border-border/50">
                   <div className="flex items-center gap-2 mb-2">
                     <Icon name="TrendingUp" size={18} color="var(--color-success)" />
                     <span className="text-sm font-medium text-muted-foreground">Progress</span>
@@ -109,15 +109,15 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
                   {project?.milestones?.map((milestone, index) => (
                     <div key={index} className="flex gap-4">
                       <div className="flex flex-col items-center">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${milestone?.completed ? 'bg-success' : 'bg-muted'}`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${milestone?.completed ? 'gradient-primary' : 'bg-muted'}`}>
                           <Icon
                             name={milestone?.completed ? 'Check' : 'Circle'}
                             size={20}
-                            color={milestone?.completed ? 'var(--color-success-foreground)' : 'currentColor'}
+                            color={milestone?.completed ? '#FFFFFF' : 'currentColor'}
                           />
                         </div>
                         {index < project?.milestones?.length - 1 && (
-                          <div className={`w-0.5 h-16 ${milestone?.completed ? 'bg-success' : 'bg-border'}`} />
+                          <div className={`w-0.5 h-16 ${milestone?.completed ? 'gradient-primary' : 'bg-border'}`} />
                         )}
                       </div>
                       <div className="flex-1 pb-4">
@@ -155,7 +155,7 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
                       {phaseTasks?.map((task) => (
                         <div
                           key={task?.id}
-                          className="bg-muted/50 rounded-lg p-4 hover:bg-muted transition-smooth"
+                          className="bg-background rounded-lg p-4 border border-border/50 hover:border-primary/30 hover:shadow-soft-sm transition-smooth"
                         >
                           <div className="flex items-start gap-3">
                             <Checkbox
@@ -174,7 +174,7 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
                                   <span>{new Date(task.dueDate)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <div className="w-5 h-5 rounded-full overflow-hidden bg-muted">
+                                  <div className="w-5 h-5 rounded-full overflow-hidden bg-muted ring-2 ring-card">
                                     <Image
                                       src={task?.assignee?.avatar}
                                       alt={task?.assignee?.avatarAlt}
@@ -200,7 +200,7 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
               {project?.files?.map((file, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg hover:bg-muted transition-smooth"
+                  className="flex items-center gap-4 p-4 bg-background rounded-lg border border-border/50 hover:border-primary/30 hover:shadow-soft-sm transition-smooth"
                 >
                   <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Icon name={file?.type === 'image' ? 'Image' : file?.type === 'document' ? 'FileText' : 'File'} size={20} color="var(--color-primary)" />
@@ -224,9 +224,9 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
               {project?.teamMembers?.map((member, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg"
+                  className="flex items-center gap-4 p-4 bg-background rounded-lg border border-border/50 hover:border-primary/30 hover:shadow-soft-sm transition-smooth"
                 >
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-muted flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-muted flex-shrink-0 ring-2 ring-card">
                     <Image
                       src={member?.avatar}
                       alt={member?.avatarAlt}
@@ -244,7 +244,7 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
           )}
         </div>
 
-        <div className="flex gap-3 p-4 md:p-6 border-t border-border">
+        <div className="flex gap-3 p-5 md:p-6 border-t border-border">
           <Button variant="outline" fullWidth onClick={onClose}>
             Close
           </Button>

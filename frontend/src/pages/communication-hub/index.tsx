@@ -104,19 +104,19 @@ const CommunicationHub = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background animate-fade-in">
       <Sidebar />
       <TopBar />
       <main className="md:ml-[260px] pt-[60px]">
         <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <h1 className="text-2xl md:text-3xl font-heading font-bold text-foreground">Communication Hub</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground">Communication Hub</h1>
               <p className="text-sm text-muted-foreground mt-1">Track all client interactions and follow-ups in one place</p>
             </div>
             <button
               onClick={() => setShowLogModal(true)}
-              className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium transition-smooth hover-lift active-press"
+              className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium transition-smooth hover-lift active-press shadow-soft-sm"
             >
               <Icon name="Plus" size={18} color="currentColor" />
               Log Communication
@@ -125,7 +125,7 @@ const CommunicationHub = () => {
 
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="flex-1 min-w-0">
-              <div className="bg-card rounded-xl shadow-warm p-4 mb-4">
+              <div className="bg-card rounded-xl shadow-soft-sm border border-border p-4 mb-4">
                 <div className="flex flex-col sm:flex-row gap-3">
                   <div className="relative flex-1">
                     <Icon name="Search" size={16} color="var(--color-muted-foreground)" className="absolute left-3 top-1/2 -translate-y-1/2" />
@@ -133,13 +133,13 @@ const CommunicationHub = () => {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e?.target?.value)}
                       placeholder="Search by client, participant, or topic..."
-                      className="w-full pl-9 pr-4 py-2 bg-muted border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+                      className="w-full pl-9 pr-4 py-2 bg-muted border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                     />
                   </div>
                   <select
                     value={dateFilter}
                     onChange={(e) => setDateFilter(e?.target?.value)}
-                    className="px-3 py-2 bg-muted border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                    className="px-3 py-2 bg-muted border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                   >
                     {dateOptions?.map((opt) => (
                       <option key={opt?.id} value={opt?.id}>{opt?.label}</option>
@@ -153,7 +153,7 @@ const CommunicationHub = () => {
                       onClick={() => setActiveFilter(filter?.id)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-smooth ${
                         activeFilter === filter?.id
-                          ? 'bg-primary text-primary-foreground'
+                          ? 'bg-primary text-primary-foreground shadow-soft-sm'
                           : 'bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary'
                       }`}
                     >
@@ -184,9 +184,9 @@ const CommunicationHub = () => {
               />
 
               {filteredComms?.length === 0 && (
-                <div className="text-center py-16">
-                  <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Icon name="MessageSquare" size={28} color="var(--color-muted-foreground)" />
+                <div className="text-center py-16 animate-fade-in">
+                  <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Icon name="MessageSquare" size={28} color="var(--color-primary)" />
                   </div>
                   <p className="font-medium text-foreground mb-1">No communications found</p>
                   <p className="text-sm text-muted-foreground">Try adjusting your filters or log a new communication</p>

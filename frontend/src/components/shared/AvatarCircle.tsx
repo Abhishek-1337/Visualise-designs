@@ -1,26 +1,44 @@
 import React from 'react';
+import { cn } from '../../utils/cn';
 
 interface AvatarCircleProps {
   name: string;
-  avatar?: string;
-  size?: number;
+  avatar?: string | null;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
 }
 
-const AvatarCircle: React.FC<AvatarCircleProps> = ({ name, avatar, size = 10, className = '' }) => {
-  const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-  const dimension = size * 4;
-  const textSize = size >= 12 ? 'text-sm font-bold' : size >= 10 ? 'text-sm font-bold' : size >= 8 ? 'text-[10px]' : 'text-[9px]';
+const sizeMap = {
+  sm: 'w-7 h-7 text-[10px]',
+  md: 'w-9 h-9 text-xs',
+  lg: 'w-11 h-11 text-sm',
+  xl: 'w-14 h-14 text-lg',
+};
+
+const colors = [
+  'bg-gradient-to-br from-violet-500 to-violet-600',
+  'bg-gradient-to-br from-emerald-500 to-emerald-600',
+  'bg-gradient-to-br from-amber-500 to-amber-600',
+  'bg-gradient-to-br from-rose-500 to-rose-600',
+  'bg-gradient-to-br from-sky-500 to-sky-600',
+  'bg-gradient-to-br from-indigo-500 to-indigo-600',
+];
+
+const AvatarCircle: React.FC<AvatarCircleProps> = ({ name, avatar, size = 'md', className }) => {
+  const initial = name?.charAt(0)?.toUpperCase() || '?';
+  const colorIndex = name?.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % colors.length || 0;
 
   return (
-    <div
-      className={`rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0 ${className}`}
-      style={{ width: dimension, height: dimension }}
-    >
+    <div className={cn(
+      'rounded-full flex items-center justify-center font-semibold text-white flex-shrink-0 overflow-hidden',
+      sizeMap[size],
+      !avatar && colors[colorIndex],
+      className
+    )}>
       {avatar ? (
-        <img src={avatar} alt={name} className="w-full h-full rounded-full object-cover" />
+        <img src={avatar} alt={name} className="w-full h-full object-cover" />
       ) : (
-        <span className={`${textSize} font-medium text-blue-600 dark:text-blue-400`}>{initials}</span>
+        initial
       )}
     </div>
   );

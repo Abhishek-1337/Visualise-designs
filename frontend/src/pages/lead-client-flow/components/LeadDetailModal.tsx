@@ -24,9 +24,9 @@ const LeadDetailModal = ({ lead, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-      <div className="bg-card rounded-xl shadow-warm-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-card border-b border-border px-6 py-4 flex items-center justify-between">
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-fade-in">
+      <div className="bg-card rounded-lg shadow-soft-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-border/50 animate-slide-up">
+        <div className="sticky top-0 bg-card border-b border-border px-6 py-4 flex items-center justify-between rounded-t-lg">
           <h2 className="font-heading font-semibold text-xl text-foreground">Lead Details</h2>
           <button
             onClick={onClose}
@@ -42,7 +42,7 @@ const LeadDetailModal = ({ lead, onClose }) => {
             <Image
               src={lead?.avatar}
               alt={lead?.avatarAlt}
-              className="w-20 h-20 rounded-full object-cover flex-shrink-0"
+              className="w-20 h-20 rounded-full object-cover flex-shrink-0 ring-2 ring-card"
             />
             <div className="flex-1">
               <h3 className="font-heading font-semibold text-2xl text-foreground mb-1">
@@ -64,7 +64,7 @@ const LeadDetailModal = ({ lead, onClose }) => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-background rounded-lg p-4">
+            <div className="bg-background rounded-lg p-4 border border-border/50">
               <div className="flex items-center gap-2 mb-2">
                 <Icon name="DollarSign" size={18} color="var(--color-primary)" />
                 <span className="text-sm font-medium text-muted-foreground">Estimated Value</span>
@@ -74,7 +74,7 @@ const LeadDetailModal = ({ lead, onClose }) => {
               </p>
             </div>
 
-            <div className="bg-background rounded-lg p-4">
+            <div className="bg-background rounded-lg p-4 border border-border/50">
               <div className="flex items-center gap-2 mb-2">
                 <Icon name="Calendar" size={18} color="var(--color-secondary)" />
                 <span className="text-sm font-medium text-muted-foreground">Last Contact</span>
@@ -89,15 +89,21 @@ const LeadDetailModal = ({ lead, onClose }) => {
             <h4 className="font-heading font-semibold text-base text-foreground">Contact Information</h4>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <Icon name="Mail" size={18} color="var(--color-muted-foreground)" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Icon name="Mail" size={16} color="var(--color-primary)" />
+                </div>
                 <span className="text-sm text-foreground">{lead?.email}</span>
               </div>
               <div className="flex items-center gap-3">
-                <Icon name="Phone" size={18} color="var(--color-muted-foreground)" />
+                <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
+                  <Icon name="Phone" size={16} color="var(--color-secondary)" />
+                </div>
                 <span className="text-sm text-foreground">{lead?.phone}</span>
               </div>
               <div className="flex items-center gap-3">
-                <Icon name="MapPin" size={18} color="var(--color-muted-foreground)" />
+                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                  <Icon name="MapPin" size={16} color="var(--color-accent)" />
+                </div>
                 <span className="text-sm text-foreground">{lead?.location}</span>
               </div>
             </div>
@@ -111,7 +117,9 @@ const LeadDetailModal = ({ lead, onClose }) => {
           <div className="space-y-4">
             <h4 className="font-heading font-semibold text-base text-foreground">Lead Source</h4>
             <div className="flex items-center gap-2">
-              <Icon name="TrendingUp" size={18} color="var(--color-accent)" />
+              <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                <Icon name="TrendingUp" size={16} color="var(--color-accent)" />
+              </div>
               <span className="text-sm text-foreground capitalize">{lead?.source}</span>
             </div>
           </div>
@@ -119,8 +127,8 @@ const LeadDetailModal = ({ lead, onClose }) => {
           <div className="space-y-4">
             <h4 className="font-heading font-semibold text-base text-foreground">Assigned To</h4>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
-                <Icon name="User" size={18} color="var(--color-accent-foreground)" />
+              <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center">
+                <Icon name="User" size={18} color="#FFFFFF" />
               </div>
               <span className="text-sm text-foreground">{lead?.assignedToName}</span>
             </div>

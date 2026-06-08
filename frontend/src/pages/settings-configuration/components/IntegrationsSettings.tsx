@@ -89,7 +89,7 @@ const IntegrationsSettings = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {connected?.map((service) => (
-            <div key={service?.id} className="bg-card rounded-xl p-5 border border-success/20 shadow-warm-sm">
+            <div key={service?.id} className="bg-card border border-success/20 rounded-xl p-5 shadow-soft-sm hover-lift transition-smooth">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${integrationColors[service?.id] || 'text-foreground bg-muted'}`}>
@@ -100,7 +100,7 @@ const IntegrationsSettings = () => {
                     <p className="text-xs text-muted-foreground">{service?.category}</p>
                   </div>
                 </div>
-                <span className="flex items-center gap-1 px-2 py-1 bg-success/10 text-success rounded-full text-xs font-medium">
+                <span className="flex items-center gap-1 px-2.5 py-1 bg-success/10 text-success rounded-full text-xs font-medium">
                   <Icon name="Check" size={10} color="currentColor" />
                   Active
                 </span>
@@ -134,7 +134,7 @@ const IntegrationsSettings = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {available?.map((service) => (
-            <div key={service?.id} className="bg-card rounded-xl p-5 border border-border shadow-warm-sm">
+            <div key={service?.id} className="bg-card border border-border rounded-xl p-5 shadow-soft-sm hover-lift transition-smooth">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${integrationColors[service?.id] || 'text-foreground bg-muted'} opacity-60`}>

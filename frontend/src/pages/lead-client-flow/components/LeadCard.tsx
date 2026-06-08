@@ -57,18 +57,27 @@ const LeadCard = ({ lead, onDragStart, onClick, onQuickAction }: LeadCardProps) 
     return colors?.[priority] || 'text-muted-foreground';
   };
 
+  const getPriorityBg = (priority) => {
+    const colors = {
+      high: 'bg-error/10',
+      medium: 'bg-warning/10',
+      low: 'bg-success/10'
+    };
+    return colors?.[priority] || 'bg-muted';
+  };
+
   return (
     <div
       draggable
       onDragStart={(e) => onDragStart(e, lead)}
       onClick={() => onClick(lead)}
-      className="bg-background rounded-lg p-4 border border-border cursor-move hover-lift active-press transition-smooth"
+      className="bg-background rounded-lg p-4 border border-border cursor-move hover-lift active-press transition-smooth hover:border-primary/30 hover:shadow-soft-sm"
     >
       <div className="flex items-start gap-3 mb-3">
         <Image
           src={lead?.avatar}
           alt={lead?.avatarAlt}
-          className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+          className="w-10 h-10 rounded-full object-cover flex-shrink-0 ring-2 ring-card"
         />
         <div className="flex-1 min-w-0">
           <h4 className="font-heading font-semibold text-sm text-foreground truncate">
@@ -76,12 +85,14 @@ const LeadCard = ({ lead, onDragStart, onClick, onQuickAction }: LeadCardProps) 
           </h4>
           <p className="text-xs text-muted-foreground truncate">{lead?.company}</p>
         </div>
-        <Icon 
-          name="Flag" 
-          size={14} 
-          color="currentColor" 
-          className={getPriorityColor(lead?.priority)}
-        />
+        <div className={`w-2 h-2 rounded-full mt-1.5 ${getPriorityBg(lead?.priority)}`}>
+          <Icon 
+            name="Flag" 
+            size={14} 
+            color="currentColor" 
+            className={getPriorityColor(lead?.priority)}
+          />
+        </div>
       </div>
       <div className="space-y-2 mb-3">
         <div className="flex items-center gap-2">

@@ -97,7 +97,7 @@ const TeamManagement = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -111,26 +111,26 @@ const TeamManagement = () => {
         </div>
         <button
           onClick={() => { setShowInviteForm(!showInviteForm); setInviteError(''); setInviteSuccess(''); }}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 shadow-warm-sm">
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 shadow-soft-sm">
           <Icon name="UserPlus" size={16} color="currentColor" />
           Invite Member
         </button>
       </div>
 
       {showInviteForm &&
-        <div className="bg-card rounded-xl p-5 border border-primary/20 shadow-warm-sm">
+        <div className="bg-card border border-primary/20 rounded-xl p-5 shadow-soft-sm">
           <h4 className="font-medium text-foreground mb-4">Invite New Member</h4>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="email"
               placeholder="Email address"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e?.target?.value)}
-              className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40" />
+              className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
             <select
               value={inviteRole}
               onChange={(e) => setInviteRole(e?.target?.value)}
-              className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40">
+              className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
               <option value="EMPLOYEE">Employee</option>
               <option value="MANAGER">Manager</option>
               <option value="ADMIN">Admin</option>
@@ -138,7 +138,7 @@ const TeamManagement = () => {
             <button
               onClick={handleSendInvite}
               disabled={sending}
-              className="px-4 py-2 bg-accent text-accent-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 disabled:opacity-50">
+              className="px-4 py-2 bg-gradient-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 disabled:opacity-50 shadow-soft-sm">
               {sending ? 'Sending...' : 'Send Invite'}
             </button>
           </div>
@@ -155,7 +155,7 @@ const TeamManagement = () => {
         <div className="space-y-2">
           <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Pending Invitations</h4>
           {invites.filter((inv) => inv.status === 'PENDING').map((inv) => (
-            <div key={inv.id} className="flex items-center gap-3 bg-card rounded-xl border border-border shadow-warm-sm p-4">
+            <div key={inv.id} className="flex items-center gap-3 bg-card border border-border rounded-xl shadow-soft-sm p-4 hover-lift transition-smooth">
               <div className="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center">
                 <Icon name="Clock" size={16} color="var(--color-warning)" />
               </div>
@@ -166,7 +166,7 @@ const TeamManagement = () => {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-warning/10 text-warning">
+                <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-warning/10 text-warning">
                   Pending
                 </span>
                 <button
@@ -185,7 +185,7 @@ const TeamManagement = () => {
           <p className="text-center text-sm text-muted-foreground py-8">No team members yet. Invite someone to get started.</p>
         }
         {allMembers?.map((member) =>
-          <div key={member?.id} className="bg-card rounded-xl border border-border shadow-warm-sm overflow-hidden">
+          <div key={member?.id} className="bg-card border border-border rounded-xl shadow-soft-sm overflow-hidden transition-smooth">
             <div
               className="flex items-center gap-4 p-4 cursor-pointer hover:bg-muted/30 transition-smooth"
               onClick={() => setSelectedMember(selectedMember?.id === member?.id ? null : member)}>
@@ -195,7 +195,7 @@ const TeamManagement = () => {
                     <AppImage
                       src={member?.avatar}
                       alt={member?.name}
-                      className="w-10 h-10 rounded-full object-cover" />
+                      className="w-10 h-10 rounded-full object-cover ring-2 ring-border" />
                     <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card ${
                       member?.isActive ? 'bg-success' : 'bg-muted-foreground'
                     }`} />
@@ -209,7 +209,7 @@ const TeamManagement = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="font-medium text-sm text-foreground truncate">{member?.name}</p>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${roleColors[member?.role] || roleColors.EMPLOYEE}`}>
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${roleColors[member?.role] || roleColors.EMPLOYEE}`}>
                     {roleLabels[member?.role] || member?.role}
                   </span>
                 </div>
@@ -239,7 +239,7 @@ const TeamManagement = () => {
                     <select
                       value={member?.role}
                       onChange={(e) => updateRole(member?.id, e?.target?.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40">
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
                       <option value="EMPLOYEE">Employee</option>
                       <option value="MANAGER">Manager</option>
                       <option value="ADMIN">Admin</option>

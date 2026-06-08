@@ -35,7 +35,7 @@ const TeamCalendar = ({ events }) => {
   };
 
   return (
-    <div className="bg-card rounded-xl shadow-warm p-4 md:p-5 lg:p-6">
+    <div className="bg-card border border-border rounded-xl shadow-soft-sm p-4 md:p-5 lg:p-6">
       <div className="flex items-center justify-between mb-4 md:mb-6">
         <h2 className="font-heading font-semibold text-lg md:text-xl lg:text-2xl text-foreground">
           Team Calendar
@@ -82,7 +82,7 @@ const TeamCalendar = ({ events }) => {
               key={day}
               className={`
                 aspect-square p-1 md:p-2 rounded-lg transition-smooth cursor-pointer
-                ${today ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'}
+                ${today ? 'bg-primary text-primary-foreground shadow-soft-sm' : 'bg-background hover:bg-muted border border-border/50'}
               `}
             >
               <div className="text-xs md:text-sm font-medium mb-1">{day}</div>
@@ -91,7 +91,7 @@ const TeamCalendar = ({ events }) => {
                   {dayEvents?.slice(0, 2)?.map((event, idx) => (
                     <div
                       key={idx}
-                      className={`w-full h-1 rounded-full ${
+                      className={`w-full h-1.5 rounded-full ${
                         event?.type === 'meeting' ? 'bg-accent' :
                         event?.type === 'deadline'? 'bg-error' : 'bg-success'
                       }`}

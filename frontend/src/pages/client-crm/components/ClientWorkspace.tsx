@@ -64,16 +64,15 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
   };
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col min-w-0 bg-background overflow-hidden">
-      <div className="px-6 py-4 border-b border-border shrink-0">
+    <div className="flex-1 min-h-0 flex flex-col min-w-0 bg-background overflow-hidden animate-fade-in">
+      <div className="px-6 py-4 border-b border-border shrink-0 bg-gradient-to-r from-background to-muted/30">
         
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <button
             onClick={onBack}
-            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-smooth"
+            className="text-sm text-primary hover:text-primary/80 transition-smooth"
           >
             <Icon name="ChevronLeft" size={14} color="currentColor" />
-            {/* <span>All Clients</span> */}
           </button>
           <span>Clients</span>
           <Icon name="ChevronRight" size={12} color="currentColor" />
@@ -81,27 +80,26 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
         </div>
       </div>
 
-      <Card variant="bordered" padding="lg" className="mx-4 mt-4 mb-0 pb-0 shrink-0">
+      <Card variant="elevated" padding="lg" className="mx-4 mt-4 mb-0 pb-0 shrink-0 shadow-soft-md">
         <div className="flex flex-col lg:flex-row lg:items-start gap-5">
           <div className="flex items-start gap-4 flex-1">
-            <AvatarCircle name={client.name} avatar={client.avatar} size={14} />
+            <AvatarCircle name={client.name} avatar={client.avatar} size="lg" />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-xl font-heading font-bold text-foreground">{client.name}</h1>
+                <h1 className="text-xl font-bold text-foreground">{client.name}</h1>
                 <StatusBadge status={client.status} size="md" />
               </div>
-              {/* <p className="text-sm text-muted-foreground font-medium mt-0.5">{client.company}</p> */}
               <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
                 <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Icon name="Mail" size={12} color="#3B82F6" />
+                  <Icon name="Mail" size={12} color="var(--color-primary)" />
                   {client.email}
                 </span>
                 <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Icon name="Phone" size={12} color="#3B82F6" />
+                  <Icon name="Phone" size={12} color="var(--color-primary)" />
                   {client.phone}
                 </span>
                 <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Icon name="MapPin" size={12} color="#3B82F6" />
+                  <Icon name="MapPin" size={12} color="var(--color-primary)" />
                   {client.location}
                 </span>
               </div>
@@ -121,8 +119,8 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-smooth border-b-2 ${
                   activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/20'
-                    : 'border-transparent text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-800'
+                    ? 'border-primary text-primary bg-primary/[0.03]'
+                    : 'border-transparent text-muted-foreground hover:text-primary hover:border-primary/30'
                 }`}
               >
                 <Icon name={tab.icon} size={15} color="currentColor" />
@@ -133,28 +131,26 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
         </div>
       </Card>
 
-      
-
       <div className="flex-1 min-h-0 p-6 overflow-y-auto">
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card variant="bordered" padding="lg" className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-blue-600 mb-2">
+            <Card variant="elevated" padding="lg" className="flex flex-col gap-2 shadow-soft-md">
+              <div className="flex items-center gap-2 text-primary mb-2">
                 <Icon name="Briefcase" size={20} color="currentColor" />
                 <h3 className="font-semibold">Deals</h3>
               </div>
               <p className="text-3xl font-bold">{deals.length}</p>
               <p className="text-sm text-muted-foreground">Active proposals and opportunities</p>
             </Card>
-            <Card variant="bordered" padding="lg" className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-blue-600 mb-2">
+            <Card variant="elevated" padding="lg" className="flex flex-col gap-2 shadow-soft-md">
+              <div className="flex items-center gap-2 text-primary mb-2">
                 <Icon name="Folder" size={20} color="currentColor" />
                 <h3 className="font-semibold">Projects</h3>
               </div>
               <p className="text-3xl font-bold">{projects.length}</p>
               <p className="text-sm text-muted-foreground">Active and planning projects</p>
             </Card>
-            <Card variant="bordered" padding="lg" className="flex flex-col gap-2">
+            <Card variant="elevated" padding="lg" className="flex flex-col gap-2 shadow-soft-md">
               <div className="flex items-center gap-2 text-emerald-600 mb-2">
                 <Icon name="CheckSquare" size={20} color="currentColor" />
                 <h3 className="font-semibold">Tasks</h3>
@@ -182,9 +178,10 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
                     variant="bordered"
                     padding="md"
                     className="flex items-center justify-between gap-4 w-full"
+                    hover
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                         <Icon name="Briefcase" size={18} color="currentColor" />
                       </div>
                       <div>
@@ -200,7 +197,7 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
                         <button
                           onClick={() => handleConvertToProject(deal.id)}
                           disabled={convertingDealId === deal.id}
-                          className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 disabled:opacity-50 transition-smooth"
+                          className="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-medium hover:bg-primary/90 disabled:opacity-50 transition-smooth shadow-soft-sm"
                         >
                           {convertingDealId === deal.id ? 'Converting...' : 'Convert to Project'}
                         </button>
@@ -237,8 +234,8 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
                   >
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                       String(project.id) === selectedProjectId
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-primary/10 text-primary'
                     }`}>
                       <Icon name="Folder" size={18} color="currentColor" />
                     </div>
@@ -249,18 +246,18 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
                         <StatusBadge status={project.status} className='max-w-max mt-1'/>
                       </div>
                       <div className="flex flex-col gap-3 w-full justify-center">
-                        <ProgressWithLabel progress={project.progress} />
+                        <ProgressWithLabel value={project.progress} />
                         <TeamMemberAvatars members={project.team} />
                       </div>
                       <div className="flex flex-col items-start md:items-center justify-center gap-1 text-xs text-muted-foreground">
                         <span className="font-semibold">Due Date</span>
                         <div className="flex gap-2 items-center">
-                          <Icon name="Calendar" size={14} color="#3B82F6" />
+                          <Icon name="Calendar" size={14} color="var(--color-primary)" />
                           <span className="whitespace-nowrap">{project.dueDate}</span>
                         </div>
                       </div>
                     </div>
-                    <Icon name="ChevronRight" size={16} color="#3B82F6" className="mt-2 flex-shrink-0 opacity-40 self-center" />
+                    <Icon name="ChevronRight" size={16} color="var(--color-primary)" className="mt-2 flex-shrink-0 opacity-40 self-center" />
                   </Card>
                 ))}
               </div>
@@ -303,8 +300,8 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
             <CardHeader title="Activity Log" />
             <div className="space-y-4">
               <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                  <Icon name="UserPlus" size={14} color="#3B82F6" />
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <Icon name="UserPlus" size={14} color="var(--color-primary)" />
                 </div>
                 <div>
                   <p className="text-sm text-foreground">Client added to the system</p>

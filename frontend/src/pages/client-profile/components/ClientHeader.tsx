@@ -12,10 +12,10 @@ const ClientHeader = ({ client, onEdit }) => {
   };
 
   return (
-    <div className="bg-card rounded-xl shadow-warm p-6 mb-6">
+    <div className="bg-card rounded-xl shadow-soft-md border border-border p-6 mb-6 hover-lift">
       <div className="flex flex-col lg:flex-row lg:items-start gap-6">
         <div className="flex items-start gap-4 flex-1">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center flex-shrink-0">
             {client?.avatar ? (
               <img src={client?.avatar} alt={client?.avatarAlt || client?.name} className="w-16 h-16 rounded-full object-cover" />
             ) : (
@@ -24,8 +24,8 @@ const ClientHeader = ({ client, onEdit }) => {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-heading font-bold text-foreground">{client?.name}</h1>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${statusColors?.[client?.status] || statusColors?.active}`}>
+              <h1 className="text-2xl font-bold text-foreground">{client?.name}</h1>
+              <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize border ${statusColors?.[client?.status] || statusColors?.active}`}>
                 {client?.status || 'Active'}
               </span>
             </div>
@@ -49,21 +49,21 @@ const ClientHeader = ({ client, onEdit }) => {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover-lift active-press">
+          <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover-lift shadow-soft-sm">
             <Icon name="Phone" size={16} color="currentColor" />
             <span>Call</span>
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium text-foreground transition-smooth hover:bg-muted active-press">
+          <button className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium text-foreground transition-smooth hover:bg-muted">
             <Icon name="Mail" size={16} color="currentColor" />
             <span>Email</span>
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium text-foreground transition-smooth hover:bg-muted active-press">
+          <button className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium text-foreground transition-smooth hover:bg-muted">
             <Icon name="Calendar" size={16} color="currentColor" />
             <span>Schedule</span>
           </button>
           <button
             onClick={() => onEdit?.()}
-            className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium text-foreground transition-smooth hover:bg-muted active-press"
+            className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium text-foreground transition-smooth hover:bg-muted"
           >
             <Icon name="Edit" size={16} color="currentColor" />
             <span>Edit</span>

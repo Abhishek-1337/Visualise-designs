@@ -53,7 +53,7 @@ const TodaysFocusCard = () => {
 
   if (isLoading && !localTasks.length) {
     return (
-      <div className="bg-card rounded-xl shadow-warm-md p-6 lg:p-8">
+      <div className="bg-card rounded-lg shadow-soft-md p-6 lg:p-8 border border-border/50">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-muted rounded w-1/3"></div>
           <div className="h-2 bg-muted rounded"></div>
@@ -64,11 +64,11 @@ const TodaysFocusCard = () => {
   }
 
   return (
-    <div className="bg-card rounded-xl shadow-warm-md p-4 md:p-6 lg:p-8 transition-smooth hover-lift">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 md:mb-6">
+    <div className="bg-card rounded-lg shadow-soft-lg p-5 md:p-6 lg:p-8 transition-smooth hover-lift border border-border/50">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 md:mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-            <Icon name="Target" size={20} color="var(--color-primary)" />
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg gradient-primary flex items-center justify-center shadow-soft-sm">
+            <Icon name="Target" size={20} color="#FFFFFF" />
           </div>
           <div>
             <h2 className="text-xl md:text-2xl lg:text-3xl font-heading font-semibold text-foreground">Today's Focus</h2>
@@ -81,9 +81,9 @@ const TodaysFocusCard = () => {
         </div>
       </div>
       {totalCount > 0 && (
-        <div className="mb-4 md:mb-6">
+        <div className="mb-5 md:mb-6">
           <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <div className="h-full bg-primary transition-smooth" style={{ width: `${progressPercentage}%` }} />
+            <div className="h-full gradient-primary transition-smooth" style={{ width: `${progressPercentage}%` }} />
           </div>
         </div>
       )}
@@ -95,7 +95,7 @@ const TodaysFocusCard = () => {
       ) : (
         <div className="space-y-3 md:space-y-4">
           {localTasks?.map((task) => (
-            <div key={task?.id} className={`group p-3 md:p-4 rounded-lg border transition-smooth ${task?.completed ? 'bg-muted/50 border-border opacity-60' : 'bg-background border-border hover:border-primary/30 hover:shadow-warm-sm'}`}>
+            <div key={task?.id} className={`group p-3 md:p-4 rounded-lg border transition-smooth ${task?.completed ? 'bg-muted/50 border-border opacity-60' : 'bg-background border-border hover:border-primary/30 hover:shadow-soft-sm'}`}>
               <div className="flex items-start gap-3">
                 <div className="pt-0.5">
                   <Checkbox checked={task?.completed} onChange={() => handleTaskToggle(task?.id)} size="default" />
@@ -115,7 +115,7 @@ const TodaysFocusCard = () => {
           ))}
         </div>
       )}
-      <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-border">
+      <div className="mt-5 md:mt-6 pt-5 md:pt-6 border-t border-border">
         <Link to="/lead-client-flow"><Button variant="outline" fullWidth iconName="ArrowRight" iconPosition="right">View All Tasks & Pipeline</Button></Link>
       </div>
     </div>

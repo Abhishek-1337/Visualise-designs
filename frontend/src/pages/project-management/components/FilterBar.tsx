@@ -30,7 +30,7 @@ const FilterBar = ({ filters, onFilterChange, onClearFilters }) => {
   ];
 
   return (
-    <div className="bg-card rounded-xl shadow-warm p-4 md:p-5 lg:p-6 mb-6">
+    <div className="bg-card rounded-lg shadow-soft-md p-5 mb-6 border border-border/50">
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1">
           <Input

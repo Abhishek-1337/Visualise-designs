@@ -100,16 +100,16 @@ const ClientProjectDetails = () => {
   }
 
   return (
-    <div className="h-screen overflow-hidden bg-background">
+    <div className="h-screen overflow-hidden bg-background animate-fade-in">
       <Sidebar />
       <TopBar />
       <main className="md:ml-[240px] h-screen pt-[60px] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="bg-card border-b border-border px-6 py-4">
+        <div className="bg-card border-b border-border px-6 py-4 shadow-soft-sm">
           <div className="flex items-center gap-4 mb-4">
             <button 
               onClick={() => navigate('/client-portal/projects')}
-              className="p-2 hover:bg-muted rounded-lg transition-smooth"
+              className="p-2 hover:bg-muted rounded-lg transition-all duration-200 active-press"
             >
               <Icon name="ArrowLeft" size={20} />
             </button>
@@ -118,7 +118,7 @@ const ClientProjectDetails = () => {
                 <h1 className="text-xl font-bold text-foreground">{project.name}</h1>
                 <StatusBadge status={project.status} />
               </div>
-              <p className="text-sm text-muted-foreground">{project.description}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{project.description}</p>
             </div>
           </div>
 
@@ -127,7 +127,7 @@ const ClientProjectDetails = () => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`text-sm font-medium pb-2 transition-smooth border-b-2 capitalize ${
+                className={`text-sm font-medium pb-2 transition-all duration-200 border-b-2 capitalize ${
                   activeTab === tab 
                     ? 'border-primary text-primary' 
                     : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -144,7 +144,7 @@ const ClientProjectDetails = () => {
           <div className="max-w-7xl mx-auto px-6 py-6 h-full flex flex-col">
             {activeTab === 'overview' && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="p-6 md:col-span-2">
+                <Card className="md:col-span-2">
                   <h3 className="font-semibold mb-4">Progress</h3>
                   <div className="mb-6">
                     <div className="flex justify-between text-sm mb-2">
@@ -153,7 +153,7 @@ const ClientProjectDetails = () => {
                     </div>
                     <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-primary" 
+                        className="h-full bg-gradient-to-r from-primary to-indigo-500 rounded-full transition-all duration-700 ease-out" 
                         style={{ width: `${project.progress}%` }} 
                       />
                     </div>
@@ -163,30 +163,30 @@ const ClientProjectDetails = () => {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="text-muted-foreground">Start Date</p>
-                      <p className="font-medium">{project.startDate ? new Date(project.startDate).toLocaleDateString() : 'N/A'}</p>
+                      <p className="font-medium text-foreground">{project.startDate ? new Date(project.startDate).toLocaleDateString() : 'N/A'}</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">Target End Date</p>
-                      <p className="font-medium">{project.endDate ? new Date(project.endDate).toLocaleDateString() : 'N/A'}</p>
+                      <p className="font-medium text-foreground">{project.endDate ? new Date(project.endDate).toLocaleDateString() : 'N/A'}</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">Budget</p>
-                      <p className="font-medium">${project.budget?.toLocaleString() || 'N/A'}</p>
+                      <p className="font-medium text-foreground">${project.budget?.toLocaleString() || 'N/A'}</p>
                     </div>
                   </div>
                 </Card>
 
-                <Card className="p-6 h-fit">
+                <Card className="h-fit">
                   <h3 className="font-semibold mb-4">Team</h3>
                   <div className="space-y-4">
                     {(project.members || []).map((m: any) => (
                       <div key={m.id} className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-                          {m.avatar ? <img src={m.avatar} alt={m.name} /> : m.name[0]}
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center overflow-hidden text-xs font-bold text-primary">
+                          {m.avatar ? <img src={m.avatar} alt={m.name} className="w-full h-full object-cover" /> : m.name[0]}
                         </div>
                         <div>
                           <p className="text-sm font-medium text-foreground">{m.name}</p>
-                          <p className="text-[10px] text-muted-foreground uppercase">{m.role}</p>
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{m.role}</p>
                         </div>
                       </div>
                     ))}
@@ -201,14 +201,14 @@ const ClientProjectDetails = () => {
                   <EmptyState icon="CheckSquare" title="No tasks found" description="Tasks will appear here once the team starts the delivery flow." />
                 ) : (
                   tasks.map((task) => (
-                    <Card key={task.id} className="p-4 flex items-center justify-between">
+                    <Card key={task.id} hover className="p-4 flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className={`w-2 h-2 rounded-full ${
+                        <div className={`w-2.5 h-2.5 rounded-full ${
                           task.status === 'COMPLETED' ? 'bg-emerald-500' : 'bg-amber-500'
-                        }`} />
+                        } shadow-soft-sm`} />
                         <div>
                           <p className="font-medium text-foreground">{task.title}</p>
-                          <p className="text-xs text-muted-foreground">{task.description}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{task.description}</p>
                         </div>
                       </div>
                       <StatusBadge status={task.status} />
@@ -219,19 +219,19 @@ const ClientProjectDetails = () => {
             )}
 
             {activeTab === 'chat' && (
-              <div className="flex-1 flex flex-col min-h-0 bg-card border border-border rounded-xl">
+              <div className="flex-1 flex flex-col min-h-0 bg-card border border-border rounded-xl shadow-soft-md">
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                   {messages.map((msg, i) => (
-                    <div key={msg.id} className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
+                    <div key={msg.id || i} className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
                       <div className={`max-w-[70%] rounded-xl px-4 py-2 ${
                         msg.sender === 'me' 
-                          ? 'bg-primary text-white' 
-                          : 'bg-muted text-foreground'
+                          ? 'bg-gradient-to-r from-primary to-indigo-600 text-white shadow-soft-sm' 
+                          : 'bg-muted text-foreground border border-border/50'
                       }`}>
                         {msg.sender !== 'me' && (
                           <p className="text-[10px] font-bold mb-1 opacity-70">{msg.senderName}</p>
                         )}
-                        <p className="text-sm">{msg.content}</p>
+                        <p className="text-sm leading-relaxed">{msg.content}</p>
                         <p className={`text-[9px] mt-1 text-right ${msg.sender === 'me' ? 'text-white/70' : 'text-muted-foreground'}`}>
                           {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>
@@ -248,11 +248,11 @@ const ClientProjectDetails = () => {
                       onChange={(e) => setMessageText(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type your message..."
-                      className="flex-1 bg-background border border-border rounded-lg px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/30"
+                      className="flex-1 bg-background border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all duration-200"
                     />
                     <button
                       onClick={handleSendMessage}
-                      className="p-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-smooth"
+                      className="p-2.5 gradient-primary text-white rounded-lg hover:opacity-90 shadow-soft-sm transition-all duration-200 active-press"
                     >
                       <Icon name="Send" size={20} />
                     </button>

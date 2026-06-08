@@ -26,7 +26,7 @@ const WorkloadChart = ({ data }: WorkloadChartProps) => {
   const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     if (active && payload && payload?.length) {
       return (
-        <div className="bg-popover border border-border rounded-lg shadow-warm-lg p-3">
+        <div className="bg-popover border border-border rounded-xl shadow-soft-lg p-3">
           <p className="text-sm font-medium text-popover-foreground mb-1">{payload?.[0]?.payload?.name}</p>
           <p className="text-xs text-muted-foreground">
             Workload: <span className="font-semibold text-foreground">{payload?.[0]?.value}%</span>
@@ -41,7 +41,7 @@ const WorkloadChart = ({ data }: WorkloadChartProps) => {
   };
 
   return (
-    <div className="bg-card rounded-xl shadow-warm p-4 md:p-5 lg:p-6">
+    <div className="bg-card border border-border rounded-xl shadow-soft-sm p-4 md:p-5 lg:p-6">
       <div className="flex items-center justify-between mb-4 md:mb-6">
         <h2 className="font-heading font-semibold text-lg md:text-xl lg:text-2xl text-foreground">
           Team Workload Distribution

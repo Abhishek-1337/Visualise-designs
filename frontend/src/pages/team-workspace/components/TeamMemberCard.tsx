@@ -24,13 +24,13 @@ const TeamMemberCard = ({ member, onAssignTask, onViewDetails, onMessage }) => {
   };
 
   return (
-    <div className="bg-card rounded-xl shadow-warm p-4 md:p-5 lg:p-6 transition-smooth hover-lift">
+    <div className="bg-card border border-border rounded-xl shadow-soft-sm p-4 md:p-5 lg:p-6 transition-smooth hover-lift">
       <div className="flex items-start gap-3 md:gap-4 mb-4">
         <div className="relative flex-shrink-0">
           <Image
             src={member?.avatar}
             alt={member?.avatarAlt}
-            className="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full object-cover"
+            className="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full object-cover ring-2 ring-border"
           />
           <div className={`absolute bottom-0 right-0 w-4 h-4 md:w-5 md:h-5 rounded-full border-2 border-card ${getStatusColor(member?.status)}`} />
         </div>
@@ -43,7 +43,7 @@ const TeamMemberCard = ({ member, onAssignTask, onViewDetails, onMessage }) => {
             {member?.role}
           </p>
           <div className="flex items-center gap-2 mt-2">
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(member?.status)}`}>
+            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(member?.status)}`}>
               <span className="w-1.5 h-1.5 rounded-full bg-current" />
               {member?.status?.charAt(0)?.toUpperCase() + member?.status?.slice(1)}
             </span>
@@ -67,14 +67,14 @@ const TeamMemberCard = ({ member, onAssignTask, onViewDetails, onMessage }) => {
           </div>
           <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
             <div
-              className={`h-full transition-smooth ${getWorkloadColor(member?.workloadPercentage)}`}
+              className={`h-full rounded-full transition-smooth ${getWorkloadColor(member?.workloadPercentage)}`}
               style={{ width: `${member?.workloadPercentage}%` }}
             />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3 md:gap-4">
-          <div className="bg-background rounded-lg p-3">
+          <div className="bg-gradient-to-br from-indigo-50/50 to-transparent rounded-xl p-3 border border-indigo-100/30">
             <div className="flex items-center gap-2 mb-1">
               <Icon name="FolderKanban" size={16} color="var(--color-primary)" />
               <span className="text-xs text-muted-foreground">Active</span>
@@ -82,7 +82,7 @@ const TeamMemberCard = ({ member, onAssignTask, onViewDetails, onMessage }) => {
             <p className="text-lg md:text-xl font-semibold text-foreground">{member?.activeProjects}</p>
           </div>
 
-          <div className="bg-background rounded-lg p-3">
+          <div className="bg-gradient-to-br from-amber-50/50 to-transparent rounded-xl p-3 border border-amber-100/30">
             <div className="flex items-center gap-2 mb-1">
               <Icon name="Clock" size={16} color="var(--color-accent)" />
               <span className="text-xs text-muted-foreground">Deadlines</span>
@@ -97,7 +97,7 @@ const TeamMemberCard = ({ member, onAssignTask, onViewDetails, onMessage }) => {
           {member?.currentProjects?.map((project, index) => (
             <span
               key={index}
-              className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md text-xs"
+              className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary/10 text-primary rounded-lg text-xs font-medium"
             >
               {project}
             </span>

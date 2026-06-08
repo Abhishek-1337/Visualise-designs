@@ -44,20 +44,20 @@ const ActivityFeed = ({ activities }: ActivityFeedProps) => {
   };
 
   return (
-    <div className="bg-card rounded-xl shadow-warm p-4 md:p-5 lg:p-6">
+    <div className="bg-card border border-border rounded-xl shadow-soft-sm p-4 md:p-5 lg:p-6">
       <h2 className="font-heading font-semibold text-lg md:text-xl lg:text-2xl text-foreground mb-4 md:mb-6">
         Team Activity Feed
       </h2>
-      <div className="space-y-3 md:space-y-4 max-h-[500px] md:max-h-[600px] overflow-y-auto">
+      <div className="space-y-3 md:space-y-4 max-h-[500px] md:max-h-[600px] overflow-y-auto pr-1">
         {activities?.map((activity) => {
           const iconConfig = getActivityIcon(activity?.type);
           return (
             <div
               key={activity?.id}
-              className="flex gap-3 md:gap-4 p-3 md:p-4 bg-background rounded-lg transition-smooth hover:bg-muted"
+              className="flex gap-3 md:gap-4 p-3 md:p-4 bg-background rounded-xl border border-border/50 transition-smooth hover:bg-muted/50"
             >
               <div className="flex-shrink-0">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-card flex items-center justify-center shadow-warm-sm">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-card border border-border flex items-center justify-center shadow-soft-sm">
                   <Icon name={iconConfig?.name} size={20} color={iconConfig?.color} />
                 </div>
               </div>
@@ -79,7 +79,7 @@ const ActivityFeed = ({ activities }: ActivityFeedProps) => {
                   <Image
                     src={activity?.userAvatar}
                     alt={activity?.userAvatarAlt}
-                    className="w-6 h-6 rounded-full object-cover"
+                    className="w-6 h-6 rounded-full object-cover ring-1 ring-border"
                   />
                   <span className="text-xs text-muted-foreground">{activity?.userName}</span>
                   {activity?.projectName && (
@@ -91,7 +91,7 @@ const ActivityFeed = ({ activities }: ActivityFeedProps) => {
                 </div>
 
                 {activity?.celebration && (
-                  <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-1 bg-warning/10 text-warning rounded-md text-xs">
+                  <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 bg-warning/10 text-warning rounded-lg text-xs font-medium">
                     <Icon name="Sparkles" size={14} color="var(--color-warning)" />
                     <span>{activity?.celebration}</span>
                   </div>

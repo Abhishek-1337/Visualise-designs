@@ -45,7 +45,7 @@ const MessageBubble: React.FC<{ message: Message; showSender: boolean }> = ({ me
     <div className={`flex gap-3 ${isMe ? 'flex-row-reverse' : ''} ${showSender ? 'mb-4' : 'mb-1'}`}>
       {showSender && (
         <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center mt-0.5 ${
-          isMe ? 'bg-blue-600 text-white' : (isTeam ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400' : 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400')
+          isMe ? 'bg-primary text-primary-foreground' : (isTeam ? 'bg-primary/10 text-primary' : 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400')
         }`}>
           {message.senderAvatar ? (
             <img src={message.senderAvatar} alt={message.senderName} className="w-7 h-7 rounded-full object-cover" />
@@ -58,7 +58,7 @@ const MessageBubble: React.FC<{ message: Message; showSender: boolean }> = ({ me
       <div className={`max-w-[80%] ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
         {showSender && (
           <div className={`flex items-center gap-2 mb-0.5 ${isMe ? 'flex-row-reverse' : ''}`}>
-            <span className={`text-[11px] font-semibold ${isMe ? 'text-blue-600' : (isTeam ? 'text-indigo-600' : 'text-emerald-600')}`}>
+            <span className={`text-[11px] font-semibold ${isMe ? 'text-primary' : (isTeam ? 'text-primary' : 'text-emerald-600')}`}>
               {isMe ? 'You' : message.senderName || (isTeam ? 'Team Member' : 'Client')}
             </span>
             <span className="text-[10px] text-muted-foreground">{time}</span>
@@ -69,8 +69,8 @@ const MessageBubble: React.FC<{ message: Message; showSender: boolean }> = ({ me
         )}
         <div className={`rounded-xl px-3.5 py-2 text-sm leading-relaxed ${
           isMe
-            ? 'bg-blue-600 text-white rounded-tr-sm'
-            : (isTeam ? 'bg-indigo-50 dark:bg-indigo-950/30 text-foreground border border-indigo-100 dark:border-indigo-900/50 rounded-tl-sm' : 'bg-emerald-50 dark:bg-emerald-950/30 text-foreground border border-emerald-100 dark:border-emerald-900/50 rounded-tl-sm')
+            ? 'bg-primary text-primary-foreground rounded-tr-sm shadow-soft-sm'
+            : (isTeam ? 'bg-primary/5 text-foreground border border-primary/10 rounded-tl-sm' : 'bg-emerald-50 dark:bg-emerald-950/30 text-foreground border border-emerald-100 dark:border-emerald-900/50 rounded-tl-sm')
         }`}>
           <p className="whitespace-pre-wrap break-words">{message.content}</p>
         </div>
@@ -149,8 +149,8 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
       <div className="w-full lg:w-[380px] xl:w-[420px] flex flex-col bg-card border-l border-border">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center">
-              <Icon name="MessageSquare" size={18} color="#3B82F6" />
+            <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center">
+              <Icon name="MessageSquare" size={18} color="var(--color-primary)" />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-foreground">Project Chat</h3>
@@ -158,17 +158,17 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
             </div>
           </div>
         </div>
-        <EmptyState icon="MessageCircle" title="Select a project from the client workspace to view its conversation." iconSize={24} />
+        <EmptyState icon="MessageCircle" title="Select a project from the client workspace to view its conversation." />
       </div>
     );
   }
 
   return (
-    <div className="w-full lg:w-[380px] xl:w-[420px] h-full flex flex-col bg-card border-l border-border min-h-0">
+    <div className="w-full lg:w-[380px] xl:w-[420px] h-full flex flex-col bg-card border-l border-border min-h-0 animate-fade-in">
       <div className="flex items-center justify-between px-5 py-4 border-b border-border">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
-            <Icon name="Folder" size={16} color="#3B82F6" />
+          <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+            <Icon name="Folder" size={16} color="var(--color-primary)" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
@@ -194,8 +194,8 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
               onClick={() => setActiveChatTab(tab.id)}
               className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium whitespace-nowrap transition-smooth border-b-2 ${
                 activeChatTab === tab.id
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-800'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-primary hover:border-primary/30'
               }`}
             >
               <Icon name={tab.icon} size={13} color="currentColor" />
@@ -210,7 +210,7 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
           <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3 space-y-1">
             {groupedMessages.length === 0 ? (
               <div className="flex items-center justify-center h-full">
-                <EmptyState icon="MessageCircle" title="No messages yet" description="Start the conversation" iconSize={20} />
+                <EmptyState icon="MessageCircle" title="No messages yet" description="Start the conversation" />
               </div>
             ) : (
               groupedMessages.map((group, gi) => (
@@ -227,7 +227,7 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
           </div>
 
           <div className="border-t border-border px-4 py-3">
-            <div className="flex items-end gap-2 bg-blue-50/50 dark:bg-blue-950/20 border border-border rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-400 transition-all">
+            <div className="flex items-end gap-2 bg-muted border border-border rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-primary/30 transition-all">
               <IconButton icon="Paperclip" title="Attach file" />
               <textarea
                 ref={textareaRef}
@@ -245,8 +245,8 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
                   disabled={!messageText.trim()}
                   className={`p-1.5 rounded-lg transition-smooth ${
                     messageText.trim()
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft-sm'
+                      : 'bg-muted-foreground/20 text-muted-foreground/50 cursor-not-allowed'
                   }`}
                 >
                   <Icon name="Send" size={15} color="currentColor" />
@@ -259,7 +259,7 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
 
       {activeChatTab !== 'chat' && (
         <div className="flex-1 flex items-center justify-center">
-          <EmptyState icon={chatTabs.find(t => t.id === activeChatTab)?.icon || 'Info'} title={`${activeChatTab} coming soon`} iconSize={18} />
+          <EmptyState icon={chatTabs.find(t => t.id === activeChatTab)?.icon || 'Info'} title={`${activeChatTab} coming soon`} />
         </div>
       )}
     </div>

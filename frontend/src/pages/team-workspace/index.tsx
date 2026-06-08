@@ -101,7 +101,7 @@ const TeamWorkspace = () => {
         <Sidebar />
         <TopBar />
         <main className="md:ml-[260px] pt-[60px]">
-          <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10">
+          <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10 animate-fade-in">
             <div className="mb-6 md:mb-8 lg:mb-10">
               <h1 className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-2">
                 Team Workspace

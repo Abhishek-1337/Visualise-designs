@@ -45,10 +45,10 @@ const MoneySnapshotCard = () => {
   };
 
   return (
-    <div className="bg-card rounded-xl shadow-warm-md p-4 md:p-6 lg:p-8 transition-smooth hover-lift">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 md:mb-6">
+    <div className="bg-card rounded-lg shadow-soft-lg p-5 md:p-6 lg:p-8 transition-smooth hover-lift border border-border/50">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 md:mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 md:w-12 md:h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-amber-100 flex items-center justify-center">
             <Icon name="DollarSign" size={20} color="var(--color-accent)" />
           </div>
           <div>
@@ -58,7 +58,7 @@ const MoneySnapshotCard = () => {
         </div>
         <Button variant="outline" size="sm" iconName="TrendingUp" iconPosition="left">View Reports</Button>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-5 md:mb-6">
         <div className="bg-primary/5 rounded-lg p-3 md:p-4 border border-primary/10">
           <div className="flex items-center gap-2 mb-2"><Icon name="TrendingUp" size={16} color="var(--color-primary)" /><span className="text-xs md:text-sm text-muted-foreground">Total Revenue</span></div>
           <p className="text-xl md:text-2xl lg:text-3xl font-heading font-bold text-primary data-text">{formatCurrency(financialData?.totalRevenue)}</p>
@@ -84,7 +84,7 @@ const MoneySnapshotCard = () => {
           revenueStreams?.map((stream) => {
             const statusConfig = getStatusConfig(stream?.status);
             return (
-              <div key={stream?.id} className="group p-3 md:p-4 rounded-lg border border-border bg-background hover:border-primary/30 hover:shadow-warm-sm transition-smooth">
+              <div key={stream?.id} className="group p-3 md:p-4 rounded-lg border border-border bg-background hover:border-primary/30 hover:shadow-soft-sm transition-smooth">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 mb-2">
@@ -108,7 +108,7 @@ const MoneySnapshotCard = () => {
           })
         )}
       </div>
-      <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-border">
+      <div className="mt-5 md:mt-6 pt-5 md:pt-6 border-t border-border">
         <Button variant="outline" fullWidth iconName="ArrowRight" iconPosition="right">View All Financial Records</Button>
       </div>
     </div>

@@ -106,51 +106,52 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col lg:flex-row">
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 p-8 lg:p-12 flex-col justify-between">
-        <div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-warm-offwhite to-indigo-50/30 flex flex-col lg:flex-row">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-indigo-600 via-indigo-700 to-slate-800 p-8 lg:p-12 flex-col justify-between relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent" />
+        <div className="relative z-10">
           <Link to="/login" className="flex items-center gap-3 mb-12 transition-smooth hover:opacity-80">
-            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-              <Icon name="Sparkles" size={28} color="var(--color-primary)" />
+            <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <Icon name="Sparkles" size={28} color="#fff" />
             </div>
-            <span className="font-heading font-bold text-2xl text-foreground">Visualise CRM</span>
+            <span className="font-heading font-bold text-2xl text-white">Visualise CRM</span>
           </Link>
           <div className="space-y-8 mb-12">
             <div>
-              <h1 className="font-heading font-bold text-4xl lg:text-5xl text-foreground mb-4">Welcome back to your creative studio control room</h1>
-              <p className="text-base lg:text-lg text-muted-foreground">Transform your architectural visualization business with a CRM that feels as creative as your work</p>
+              <h1 className="font-heading font-bold text-4xl lg:text-5xl text-white mb-4 leading-tight">Welcome back to your creative studio control room</h1>
+              <p className="text-base lg:text-lg text-indigo-200">Transform your architectural visualization business with a CRM that feels as creative as your work</p>
             </div>
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 gap-4">
               {features?.map((feature, index) => (
-                <div key={index} className="flex items-start gap-4 p-4 bg-card rounded-lg shadow-warm-sm hover-lift">
-                  <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Icon name={feature?.icon} size={20} color="var(--color-accent)" />
+                <div key={index} className="flex items-start gap-4 p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 hover:bg-white/10 transition-smooth">
+                  <div className="w-10 h-10 bg-amber-400/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Icon name={feature?.icon} size={20} color="#FBBF24" />
                   </div>
                   <div>
-                    <h3 className="font-heading font-semibold text-base text-foreground mb-1">{feature?.title}</h3>
-                    <p className="text-sm text-muted-foreground">{feature?.description}</p>
+                    <h3 className="font-heading font-semibold text-base text-white mb-1">{feature?.title}</h3>
+                    <p className="text-sm text-indigo-200">{feature?.description}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-          <Icon name="Shield" size={16} color="var(--color-success)" />
+        <div className="relative z-10 flex items-center gap-3 text-sm text-indigo-200">
+          <Icon name="Shield" size={16} color="#34D399" />
           <span>Secure authentication with OAuth2</span>
         </div>
       </div>
 
       <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-12">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md animate-fade-in">
           <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
-            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-              <Icon name="Sparkles" size={24} color="var(--color-primary)" />
+            <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center">
+              <Icon name="Sparkles" size={24} color="var(--color-primary-foreground)" />
             </div>
             <span className="font-heading font-bold text-xl text-foreground">Visualise CRM</span>
           </div>
 
-          <div className="bg-card rounded-xl shadow-warm-lg p-6 sm:p-8">
+          <div className="bg-card border border-border rounded-xl shadow-soft-lg p-6 sm:p-8">
             <div className="mb-8">
               <h2 className="font-heading font-bold text-2xl sm:text-3xl text-foreground mb-2">Sign in to your account</h2>
               <p className="text-sm sm:text-base text-muted-foreground">Choose your preferred sign-in method</p>
@@ -189,7 +190,7 @@ const Login = () => {
               </div>
               <div className="flex items-center justify-between">
                 <Checkbox label="Remember me" checked={formData?.rememberMe} onChange={(e) => setFormData((prev) => ({ ...prev, rememberMe: e?.target?.checked }))} disabled={isLoading} />
-                <Link to="/forgot-password" className="text-sm font-medium text-accent hover:text-accent/80 transition-smooth">Forgot password?</Link>
+                <Link to="/forgot-password" className="text-sm font-medium text-amber-600 hover:text-amber-700 transition-smooth">Forgot password?</Link>
               </div>
               {errors?.submit && (
                 <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg flex items-start gap-3">
@@ -197,7 +198,7 @@ const Login = () => {
                   <p className="text-xs text-destructive/80 whitespace-pre-line">{errors?.submit}</p>
                 </div>
               )}
-              <Button type="submit" variant="default" size="lg" fullWidth loading={isLoading} iconName="LogIn" iconPosition="right">
+              <Button type="submit" variant="default" size="lg" fullWidth loading={isLoading} iconName="LogIn" iconPosition="right" className="bg-gradient-primary">
                 {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
             </form>
@@ -205,7 +206,7 @@ const Login = () => {
             <div className="mt-6 pt-6 border-t border-border space-y-3">
               <p className="text-center text-sm text-muted-foreground">
                 Don't have an account?{' '}
-                <Link to="/register" className="font-medium text-accent hover:text-accent/80 transition-smooth">Create Account</Link>
+                <Link to="/register" className="font-medium text-amber-600 hover:text-amber-700 transition-smooth">Create Account</Link>
               </p>
               <p className="text-center text-sm text-muted-foreground">
                 Want to register your company?{' '}

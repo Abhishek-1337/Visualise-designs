@@ -196,7 +196,8 @@ export const getAllDeals = async (req: Request, res: Response): Promise<void> =>
         orderBy: { updatedAt: 'desc' },
         include: {
           contact: { select: { id: true, firstName: true, lastName: true, company: true } },
-          assignedTo: { select: { id: true, name: true, avatar: true } }
+          assignedTo: { select: { id: true, name: true, avatar: true } },
+          project: { select: { id: true, name: true } }
         }
       }),
       prisma.deal.count({ where })
@@ -428,6 +429,7 @@ export const getAllProjects = async (req: Request, res: Response): Promise<void>
         include: {
           contact: { select: { id: true, firstName: true, lastName: true, email: true, company: true } },
           members: { select: { id: true, name: true, avatar: true } },
+          deal: { select: { id: true, title: true, value: true, status: true } },
           _count: { select: { tasks: true } }
         }
       }),
@@ -447,6 +449,7 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
       where: { id: req.params.id as string, tenantId: authReq.user.tenantId },
       include: {
         contact: { select: { id: true, firstName: true, lastName: true, email: true, company: true } },
+        deal: { select: { id: true, title: true, value: true, status: true } },
         members: { select: { id: true, name: true, avatar: true } },
         tasks: { orderBy: { createdAt: 'desc' }, take: 10 },
         activities: { orderBy: { createdAt: 'desc' }, take: 10, include: { user: { select: { id: true, name: true } } } }
@@ -474,7 +477,29 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
       res.status(403).json({ error: 'Clients cannot create projects' });
       return;
     }
-    const { name, description, status, budget, contactId, memberIds, startDate, endDate } = req.body;
+    const { name, description, status, budget, contactId, memberIds, startDate, endDate, dealId } = req.body;
+
+    if (dealId) {
+      const deal = await prisma.deal.findFirst({
+        where: { id: dealId, tenantId: authReq.user.tenantId },
+        include: { project: { select: { id: true } } }
+      });
+
+      if (!deal) {
+        res.status(400).json({ error: 'Selected deal was not found' });
+        return;
+      }
+
+      if (deal.contactId !== contactId) {
+        res.status(400).json({ error: 'Selected deal belongs to a different client' });
+        return;
+      }
+
+      if (deal.project) {
+        res.status(400).json({ error: 'Selected deal is already linked to a project' });
+        return;
+      }
+    }
 
     const project = await prisma.project.create({
       data: {
@@ -484,6 +509,7 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
         startDate: startDate ? new Date(startDate) : null,
         endDate: endDate ? new Date(endDate) : null,
         contactId,
+        dealId: dealId || null,
         tenantId: authReq.user.tenantId,
         members: memberIds ? { connect: memberIds.map((id: string) => ({ id })) } : undefined
       }
@@ -496,12 +522,17 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
         userId: authReq.user.id,
         projectId: project.id,
         contactId,
+        dealId: dealId || undefined,
         tenantId: authReq.user.tenantId
       }
     });
 
     res.status(201).json(project);
-  } catch {
+  } catch (error: any) {
+    if (error.code === 'P2002') {
+      res.status(400).json({ error: 'Selected deal is already linked to a project' });
+      return;
+    }
     res.status(500).json({ error: 'Failed to create project' });
   }
 };

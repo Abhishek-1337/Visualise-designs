@@ -57,7 +57,7 @@ const CommunicationFeed = ({ communications, onSelect, selectedId }: Communicati
           <div
             key={comm?.id}
             className={`bg-card rounded-xl border transition-smooth cursor-pointer ${
-              isSelected ? 'border-primary shadow-warm-sm' : 'border-border hover:border-primary/30 hover:shadow-warm-sm'
+              isSelected ? 'border-primary shadow-soft-md ring-1 ring-primary/10' : 'border-border hover:border-primary/30 hover:shadow-soft-sm'
             }`}
             onClick={() => { onSelect?.(comm); setExpandedId(isExpanded ? null : comm?.id); }}
           >
@@ -107,7 +107,7 @@ const CommunicationFeed = ({ communications, onSelect, selectedId }: Communicati
                     </div>
                   )}
                   <div className="flex gap-2 mt-3">
-                    <button className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-medium transition-smooth hover-lift">
+                    <button className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-medium transition-smooth hover-lift shadow-soft-sm">
                       <Icon name="Phone" size={12} color="currentColor" />
                       Schedule Callback
                     </button>

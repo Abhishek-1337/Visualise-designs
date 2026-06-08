@@ -38,11 +38,11 @@ const MessageBubble: React.FC<{ message: Message; showSender: boolean }> = ({ me
   return (
     <div className={`flex gap-3 ${isMe ? 'flex-row-reverse' : ''} ${showSender ? 'mb-4' : 'mb-1'}`}>
       {showSender && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-accent flex items-center justify-center mt-0.5">
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
           {isMe ? (
-            <span className="text-xs font-semibold text-accent-foreground">ME</span>
+            <span className="text-xs font-semibold text-primary">ME</span>
           ) : (
-            <span className="text-xs font-semibold text-accent-foreground">
+            <span className="text-xs font-semibold text-primary">
               {message.senderName?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'CL'}
             </span>
           )}
@@ -50,34 +50,22 @@ const MessageBubble: React.FC<{ message: Message; showSender: boolean }> = ({ me
       )}
       {!showSender && <div className="w-8 flex-shrink-0" />}
       <div className={`max-w-[75%] ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
-        {showSender && (
-          <div className={`flex items-center gap-2 mb-1 ${isMe ? 'flex-row-reverse' : ''}`}>
-            {/* <span className="text-xs font-semibold text-foreground">
-              {isMe ? 'You' : message.senderName || 'Client'}
-            </span> */}
-            {/* <span className="text-[10px] text-muted-foreground">{time}</span> */}
-          </div>
-        )}
-        {/* {!showSender && (
-          <span className="text-[10px] text-muted-foreground/50 mb-0.5 ml-0.5">{time}</span>
-        )} */}
         <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed relative ${
           isMe
-            ? 'bg-primary text-primary-foreground rounded-tr-md'
+            ? 'bg-primary text-primary-foreground rounded-tr-md shadow-soft-sm'
             : 'bg-muted text-foreground rounded-tl-md'
         }`}>
           <div className="whitespace-pre-wrap break-words flex items-end gap-2">
             {message.content}
-            <span className="text-[8px] text-gray-300 font-semibold ml-0.5">{time}</span>
+            <span className={`text-[8px] font-semibold ml-0.5 flex-shrink-0 ${isMe ? 'text-primary-foreground/60' : 'text-muted-foreground/50'}`}>{time}</span>
             {
               isMe && (message.isRead  ? (
-                <CheckCheck className="w-3 h-3"/>
+                <CheckCheck className={`w-3 h-3 ${isMe ? 'text-primary-foreground/60' : ''}`}/>
                 ) : 
                 (
-                  <Check className="w-3 h-3" />
+                  <Check className={`w-3 h-3 ${isMe ? 'text-primary-foreground/60' : ''}`} />
                 ))
             }
-  
           </div>
         </div>
       </div>
@@ -111,10 +99,10 @@ const DateSeparator: React.FC<{ date: Date }> = ({ date }) => {
 };
 
 const EmptyState: React.FC = () => (
-  <div className="flex-1 flex items-center justify-center p-8">
+  <div className="flex-1 flex items-center justify-center p-8 animate-fade-in">
     <div className="text-center max-w-sm">
-      <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-6">
-        <Icon name="MessageSquare" size={36} color="var(--color-muted-foreground)" />
+      <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
+        <Icon name="MessageSquare" size={36} color="var(--color-primary)" />
       </div>
       <h3 className="text-xl font-semibold text-foreground mb-2">Welcome to Client Chat</h3>
       <p className="text-sm text-muted-foreground leading-relaxed">
@@ -126,11 +114,11 @@ const EmptyState: React.FC = () => (
 
 const TypingIndicator: React.FC<{ name: string }> = ({ name }) => (
   <div className="flex gap-3 mb-6">
-    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-accent flex items-center justify-center mt-0.5 animate-pulse" />
-    <div className="bg-muted rounded-2xl px-4 py-3 flex items-center gap-1">
-      <div className="w-1.5 h-1.5 bg-muted-foreground/40 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-      <div className="w-1.5 h-1.5 bg-muted-foreground/40 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-      <div className="w-1.5 h-1.5 bg-muted-foreground/40 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mt-0.5 animate-pulse" />
+    <div className="bg-muted rounded-2xl px-4 py-3 flex items-center gap-1 border border-border">
+      <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+      <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+      <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
     </div>
   </div>
 );
@@ -160,7 +148,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ client, messages, onSend, onToggleC
 
   if (!client) {
     return (
-      <div className="flex-1 flex flex-col bg-background">
+      <div className="flex-1 flex flex-col bg-background animate-fade-in">
         <ChatHeader client={null} onToggleClientList={onToggleClientList} />
         <EmptyState />
       </div>
@@ -168,14 +156,14 @@ const ChatArea: React.FC<ChatAreaProps> = ({ client, messages, onSend, onToggleC
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-background min-w-0">
+    <div className="flex-1 flex flex-col bg-background min-w-0 animate-fade-in">
       <ChatHeader client={client} onToggleClientList={onToggleClientList} />
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-1 scroll-smooth">
         {groupedMessages.length === 0 && !isTyping ? (
           <div className="flex-1 flex items-center justify-center">
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                <Icon name="MessageCircle" size={28} color="var(--color-muted-foreground)" />
+            <div className="text-center py-12 animate-fade-in">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Icon name="MessageCircle" size={28} color="var(--color-primary)" />
               </div>
               <h3 className="text-base font-semibold text-foreground mb-1">No messages yet</h3>
               <p className="text-sm text-muted-foreground">Start a conversation with {client.name}</p>

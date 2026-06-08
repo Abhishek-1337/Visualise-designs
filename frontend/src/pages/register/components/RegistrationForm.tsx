@@ -178,8 +178,8 @@ const RegistrationForm = () => {
               <span className="text-xs text-muted-foreground">Password strength</span>
               <span className="text-xs font-medium">{strength.label}</span>
             </div>
-            <div className="h-1 bg-muted rounded-full overflow-hidden">
-              <div className={`h-full transition-all ${strength.color}`} style={{ width: `${(strength.strength / 4) * 100}%` }} />
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+              <div className={`h-full transition-all rounded-full ${strength.color}`} style={{ width: `${(strength.strength / 4) * 100}%` }} />
             </div>
           </div>
         )}
@@ -194,7 +194,7 @@ const RegistrationForm = () => {
             onClick={() => handleInputChange('accountType', 'client')}
             className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
               formData.accountType === 'client'
-                ? 'border-primary bg-primary/5 shadow-sm'
+                ? 'border-primary bg-primary/5 shadow-soft-sm'
                 : 'border-border bg-card hover:border-muted-foreground/30'
             }`}
           >
@@ -207,7 +207,7 @@ const RegistrationForm = () => {
             onClick={() => handleInputChange('accountType', 'team')}
             className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
               formData.accountType === 'team'
-                ? 'border-primary bg-primary/5 shadow-sm'
+                ? 'border-primary bg-primary/5 shadow-soft-sm'
                 : 'border-border bg-card hover:border-muted-foreground/30'
             }`}
           >
@@ -233,7 +233,7 @@ const RegistrationForm = () => {
         </div>
       </div>
 
-      <Button type="submit" variant="default" size="lg" fullWidth loading={isSubmitting} iconName="UserPlus" iconPosition="left">
+      <Button type="submit" variant="default" size="lg" fullWidth loading={isSubmitting} iconName="UserPlus" iconPosition="left" className="bg-gradient-primary">
         Create Account
       </Button>
     </form>

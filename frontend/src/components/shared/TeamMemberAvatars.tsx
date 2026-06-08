@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../../utils/cn';
 
 interface TeamMember {
   name: string;
@@ -8,33 +9,49 @@ interface TeamMember {
 interface TeamMemberAvatarsProps {
   members: TeamMember[];
   max?: number;
+  size?: 'sm' | 'md';
+  className?: string;
 }
 
-const MemberCircle: React.FC<{ name: string; avatar?: string }> = ({ name, avatar }) => (
-  <div
-    className="w-6 h-6 rounded-full border-2 border-card bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center"
-    title={name}
-  >
-    {avatar ? (
-      <img src={avatar} alt={name} className="w-full h-full rounded-full object-cover" />
-    ) : (
-      <span className="text-[9px] font-medium text-blue-600 dark:text-blue-400">{name.charAt(0)}</span>
-    )}
-  </div>
-);
+const colors = [
+  'bg-gradient-to-br from-violet-500 to-violet-600',
+  'bg-gradient-to-br from-emerald-500 to-emerald-600',
+  'bg-gradient-to-br from-amber-500 to-amber-600',
+  'bg-gradient-to-br from-rose-500 to-rose-600',
+  'bg-gradient-to-br from-sky-500 to-sky-600',
+];
 
-const TeamMemberAvatars: React.FC<TeamMemberAvatarsProps> = ({ members, max = 3 }) => {
+const TeamMemberAvatars: React.FC<TeamMemberAvatarsProps> = ({ members, max = 4, size = 'sm', className }) => {
   const visible = members.slice(0, max);
   const remaining = members.length - max;
 
+  const sizeClasses = size === 'sm' ? 'w-7 h-7 text-[10px] -ml-1.5 first:ml-0' : 'w-9 h-9 text-xs -ml-2 first:ml-0';
+
   return (
-    <div className="flex -space-x-1.5">
-      {visible.map((member, i) => (
-        <MemberCircle key={i} name={member.name} avatar={member.avatar} />
+    <div className={cn('flex items-center', className)}>
+      {visible.map((m, i) => (
+        <div
+          key={i}
+          className={cn(
+            'rounded-full flex items-center justify-center font-semibold text-white ring-2 ring-card flex-shrink-0 overflow-hidden',
+            colors[i % colors.length],
+            sizeClasses
+          )}
+          title={m.name}
+        >
+          {m.avatar ? (
+            <img src={m.avatar} alt={m.name} className="w-full h-full object-cover" />
+          ) : (
+            m.name.charAt(0).toUpperCase()
+          )}
+        </div>
       ))}
       {remaining > 0 && (
-        <div className="w-6 h-6 rounded-full border-2 border-card bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
-          <span className="text-[9px] font-medium text-blue-600 dark:text-blue-400">+{remaining}</span>
+        <div className={cn(
+          'rounded-full flex items-center justify-center font-medium bg-muted text-muted-foreground ring-2 ring-card flex-shrink-0',
+          sizeClasses
+        )}>
+          +{remaining}
         </div>
       )}
     </div>

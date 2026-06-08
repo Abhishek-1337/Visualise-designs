@@ -1,29 +1,54 @@
 import React from 'react';
-
-const getProgressColor = (pct: number) => {
-  if (pct >= 75) return 'bg-green-500';
-  if (pct >= 50) return 'bg-blue-500';
-  if (pct >= 25) return 'bg-amber-500';
-  return 'bg-gray-300 dark:bg-gray-600';
-};
+import { cn } from '../../utils/cn';
 
 interface ProgressWithLabelProps {
-  progress: number;
+  value: number;
+  max?: number;
+  label?: string;
+  size?: 'sm' | 'md';
+  showPercentage?: boolean;
+  variant?: 'primary' | 'success' | 'warning' | 'danger';
+  className?: string;
 }
 
-const ProgressWithLabel: React.FC<ProgressWithLabelProps> = ({ progress }) => (
-  <div className="flex-1 w-full">
-    <div className="flex items-center justify-between text-xs mb-1">
-      <span className="text-muted-foreground font-semibold">Progress</span>
+const variantColors = {
+  primary: 'bg-primary',
+  success: 'bg-success',
+  warning: 'bg-warning',
+  danger: 'bg-error',
+};
+
+const ProgressWithLabel: React.FC<ProgressWithLabelProps> = ({
+  value,
+  max = 100,
+  label,
+  size = 'sm',
+  showPercentage = true,
+  variant = 'primary',
+  className,
+}) => {
+  const percentage = Math.min(Math.round((value / max) * 100), 100);
+
+  const height = size === 'sm' ? 'h-2' : 'h-2.5';
+
+  return (
+    <div className={cn('w-full', className)}>
+      {(label || showPercentage) && (
+        <div className="flex items-center justify-between mb-1.5">
+          {label && <span className="text-xs font-medium text-foreground">{label}</span>}
+          {showPercentage && (
+            <span className="text-xs font-semibold text-muted-foreground">{percentage}%</span>
+          )}
+        </div>
+      )}
+      <div className={cn('w-full bg-muted rounded-full overflow-hidden', height)}>
+        <div
+          className={cn('h-full rounded-full transition-all duration-700 ease-out', variantColors[variant])}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
     </div>
-    <span className="font-medium text-foreground">{progress}%</span>
-    <div className="h-1.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-      <div
-        className={`h-full transition-all duration-500 rounded-full ${getProgressColor(progress)}`}
-        style={{ width: `${progress}%` }}
-      />
-    </div>
-  </div>
-);
+  );
+};
 
 export default ProgressWithLabel;

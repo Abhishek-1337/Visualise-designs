@@ -143,11 +143,13 @@ const QuickAccessWidget = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-      <div className="bg-card rounded-xl shadow-warm-md p-4 md:p-6 transition-smooth hover-lift">
-        <div className="flex items-center justify-between mb-4 md:mb-6">
-          <div className="flex items-center gap-2">
-            <Icon name="MessageSquare" size={20} color="var(--color-primary)" />
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="bg-card rounded-lg shadow-soft-lg p-5 md:p-6 transition-smooth hover-lift border border-border/50">
+        <div className="flex items-center justify-between mb-5 md:mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Icon name="MessageSquare" size={18} color="var(--color-primary)" />
+            </div>
             <h3 className="text-base md:text-lg font-heading font-semibold text-foreground">
               Recent Interactions
             </h3>
@@ -163,10 +165,10 @@ const QuickAccessWidget = () => {
           {recentInteractions?.map((interaction) =>
           <div
             key={interaction?.id}
-            className="p-3 rounded-lg border border-border bg-background hover:border-primary/30 transition-smooth">
+            className="p-3 rounded-lg border border-border bg-background hover:border-primary/30 hover:shadow-soft-sm transition-smooth">
 
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-card">
                   <Image
                   src={interaction?.avatar}
                   alt={interaction?.avatarAlt}
@@ -196,16 +198,18 @@ const QuickAccessWidget = () => {
           )}
         </div>
 
-        <Link to="/lead-client-flow" className="block mt-4">
+        <Link to="/lead-client-flow" className="block mt-5">
           <button className="w-full py-2 text-sm text-primary hover:text-primary/80 font-medium transition-smooth">
             View All Interactions →
           </button>
         </Link>
       </div>
-      <div className="bg-card rounded-xl shadow-warm-md p-4 md:p-6 transition-smooth hover-lift">
-        <div className="flex items-center justify-between mb-4 md:mb-6">
-          <div className="flex items-center gap-2">
-            <Icon name="FolderKanban" size={20} color="var(--color-accent)" />
+      <div className="bg-card rounded-lg shadow-soft-lg p-5 md:p-6 transition-smooth hover-lift border border-border/50">
+        <div className="flex items-center justify-between mb-5 md:mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center">
+              <Icon name="FolderKanban" size={18} color="var(--color-accent)" />
+            </div>
             <h3 className="text-base md:text-lg font-heading font-semibold text-foreground">
               Project Updates
             </h3>
@@ -221,7 +225,7 @@ const QuickAccessWidget = () => {
           {projectUpdates?.map((project) =>
           <div
             key={project?.id}
-            className="p-3 rounded-lg border border-border bg-background hover:border-accent/30 transition-smooth">
+            className="p-3 rounded-lg border border-border bg-background hover:border-accent/30 hover:shadow-soft-sm transition-smooth">
 
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div className="flex-1 min-w-0">
@@ -263,16 +267,18 @@ const QuickAccessWidget = () => {
           )}
         </div>
 
-        <Link to="/project-management" className="block mt-4">
+        <Link to="/project-management" className="block mt-5">
           <button className="w-full py-2 text-sm text-accent hover:text-accent/80 font-medium transition-smooth">
             View All Projects →
           </button>
         </Link>
       </div>
-      <div className="bg-card rounded-xl shadow-warm-md p-4 md:p-6 transition-smooth hover-lift">
-        <div className="flex items-center justify-between mb-4 md:mb-6">
-          <div className="flex items-center gap-2">
-            <Icon name="Users" size={20} color="var(--color-secondary)" />
+      <div className="bg-card rounded-lg shadow-soft-lg p-5 md:p-6 transition-smooth hover-lift border border-border/50">
+        <div className="flex items-center justify-between mb-5 md:mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-secondary/10 flex items-center justify-center">
+              <Icon name="Users" size={18} color="var(--color-secondary)" />
+            </div>
             <h3 className="text-base md:text-lg font-heading font-semibold text-foreground">
               Team Activity
             </h3>
@@ -288,10 +294,10 @@ const QuickAccessWidget = () => {
           {teamActivity?.map((activity) =>
           <div
             key={activity?.id}
-            className="p-3 rounded-lg border border-border bg-background hover:border-secondary/30 transition-smooth">
+            className="p-3 rounded-lg border border-border bg-background hover:border-secondary/30 hover:shadow-soft-sm transition-smooth">
 
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-card">
                   <Image
                   src={activity?.avatar}
                   alt={activity?.avatarAlt}
@@ -319,7 +325,7 @@ const QuickAccessWidget = () => {
           )}
         </div>
 
-        <Link to="/team-workspace" className="block mt-4">
+        <Link to="/team-workspace" className="block mt-5">
           <button className="w-full py-2 text-sm text-secondary hover:text-secondary/80 font-medium transition-smooth">
             View Team Workspace →
           </button>

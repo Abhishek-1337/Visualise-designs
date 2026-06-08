@@ -27,7 +27,7 @@ const FilterPanel = ({ filters, onFilterChange, onReset }) => {
   ];
 
   return (
-    <div className="bg-card rounded-xl shadow-warm p-4 md:p-5 lg:p-6">
+    <div className="bg-card border border-border rounded-xl shadow-soft-sm p-4 md:p-5 lg:p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-heading font-semibold text-base md:text-lg text-foreground">
           Filter Team View

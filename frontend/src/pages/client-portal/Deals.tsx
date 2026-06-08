@@ -36,7 +36,7 @@ const ClientDeals = () => {
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-background">
+    <div className="h-screen overflow-hidden bg-background animate-fade-in">
       <Sidebar />
       <TopBar />
       <main className="md:ml-[240px] h-screen pt-[60px] overflow-y-auto">
@@ -57,7 +57,7 @@ const ClientDeals = () => {
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {deals.map((deal) => (
-                <Card key={deal.id} className="p-6">
+                <Card key={deal.id} hover className="p-6">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-1">
@@ -81,13 +81,13 @@ const ClientDeals = () => {
                         <>
                           <button
                             onClick={() => handleUpdateStatus(deal.id, 'ACCEPTED')}
-                            className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-smooth"
+                            className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-lg text-sm font-medium hover:from-emerald-700 hover:to-emerald-600 shadow-soft-sm transition-all duration-200 active-press"
                           >
                             Accept Deal
                           </button>
                           <button
                             onClick={() => handleUpdateStatus(deal.id, 'CHANGES_REQUESTED')}
-                            className="px-4 py-2 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-lg text-sm font-medium hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-smooth"
+                            className="px-4 py-2 bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-lg text-sm font-medium hover:bg-amber-100 dark:hover:bg-amber-900/50 border border-amber-200/50 dark:border-amber-800/30 transition-all duration-200 active-press"
                           >
                             Request Changes
                           </button>
@@ -95,7 +95,7 @@ const ClientDeals = () => {
                       )}
                       <button
                         onClick={() => navigate(`/client-portal/deals/${deal.id}`)}
-                        className="px-4 py-2 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-muted/80 transition-smooth"
+                        className="px-4 py-2 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-muted/80 border border-border transition-all duration-200 active-press"
                       >
                         Details
                       </button>

@@ -166,7 +166,7 @@ const TenantSignupForm = () => {
         </div>
       </div>
 
-      <Button type="submit" variant="default" size="lg" fullWidth loading={isSubmitting} iconName="Building" iconPosition="left">
+      <Button type="submit" variant="default" size="lg" fullWidth loading={isSubmitting} iconName="Building" iconPosition="left" className="bg-gradient-primary">
         Sign Up Company
       </Button>
     </form>

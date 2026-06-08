@@ -49,10 +49,10 @@ const ClientList: React.FC<ClientListProps> = ({ conversations, selectedClientId
   const unreadCount = conversations.filter((c) => c.lastMessage?.unread).length;
 
   return (
-    <div className="flex flex-col h-full bg-card border-r border-border w-64">
+    <div className="flex flex-col h-full bg-card border-r border-border w-64 animate-fade-in">
       <div className="flex items-center justify-between px-4 py-6 border-b border-border">
         <div className="flex items-center gap-2">
-          <Icon name="MessageCircle" size={20} color="var(--color-foreground)" />
+          <Icon name="MessageCircle" size={20} color="var(--color-primary)" />
           <h2 className="text-base font-semibold text-foreground">Clients</h2>
           {unreadCount > 0 && (
             <span className="text-[10px] font-bold text-primary-foreground bg-primary px-1.5 py-0.5 rounded-full leading-none">
@@ -74,7 +74,7 @@ const ClientList: React.FC<ClientListProps> = ({ conversations, selectedClientId
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search clients..."
-            className="w-full pl-9 pr-9 py-2 bg-muted border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all"
+            className="w-full pl-9 pr-9 py-2 bg-muted border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
           />
           {searchQuery && (
             <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
@@ -84,7 +84,7 @@ const ClientList: React.FC<ClientListProps> = ({ conversations, selectedClientId
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto scrollbar-thin">
         {sorted.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4">
             <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-3">
@@ -105,13 +105,13 @@ const ClientList: React.FC<ClientListProps> = ({ conversations, selectedClientId
               <button
                 key={conv.client.id}
                 onClick={() => onSelectClient(conv.client)}
-                className={`w-full flex items-center gap-3 px-4 py-3 transition-smooth hover:bg-muted/50 text-left ${
-                  isSelected ? 'bg-primary/10 border-l-2 border-primary' : 'border-l-2 border-transparent'
+                className={`w-full flex items-center gap-3 px-4 py-3 transition-smooth text-left ${
+                  isSelected ? 'bg-primary/10 border-l-[3px] border-primary' : 'border-l-[3px] border-transparent hover:bg-muted/50'
                 }`}
               >
                 <div className="relative flex-shrink-0">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    isSelected ? 'bg-primary text-primary-foreground' : 'bg-accent text-accent-foreground'
+                    isSelected ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'
                   }`}>
                     {conv.client.avatar ? (
                       <img src={conv.client.avatar} alt={conv.client.name} className="w-10 h-10 rounded-full object-cover" />
@@ -161,7 +161,7 @@ const ClientList: React.FC<ClientListProps> = ({ conversations, selectedClientId
 
       <div className="px-4 py-3 border-t border-border">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Icon name="Users" size={14} color="currentColor" />
+          <Icon name="Users" size={14} color="var(--color-primary)" />
           <span>{conversations.length} client{conversations.length !== 1 ? 's' : ''}</span>
         </div>
       </div>

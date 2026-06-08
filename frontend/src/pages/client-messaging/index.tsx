@@ -250,7 +250,7 @@ const ClientMessaging = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background animate-fade-in">
       <Sidebar />
       <TopBar />
       <main className="md:ml-[240px] pt-[60px] h-screen flex flex-col">

@@ -131,7 +131,7 @@ const LeadClientFlow = () => {
       <Sidebar />
       <TopBar />
       <main className="md:ml-[260px] pt-[60px]">
-        <div className="px-4 lg:px-6 py-4 lg:py-6">
+        <div className="px-4 lg:px-6 py-4 lg:py-6 animate-fade-in">
           <div className="mb-4 lg:mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
               <div>
@@ -143,9 +143,9 @@ const LeadClientFlow = () => {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <div className="bg-card rounded-lg px-4 py-2 shadow-warm">
+                <div className="bg-card rounded-lg px-4 py-2.5 shadow-soft-sm border border-border/50">
                   <p className="text-xs text-muted-foreground mb-0.5">Total Pipeline Value</p>
-                  <p className="font-heading font-bold text-lg md:text-xl text-foreground">
+                  <p className="font-heading font-bold text-lg md:text-xl gradient-primary bg-clip-text text-transparent">
                     {loading ? '...' : formatCurrency(getTotalPipelineValue())}
                   </p>
                 </div>

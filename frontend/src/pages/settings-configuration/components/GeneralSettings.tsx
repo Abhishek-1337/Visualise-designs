@@ -29,9 +29,9 @@ const GeneralSettings = () => {
   return (
     <div className="space-y-8">
       {/* Appearance */}
-      <div className="bg-card rounded-xl p-6 shadow-warm-sm border border-border">
+      <div className="bg-card border border-border rounded-xl p-6 shadow-soft-sm">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center">
+          <div className="w-9 h-9 bg-gradient-to-br from-indigo-50 to-indigo-50/50 rounded-lg flex items-center justify-center">
             <Icon name="Palette" size={18} color="var(--color-primary)" />
           </div>
           <div>
@@ -49,7 +49,7 @@ const GeneralSettings = () => {
                   onClick={() => dispatch(setThemeMode(t as ThemeMode))}
                   className={`flex-1 py-2.5 px-3 rounded-lg border text-sm font-medium capitalize transition-smooth ${
                     theme === t
-                      ? 'bg-primary text-primary-foreground border-primary shadow-warm-sm'
+                      ? 'bg-primary text-primary-foreground border-primary shadow-soft-sm'
                       : 'bg-background text-foreground border-border hover:border-primary/40'
                   }`}
                 >
@@ -63,7 +63,7 @@ const GeneralSettings = () => {
             <select
               value={language}
               onChange={(e) => setLanguage(e?.target?.value)}
-              className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
+              className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
             >
               <option value="en">English (US)</option>
               <option value="en-gb">English (UK)</option>
@@ -77,7 +77,7 @@ const GeneralSettings = () => {
             <select
               value={defaultView}
               onChange={(e) => setDefaultView(e?.target?.value)}
-              className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
+              className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
             >
               <option value="dashboard">Dashboard</option>
               <option value="pipeline">Lead Pipeline</option>
@@ -90,7 +90,7 @@ const GeneralSettings = () => {
             <select
               value={timezone}
               onChange={(e) => setTimezone(e?.target?.value)}
-              className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
+              className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
             >
               <option value="America/New_York">Eastern Time (ET)</option>
               <option value="America/Chicago">Central Time (CT)</option>
@@ -105,7 +105,7 @@ const GeneralSettings = () => {
             <select
               value={dateFormat}
               onChange={(e) => setDateFormat(e?.target?.value)}
-              className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
+              className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
             >
               <option value="MM/DD/YYYY">MM/DD/YYYY</option>
               <option value="DD/MM/YYYY">DD/MM/YYYY</option>
@@ -115,9 +115,9 @@ const GeneralSettings = () => {
         </div>
       </div>
       {/* Notifications */}
-      <div className="bg-card rounded-xl p-6 shadow-warm-sm border border-border">
+      <div className="bg-card border border-border rounded-xl p-6 shadow-soft-sm">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-9 h-9 bg-accent/10 rounded-lg flex items-center justify-center">
+          <div className="w-9 h-9 bg-gradient-to-br from-amber-50 to-amber-50/50 rounded-lg flex items-center justify-center">
             <Icon name="Bell" size={18} color="var(--color-accent)" />
           </div>
           <div>
@@ -146,7 +146,7 @@ const GeneralSettings = () => {
                   notifications?.[key] ? 'bg-primary' : 'bg-muted'
                 }`}
               >
-                <span className={`absolute top-0.5 w-5 h-5 bg-background rounded-full shadow transition-smooth ${
+                <span className={`absolute top-0.5 w-5 h-5 bg-background rounded-full shadow-soft-sm transition-smooth ${
                   notifications?.[key] ? 'left-[22px]' : 'left-0.5'
                 }`} />
               </button>
@@ -155,7 +155,7 @@ const GeneralSettings = () => {
         </div>
       </div>
       <div className="flex justify-end">
-        <button className="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 shadow-warm-sm">
+        <button className="px-6 py-2.5 bg-gradient-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 shadow-soft-sm">
           Save Changes
         </button>
       </div>

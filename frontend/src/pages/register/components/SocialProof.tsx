@@ -42,13 +42,13 @@ const SocialProof = () => {
         {testimonials?.map((testimonial, index) =>
         <div
           key={index}
-          className="bg-card rounded-lg md:rounded-xl p-4 md:p-5 border border-border">
+          className="bg-card border border-border rounded-xl p-4 md:p-5 shadow-soft-sm">
 
             <div className="flex items-start gap-3 md:gap-4 mb-3">
               <Image
               src={testimonial?.avatar}
               alt={testimonial?.avatarAlt}
-              className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover flex-shrink-0" />
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover flex-shrink-0 ring-2 ring-border" />
 
               <div className="flex-1 min-w-0">
                 <h4 className="text-sm md:text-base font-semibold text-foreground">

@@ -57,7 +57,7 @@ const ClientProfile = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background animate-fade-in">
       <Sidebar />
       <TopBar />
       <main className="md:ml-[260px] pt-[60px]">
@@ -78,7 +78,7 @@ const ClientProfile = () => {
                   const c = contacts.find((ct) => ct.id === e.target.value);
                   if (c) setSelectedContact(c);
                 }}
-                className="w-full max-w-md px-4 py-2.5 bg-card border border-border rounded-xl text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full max-w-md px-4 py-2.5 bg-card border border-border rounded-xl text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 shadow-soft-sm"
               >
                 {contacts.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -91,7 +91,7 @@ const ClientProfile = () => {
 
           {loading ? (
             <div className="flex items-center justify-center h-[40vh]">
-              <div className="text-center">
+              <div className="text-center animate-fade-in">
                 <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                 <p className="text-muted-foreground">Loading client data...</p>
               </div>
@@ -121,14 +121,14 @@ const ClientProfile = () => {
               {activeTab === 'files' && <FilesTab />}
               {activeTab === 'payments' && <PaymentsTab />}
               {(activeTab === 'projects' || activeTab === 'communications') && (
-                <div className="text-center py-16 text-muted-foreground">
+                <div className="text-center py-16 text-muted-foreground animate-fade-in">
                   <Icon name="FolderOpen" size={48} className="mx-auto mb-4 opacity-40" />
                   <p>Select a client to view their projects and communications</p>
                 </div>
               )}
             </>
           ) : (
-            <div className="text-center py-16 text-muted-foreground">
+            <div className="text-center py-16 text-muted-foreground animate-fade-in">
               <Icon name="UserCircle" size={48} className="mx-auto mb-4 opacity-40" />
               <p>No clients found. Add contacts to get started.</p>
             </div>

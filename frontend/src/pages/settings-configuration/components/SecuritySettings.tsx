@@ -24,10 +24,10 @@ const SecuritySettings = () => {
   return (
     <div className="space-y-8">
       {/* Security Score */}
-      <div className="bg-card rounded-xl p-6 border border-border shadow-warm-sm">
+      <div className="bg-card border border-border rounded-xl p-6 shadow-soft-sm">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center">
+            <div className="w-9 h-9 bg-gradient-to-br from-indigo-50 to-indigo-50/50 rounded-lg flex items-center justify-center">
               <Icon name="Shield" size={18} color="var(--color-primary)" />
             </div>
             <div>
@@ -55,10 +55,10 @@ const SecuritySettings = () => {
         </p>
       </div>
       {/* Two-Factor Auth */}
-      <div className="bg-card rounded-xl p-6 border border-border shadow-warm-sm">
+      <div className="bg-card border border-border rounded-xl p-6 shadow-soft-sm">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-accent/10 rounded-lg flex items-center justify-center">
+            <div className="w-9 h-9 bg-gradient-to-br from-amber-50 to-amber-50/50 rounded-lg flex items-center justify-center">
               <Icon name="Smartphone" size={18} color="var(--color-accent)" />
             </div>
             <div>
@@ -72,7 +72,7 @@ const SecuritySettings = () => {
               twoFactorEnabled ? 'bg-primary' : 'bg-muted'
             }`}
           >
-            <span className={`absolute top-0.5 w-5 h-5 bg-background rounded-full shadow transition-smooth ${
+            <span className={`absolute top-0.5 w-5 h-5 bg-background rounded-full shadow-soft-sm transition-smooth ${
               twoFactorEnabled ? 'left-[22px]' : 'left-0.5'
             }`} />
           </button>
@@ -85,9 +85,9 @@ const SecuritySettings = () => {
         )}
       </div>
       {/* Password Policy */}
-      <div className="bg-card rounded-xl p-6 border border-border shadow-warm-sm">
+      <div className="bg-card border border-border rounded-xl p-6 shadow-soft-sm">
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-9 h-9 bg-secondary/10 rounded-lg flex items-center justify-center">
+          <div className="w-9 h-9 bg-gradient-to-br from-slate-50 to-slate-50/50 rounded-lg flex items-center justify-center">
             <Icon name="Lock" size={18} color="var(--color-secondary)" />
           </div>
           <div>
@@ -104,7 +104,7 @@ const SecuritySettings = () => {
             <select
               value={passwordPolicy?.minLength}
               onChange={(e) => setPasswordPolicy(prev => ({ ...prev, minLength: Number(e?.target?.value) }))}
-              className="px-3 py-1.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
+              className="px-3 py-1.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
             >
               {[6, 8, 10, 12, 16]?.map(n => <option key={n} value={n}>{n} characters</option>)}
             </select>
@@ -125,7 +125,7 @@ const SecuritySettings = () => {
                   passwordPolicy?.[key] ? 'bg-primary' : 'bg-muted'
                 }`}
               >
-                <span className={`absolute top-0.5 w-5 h-5 bg-background rounded-full shadow transition-smooth ${
+                <span className={`absolute top-0.5 w-5 h-5 bg-background rounded-full shadow-soft-sm transition-smooth ${
                   passwordPolicy?.[key] ? 'left-[22px]' : 'left-0.5'
                 }`} />
               </button>
@@ -137,21 +137,21 @@ const SecuritySettings = () => {
           className="mt-4 flex items-center gap-2 text-sm text-primary font-medium hover:opacity-80 transition-smooth"
         >
           <Icon name="Key" size={14} color="currentColor" />
-          
+          Change Password
         </button>
         {showPasswordForm && (
-          <div className="mt-4 space-y-3 p-4 bg-muted/30 rounded-lg">
-            <input type="password" placeholder="Current password" className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40" />
-            <input type="password" placeholder="New password" className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40" />
-            <input type="password" placeholder="Confirm new password" className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40" />
-            <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90">Update Password</button>
+          <div className="mt-4 space-y-3 p-4 bg-muted/30 rounded-xl border border-border">
+            <input type="password" placeholder="Current password" className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            <input type="password" placeholder="New password" className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            <input type="password" placeholder="Confirm new password" className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            <button className="px-4 py-2 bg-gradient-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 shadow-soft-sm">Update Password</button>
           </div>
         )}
       </div>
       {/* Active Sessions */}
-      <div className="bg-card rounded-xl p-6 border border-border shadow-warm-sm">
+      <div className="bg-card border border-border rounded-xl p-6 shadow-soft-sm">
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-9 h-9 bg-warning/10 rounded-lg flex items-center justify-center">
+          <div className="w-9 h-9 bg-gradient-to-br from-orange-50 to-orange-50/50 rounded-lg flex items-center justify-center">
             <Icon name="Monitor" size={18} color="var(--color-warning)" />
           </div>
           <div>
@@ -163,7 +163,9 @@ const SecuritySettings = () => {
           {activeSessions?.map((session) => (
             <div key={session?.id} className="flex items-center justify-between py-3 border-b border-border last:border-0">
               <div className="flex items-center gap-3">
-                <Icon name={session?.device?.includes('iPhone') ? 'Smartphone' : 'Monitor'} size={18} color="var(--color-muted-foreground)" />
+                <div className="w-9 h-9 bg-muted rounded-lg flex items-center justify-center">
+                  <Icon name={session?.device?.includes('iPhone') ? 'Smartphone' : 'Monitor'} size={18} color="var(--color-muted-foreground)" />
+                </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium text-foreground">{session?.device}</p>
@@ -191,7 +193,7 @@ const SecuritySettings = () => {
           <select
             value={sessionTimeout}
             onChange={(e) => setSessionTimeout(e?.target?.value)}
-            className="px-3 py-1.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
+            className="px-3 py-1.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
           >
             <option value="1h">1 hour</option>
             <option value="4h">4 hours</option>

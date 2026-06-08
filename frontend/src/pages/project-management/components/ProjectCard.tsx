@@ -25,25 +25,26 @@ const ProjectCard = ({ project, onStatusUpdate, onViewDetails }) => {
   const isOverdue = new Date(project.deadline) < new Date() && project?.status !== 'Completed';
 
   return (
-    <div className="bg-card rounded-xl shadow-warm hover-lift transition-smooth border border-border overflow-hidden">
-      <div className="relative h-40 md:h-48 lg:h-56 overflow-hidden bg-muted">
+    <div className="bg-card rounded-lg shadow-soft-md hover-lift transition-smooth border border-border/50 overflow-hidden group">
+      <div className="relative h-40 md:h-48 lg:h-56 overflow-hidden bg-gradient-to-br from-muted to-muted/50">
         <Image
           src={project?.coverImage}
           alt={project?.coverImageAlt}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
         <div className="absolute top-3 right-3 flex gap-2">
-          <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(project?.status)}`}>
+          <span className={`px-3 py-1 rounded-full text-xs font-medium border shadow-soft-sm ${getStatusColor(project?.status)}`}>
             {project?.status}
           </span>
           {isOverdue && (
-            <span className="px-3 py-1 rounded-full text-xs font-medium bg-error/10 text-error border border-error/20">
+            <span className="px-3 py-1 rounded-full text-xs font-medium bg-error/10 text-error border border-error/20 shadow-soft-sm">
               Overdue
             </span>
           )}
         </div>
       </div>
-      <div className="p-4 md:p-5 lg:p-6">
+      <div className="p-5">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex-1 min-w-0">
             <h3 className="font-heading font-semibold text-lg md:text-xl text-foreground mb-1 line-clamp-1">
@@ -59,7 +60,7 @@ const ProjectCard = ({ project, onStatusUpdate, onViewDetails }) => {
           </div>
           <button
             onClick={() => onViewDetails(project)}
-            className="p-2 rounded-lg hover:bg-muted transition-smooth active-press flex-shrink-0"
+            className="p-2 rounded-lg hover:bg-muted transition-smooth active-press flex-shrink-0 opacity-0 group-hover:opacity-100"
             aria-label="View project details"
           >
             <Icon name="ExternalLink" size={18} color="currentColor" />
@@ -108,7 +109,7 @@ const ProjectCard = ({ project, onStatusUpdate, onViewDetails }) => {
           </div>
           <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
             <div
-              className={`h-full transition-all duration-500 ${getProgressColor(project?.progress)}`}
+              className={`h-full transition-all duration-500 rounded-full ${getProgressColor(project?.progress)}`}
               style={{ width: `${project?.progress}%` }}
             />
           </div>

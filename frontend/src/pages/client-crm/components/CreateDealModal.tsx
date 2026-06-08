@@ -39,13 +39,13 @@ const CreateDealModal: React.FC<CreateDealModalProps> = ({ isOpen, onClose, onCr
   };
 
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-background/60 backdrop-blur-xl" onClick={onClose}>
       <div
-        className="bg-card rounded-xl shadow-warm-2xl w-full max-w-lg border border-border overflow-hidden"
+        className="bg-card rounded-xl shadow-soft-2xl w-full max-w-lg border border-border overflow-hidden animate-fade-in"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <h2 className="font-heading font-semibold text-lg text-foreground">Create New Deal</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-gradient-to-r from-card to-muted/20">
+          <h2 className="font-semibold text-lg text-foreground">Create New Deal</h2>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-muted transition-smooth">
             <Icon name="X" size={18} color="currentColor" />
           </button>

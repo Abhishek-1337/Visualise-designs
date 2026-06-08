@@ -86,7 +86,7 @@ const AutomationSettings = () => {
             {automations?.filter(a => a?.enabled)?.length} of {automations?.length} automations active
           </p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 shadow-warm-sm">
+        <button className="flex items-center gap-2 px-4 py-2 bg-gradient-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 shadow-soft-sm">
           <Icon name="Plus" size={16} color="currentColor" />
           New Rule
         </button>
@@ -106,7 +106,7 @@ const AutomationSettings = () => {
         {automations?.map((automation) => (
           <div
             key={automation?.id}
-            className={`bg-card rounded-xl border shadow-warm-sm overflow-hidden transition-smooth ${
+            className={`bg-card border rounded-xl shadow-soft-sm overflow-hidden transition-smooth hover-lift ${
               automation?.enabled ? 'border-border' : 'border-border opacity-70'
             }`}
           >
@@ -119,7 +119,7 @@ const AutomationSettings = () => {
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="font-medium text-sm text-foreground">{automation?.name}</p>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${categoryColors?.[automation?.category]}`}>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${categoryColors?.[automation?.category]}`}>
                         {automation?.category}
                       </span>
                     </div>
@@ -131,7 +131,7 @@ const AutomationSettings = () => {
                       automation?.enabled ? 'bg-primary' : 'bg-muted'
                     }`}
                   >
-                    <span className={`absolute top-0.5 w-5 h-5 bg-background rounded-full shadow transition-smooth ${
+                    <span className={`absolute top-0.5 w-5 h-5 bg-background rounded-full shadow-soft-sm transition-smooth ${
                       automation?.enabled ? 'left-[22px]' : 'left-0.5'
                     }`} />
                   </button>
@@ -150,14 +150,14 @@ const AutomationSettings = () => {
             {expandedId === automation?.id && (
               <div className="px-4 pb-4 border-t border-border">
                 <div className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-muted/50 rounded-lg p-3">
+                  <div className="bg-gradient-to-br from-amber-50/50 to-transparent rounded-xl p-3 border border-amber-100/30">
                     <div className="flex items-center gap-2 mb-1">
                       <Icon name="Zap" size={14} color="var(--color-accent)" />
                       <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Trigger</span>
                     </div>
                     <p className="text-sm text-foreground">{automation?.trigger}</p>
                   </div>
-                  <div className="bg-muted/50 rounded-lg p-3">
+                  <div className="bg-gradient-to-br from-indigo-50/50 to-transparent rounded-xl p-3 border border-indigo-100/30">
                     <div className="flex items-center gap-2 mb-1">
                       <Icon name="ArrowRight" size={14} color="var(--color-primary)" />
                       <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Action</span>

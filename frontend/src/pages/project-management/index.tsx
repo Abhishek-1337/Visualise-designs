@@ -8,7 +8,7 @@ import FilterBar from './components/FilterBar';
 import StatsOverview from './components/StatsOverview';
 import EmptyState from './components/EmptyState';
 import CreateProjectModal from '../client-crm/components/CreateProjectModal';
-import { projectService, contactService } from '../../services';
+import { projectService, contactService, dealService } from '../../services';
 
 const STATUS_MAP: Record<string, string> = {
   PLANNING: 'Planning',
@@ -40,6 +40,7 @@ const mapProject = (p: any) => ({
   tasks: [],
   files: [],
   contact: p.contact,
+  deal: p.deal,
   _raw: p,
 });
 
@@ -54,11 +55,14 @@ const ProjectManagement = () => {
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [creatingProject, setCreatingProject] = useState(false);
   const [allClients, setAllClients] = useState<any[]>([]);
+  const [allDeals, setAllDeals] = useState<any[]>([]);
   const [selectedClientId, setSelectedClientId] = useState<string>('');
+  const [clientSelectionId, setClientSelectionId] = useState<string>('');
 
   useEffect(() => {
     loadProjects();
     loadClients();
+    loadDeals();
   }, []);
 
   const loadProjects = async () => {
@@ -78,11 +82,17 @@ const ProjectManagement = () => {
       const res = await contactService.getAll({ limit: '100' });
       const clients = res.data.contacts || [];
       setAllClients(clients);
-      if (clients.length > 0) {
-        setSelectedClientId(clients[0].id);
-      }
     } catch {
       console.error('Failed to load clients');
+    }
+  };
+
+  const loadDeals = async () => {
+    try {
+      const res = await dealService.getAll({ limit: '100' });
+      setAllDeals(res.data.deals || []);
+    } catch {
+      console.error('Failed to load deals');
     }
   };
 
@@ -145,11 +155,16 @@ const ProjectManagement = () => {
     try {
       setCreatingProject(true);
       const res = await projectService.create(data);
-      // Fetch full project details for the card
       const fullRes = await projectService.getById(res.data.id);
       setProjects(prev => [mapProject(fullRes.data), ...prev]);
+      if (data.dealId) {
+        setAllDeals(prev => prev.map((deal) =>
+          deal.id === data.dealId ? { ...deal, project: { id: fullRes.data.id, name: fullRes.data.name } } : deal
+        ));
+      }
       setShowProjectModal(false);
       setSelectedClientId('');
+      setClientSelectionId('');
     } catch (err) {
       console.error('Failed to create project:', err);
     } finally {
@@ -159,6 +174,8 @@ const ProjectManagement = () => {
 
   const handleCreateProject = () => {
     if (allClients.length > 0) {
+      setClientSelectionId('');
+      setSelectedClientId('');
       setShowProjectModal(true);
     } else {
       alert('Please create a client first before creating a project.');
@@ -174,8 +191,8 @@ const ProjectManagement = () => {
       <div className="min-h-screen bg-background">
         <Sidebar />
         <TopBar />
-        <main className="md:ml-[260px] pt-[60px]">
-          <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10">
+        <main className="md:ml-[240px] pt-[60px]">
+          <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10 animate-fade-in">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6 md:mb-8">
               <div>
                 <h1 className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-2">
@@ -202,7 +219,7 @@ const ProjectManagement = () => {
                 <StatsOverview stats={stats} />
                 <FilterBar filters={filters} onFilterChange={handleFilterChange} onClearFilters={handleClearFilters} />
                 {filteredProjects.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
                     {filteredProjects.map((project) => (
                       <ProjectCard
                         key={project.id}
@@ -229,14 +246,14 @@ const ProjectManagement = () => {
         )}
 
         {showProjectModal && !selectedClientId && allClients.length > 0 && (
-          <div className="fixed inset-0 z-[1999] flex items-center justify-center p-4 bg-background/60 backdrop-blur-sm">
-             <div className="bg-card p-6 rounded-xl border border-border shadow-2xl w-full max-w-sm">
+          <div className="fixed inset-0 z-[1999] flex items-center justify-center p-4 bg-background/60 backdrop-blur-sm animate-fade-in">
+             <div className="bg-card p-6 rounded-lg border border-border/50 shadow-soft-xl w-full max-w-sm animate-slide-up">
                 <h3 className="text-lg font-bold mb-4">Select Client</h3>
                 <p className="text-sm text-muted-foreground mb-4">Select a client to associate with this new project.</p>
                 <select 
                   className="w-full p-2.5 border border-border rounded-lg bg-background mb-6 text-sm"
-                  value={selectedClientId}
-                  onChange={(e) => setSelectedClientId(e.target.value)}
+                  value={clientSelectionId}
+                  onChange={(e) => setClientSelectionId(e.target.value)}
                 >
                   <option value="" disabled>Choose a client...</option>
                   {allClients.map(c => (
@@ -244,8 +261,18 @@ const ProjectManagement = () => {
                   ))}
                 </select>
                 <div className="flex gap-3">
-                  <Button variant="outline" fullWidth onClick={() => setShowProjectModal(false)}>Cancel</Button>
-                  <Button variant="default" fullWidth onClick={() => {}} disabled={!selectedClientId}>Continue</Button>
+                  <Button variant="outline" fullWidth onClick={() => {
+                    setShowProjectModal(false);
+                    setClientSelectionId('');
+                  }}>Cancel</Button>
+                  <Button
+                    variant="default"
+                    fullWidth
+                    onClick={() => setSelectedClientId(clientSelectionId)}
+                    disabled={!clientSelectionId}
+                  >
+                    Continue
+                  </Button>
                 </div>
              </div>
           </div>
@@ -257,10 +284,12 @@ const ProjectManagement = () => {
             onClose={() => {
               setShowProjectModal(false);
               setSelectedClientId('');
+              setClientSelectionId('');
             }}
             onCreate={handleCreateProjectSubmit}
             loading={creatingProject}
             contactId={selectedClientId}
+            deals={allDeals}
           />
         )}
       </div>

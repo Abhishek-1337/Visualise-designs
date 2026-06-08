@@ -62,7 +62,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled, onTyping 
 
   return (
     <div className="border-t border-border bg-card px-6 py-4">
-      <div className="flex items-center gap-3 bg-muted rounded-xl px-4 py-3 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary/50 transition-all">
+      <div className="flex items-center gap-3 bg-muted rounded-xl px-4 py-3 border border-border/50 focus-within:ring-2 focus-within:ring-primary/30 transition-all">
         <button
           className="p-1.5 rounded-lg hover:bg-background transition-smooth text-muted-foreground hover:text-foreground flex-shrink-0 mb-0.5"
           title="Attach file"
@@ -91,7 +91,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled, onTyping 
             disabled={!message.trim() || disabled}
             className={`p-2 rounded-lg transition-smooth ${
               message.trim() && !disabled
-                ? 'bg-primary text-primary-foreground hover:opacity-90'
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft-sm'
                 : 'bg-muted-foreground/20 text-muted-foreground/50 cursor-not-allowed'
             }`}
             title="Send message"
@@ -100,9 +100,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSend, disabled, onTyping 
           </button>
         </div>
       </div>
-      <p className="text-[10px] text-muted-foreground/40 mt-1.5 text-center">
-        Press Enter to send · Shift+Enter for new line
-      </p>
     </div>
   );
 };

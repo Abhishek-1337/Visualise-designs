@@ -24,8 +24,8 @@ const navItemConfig: NavItem[] = [
   { label: 'Client Chat', path: '/client-messaging', icon: 'MessageSquare', tooltip: 'Slack-like client messaging', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
   { label: 'Client CRM', path: '/client-crm', icon: 'UserCog', tooltip: 'Client profiles, projects & chat', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
   { label: 'Comms', path: '/communication-hub', icon: 'MessageCircle', tooltip: 'Communication hub', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  { label: 'Payments', path: '/payments', icon: 'CreditCard', tooltip: 'Invoices & payments', roles: ['ADMIN', 'MANAGER'] },
   
-  // Client Portal Items
   { label: 'Portal Home', path: '/client-portal', icon: 'LayoutDashboard', tooltip: 'Your collaboration portal', roles: ['CLIENT'] },
   { label: 'My Deals', path: '/client-portal/deals', icon: 'Briefcase', tooltip: 'View your deals', roles: ['CLIENT'] },
   { label: 'My Projects', path: '/client-portal/projects', icon: 'FolderKanban', tooltip: 'View your projects', roles: ['CLIENT'] },
@@ -57,6 +57,7 @@ export const Sidebar: React.FC = () => {
   }, [user?.role]);
 
   const isActivePath = (path: string) => location?.pathname === path;
+  const isActiveParent = (path: string) => location?.pathname?.startsWith(path) && path !== '/';
 
   const handleLogout = () => {
     dispatch(logout());
@@ -68,39 +69,45 @@ export const Sidebar: React.FC = () => {
   const userInitial = userName?.charAt(0)?.toUpperCase() || 'U';
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full max-w-[240px]">
-      <div className="flex items-center gap-6 px-4 border-b border-border h-[60px]">
-        <Link to={user?.role === 'CLIENT' ? '/client-portal' : '/home-dashboard'} className="flex items-center gap-0 transition-smooth hover:opacity-80">
-          <div className="w-10 h-10 bg-foreground rounded-lg flex items-center justify-center transition-smooth">
-            <img src="../../public/Png.png" className="bg-white"/>
+    <div className="flex flex-col h-full w-full min-w-0 overflow-hidden">
+      <div className="flex items-center gap-3 px-5 h-[64px] border-b border-border">
+        <Link to={user?.role === 'CLIENT' ? '/client-portal' : '/home-dashboard'} className="flex items-center gap-2.5 transition-smooth hover:opacity-80">
+          <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center shadow-soft-sm">
+            <span className="text-white font-bold text-sm">V</span>
           </div>
-          <span className="font-semibold text-lg text-foreground tracking-tight">
-            Visualise CRM
-          </span>
+          <div>
+            <span className="font-semibold text-base text-foreground tracking-tight">
+              Visualise
+            </span>
+            <span className="text-[10px] block text-muted-foreground font-medium tracking-wider uppercase">CRM</span>
+          </div>
         </Link>
-        <button onClick={() => setIsMobileOpen(false)} className="md:hidden p-2 rounded-md transition-smooth hover:bg-muted">
-          <Icon name="X" size={20} color="currentColor" />
+        <button onClick={() => setIsMobileOpen(false)} className="md:hidden p-2 rounded-lg transition-smooth hover:bg-muted ml-auto">
+          <Icon name="X" size={18} color="currentColor" />
         </button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto py-4 px-2 pt-8">
-        <div className="space-y-2">
-          {navigationItems?.map((item) => (
-            <Link
-              key={item?.path}
-              to={item?.path}
-              onClick={() => { setIsMobileOpen(false); setIsUserMenuOpen(false); }}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md transition-smooth active-press ${
-                isActivePath(item?.path)
-                  ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400'
-                  : 'text-muted-foreground hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50'
-              }`}
-              title={item?.tooltip}
-            >
-              <Icon name={item?.icon} size={18} color="currentColor" />
-              <span className="text-sm font-medium">{item?.label}</span>
-            </Link>
-          ))}
+      <nav className="flex-1 overflow-y-auto py-3 px-3 scrollbar-thin">
+        <div className="space-y-0.5">
+          {navigationItems?.map((item) => {
+            const active = isActivePath(item?.path) || isActiveParent(item?.path);
+            return (
+              <Link
+                key={item?.path}
+                to={item?.path}
+                onClick={() => { setIsMobileOpen(false); setIsUserMenuOpen(false); }}
+                className={`flex w-full min-w-0 items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
+                  active
+                    ? 'bg-primary/10 text-primary font-medium'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+                title={item?.tooltip}
+              >
+                <Icon name={item?.icon} size={18} color={active ? 'var(--color-primary)' : 'currentColor'} className="flex-shrink-0" />
+                <span className="min-w-0 flex-1 truncate text-sm">{item?.label}</span>
+              </Link>
+            );
+          })}
         </div>
       </nav>
 
@@ -112,52 +119,39 @@ export const Sidebar: React.FC = () => {
         <div className="relative">
           <button
             onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-md transition-smooth hover:bg-muted"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-smooth hover:bg-muted"
           >
-            <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold text-sm">
               {user?.avatar ? (
                 <img src={user.avatar} alt={userName} className="w-8 h-8 rounded-full object-cover" />
               ) : (
-                <span className="text-xs font-medium text-foreground">{userInitial}</span>
+                userInitial
               )}
             </div>
             <div className="flex-1 text-left min-w-0">
               <p className="text-sm font-medium text-foreground truncate">{userName}</p>
               <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
-              {user?.role && (
-                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium mt-0.5 ${
-                  user.role === 'ADMIN'
-                    ? 'bg-primary/10 text-primary'
-                    : user.role === 'MANAGER'
-                    ? 'bg-accent/10 text-accent'
-                    : 'bg-muted text-muted-foreground'
-                }`}>
-                  {user.role}
-                </span>
-              )}
             </div>
-            <Icon name="ChevronDown" size={14} color="currentColor" />
+            <Icon name="ChevronDown" size={14} color="var(--color-muted-foreground)" className="flex-shrink-0" />
           </button>
 
           {isUserMenuOpen && (
-            <div className="absolute bottom-full left-0 right-0 mb-2 bg-popover border border-border rounded-md shadow-warm-lg z-[1010]">
-              <div className="p-1">
-                <Link
-                  to="/settings-configuration"
-                  className="flex items-center gap-3 px-3 py-2 rounded-md transition-smooth hover:bg-muted"
-                  onClick={() => setIsUserMenuOpen(false)}
-                >
-                  <Icon name="User" size={16} color="currentColor" />
-                  <span className="text-sm text-foreground">Profile Settings</span>
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-md transition-smooth hover:bg-muted text-left"
-                >
-                  <Icon name="LogOut" size={16} color="currentColor" />
-                  <span className="text-sm text-foreground">Logout</span>
-                </button>
-              </div>
+            <div className="absolute bottom-full left-2 right-2 mb-2 bg-card border border-border rounded-xl shadow-soft-xl z-[1010] p-1.5 animate-scale-in">
+              <Link
+                to="/settings-configuration"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-smooth hover:bg-muted text-sm text-foreground"
+                onClick={() => setIsUserMenuOpen(false)}
+              >
+                <Icon name="User" size={16} className="text-muted-foreground" />
+                Profile Settings
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-smooth hover:bg-error/10 text-sm text-error text-left"
+              >
+                <Icon name="LogOut" size={16} />
+                Logout
+              </button>
             </div>
           )}
         </div>
@@ -167,14 +161,14 @@ export const Sidebar: React.FC = () => {
 
   return (
     <SidebarContext.Provider value={{ isMobileOpen, setIsMobileOpen }}>
-      <aside className="hidden fixed h-screen md:flex top-0 left-0 bottom-0 bg-card border-r border-border z-[1000]">
+      <aside className="hidden fixed h-screen md:flex top-0 left-0 bottom-0 bg-card border-r border-border z-[1000] w-[240px]">
         <SidebarContent />
       </aside>
 
       {isMobileOpen && (
         <div className="fixed inset-0 z-[1020] md:hidden">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setIsMobileOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-[280px] bg-card border-r border-border shadow-lg">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsMobileOpen(false)} />
+          <div className="absolute left-0 top-0 bottom-0 w-[280px] bg-card border-r border-border shadow-soft-xl animate-slide-right">
             <SidebarContent />
           </div>
         </div>
@@ -192,31 +186,34 @@ export const TopBar: React.FC = () => {
   const userInitial = userName?.charAt(0)?.toUpperCase() || 'U';
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[900] h-[60px] bg-card border-b border-border flex items-center justify-between px-4 lg:px-6">
-      <button onClick={() => setIsMobileOpen(true)} className="md:hidden p-2 rounded-md transition-smooth hover:bg-muted" aria-label="Toggle menu">
-        <Icon name="Menu" size={20} color="currentColor" />
-      </button>
-      <div className="flex-1 md:ml-4">
-        <h1 className="text-base font-semibold text-foreground tracking-tight hidden md:block">Dashboard</h1>
-      </div>
+    <header className="fixed top-0 left-0 right-0 z-[900] h-[64px] bg-card/80 backdrop-blur-lg border-b border-border flex items-center justify-between px-4 lg:px-6">
       <div className="flex items-center gap-3">
+        <button onClick={() => setIsMobileOpen(true)} className="md:hidden p-2 rounded-lg transition-smooth hover:bg-muted" aria-label="Toggle menu">
+          <Icon name="Menu" size={20} color="currentColor" />
+        </button>
+        <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
+          <Icon name="ChevronRight" size={14} />
+          <span className="font-medium text-foreground">{user?.role === 'CLIENT' ? 'Client Portal' : 'Dashboard'}</span>
+        </div>
+      </div>
+      <div className="flex items-center gap-4">
         {user?.role && user.role !== 'EMPLOYEE' && (
-          <span className={`hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${
+          <span className={`hidden sm:inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold tracking-wider uppercase ${
             user.role === 'ADMIN'
               ? 'bg-primary/10 text-primary'
-              : 'bg-accent/10 text-accent'
+              : 'bg-violet-50 text-violet-700 dark:bg-violet-950/30 dark:text-violet-400'
           }`}>
             {user.role}
           </span>
         )}
-        <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold text-sm">
           {user?.avatar ? (
             <img src={user.avatar} alt={userName} className="w-8 h-8 rounded-full object-cover" />
           ) : (
-            <span className="text-xs font-medium text-foreground">{userInitial}</span>
+            userInitial
           )}
         </div>
-        <span className="hidden sm:block text-sm font-medium text-muted-foreground">{userName}</span>
+        <span className="hidden sm:block text-sm font-medium text-foreground">{userName}</span>
       </div>
     </header>
   );

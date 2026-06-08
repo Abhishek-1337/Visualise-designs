@@ -81,13 +81,13 @@ const InviteClientModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-background/60 backdrop-blur-xl" onClick={onClose}>
       <div
-        className="bg-card rounded-xl shadow-warm-2xl w-full max-w-md border border-border"
+        className="bg-card rounded-xl shadow-soft-2xl w-full max-w-md border border-border animate-fade-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <h2 className="font-heading font-semibold text-lg text-foreground">Invite New Client</h2>
+          <h2 className="font-semibold text-lg text-foreground">Invite New Client</h2>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-muted transition-smooth">
             <Icon name="X" size={18} color="currentColor" />
           </button>
@@ -100,7 +100,7 @@ const InviteClientModal = ({
               placeholder="Enter client email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
+              className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
               autoFocus
             />
           </div>
@@ -271,6 +271,15 @@ const ClientCRM = () => {
         ...prev,
         [data.contactId]: [res.data, ...(prev[data.contactId] || [])]
       }));
+
+      if (data.dealId) {
+        setDealsByClient(prev => ({
+          ...prev,
+          [data.contactId]: (prev[data.contactId] || []).map((deal) =>
+            deal.id === data.dealId ? { ...deal, project: { id: res.data.id, name: res.data.name } } : deal
+          )
+        }));
+      }
       
       setShowProjectModal(false);
     } catch (err) {
@@ -369,7 +378,7 @@ const ClientCRM = () => {
         <TopBar />
         <main className="md:ml-[240px] h-screen pt-[60px] overflow-hidden">
           <div className="flex items-center justify-center h-full">
-            <div className="text-center max-w-md px-8">
+            <div className="text-center max-w-md px-8 animate-fade-in">
               <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Icon name="Lock" size={36} color="var(--color-muted-foreground)" />
               </div>
@@ -390,7 +399,7 @@ const ClientCRM = () => {
         <Sidebar />
         <TopBar />
         <main className="md:ml-[240px] h-screen pt-[60px] flex items-center justify-center">
-          <div className="text-center">
+          <div className="text-center animate-fade-in">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-muted-foreground">Loading clients...</p>
           </div>
@@ -400,7 +409,7 @@ const ClientCRM = () => {
   }
 
   return (
-    <div className="h-screen overflow-hidden bg-background">
+    <div className="h-screen overflow-hidden bg-background animate-fade-in">
       <Sidebar />
       <TopBar />
       <main className="md:ml-[240px] h-screen pt-[60px] flex flex-col overflow-hidden">
@@ -458,6 +467,7 @@ const ClientCRM = () => {
           onCreate={handleCreateProject}
           loading={creatingProject}
           contactId={selectedClientId}
+          deals={clientDeals}
         />
       )}
 

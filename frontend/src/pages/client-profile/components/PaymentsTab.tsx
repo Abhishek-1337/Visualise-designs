@@ -23,21 +23,21 @@ const PaymentsTab = () => {
   const formatDate = (date) => date?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           { label: 'Total Received', value: formatCurrency(totalRevenue), icon: 'TrendingUp', color: 'text-success bg-success/10' },
           { label: 'Pending Payment', value: formatCurrency(totalPending), icon: 'Clock', color: 'text-warning bg-warning/10' },
           { label: 'Overdue Amount', value: formatCurrency(totalOverdue), icon: 'AlertCircle', color: 'text-error bg-error/10' }
         ]?.map((stat) => (
-          <div key={stat?.label} className="bg-card rounded-xl shadow-warm p-5">
+          <div key={stat?.label} className="bg-card rounded-xl shadow-soft-md border border-border p-5 hover-lift">
             <div className="flex items-center gap-3 mb-2">
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat?.color}`}>
                 <Icon name={stat?.icon} size={20} color="currentColor" />
               </div>
               <span className="text-sm text-muted-foreground">{stat?.label}</span>
             </div>
-            <p className="text-2xl font-heading font-bold text-foreground">{stat?.value}</p>
+            <p className="text-2xl font-bold text-foreground">{stat?.value}</p>
           </div>
         ))}
       </div>
@@ -47,16 +47,16 @@ const PaymentsTab = () => {
           <div>
             <p className="font-medium text-error text-sm">Overdue Payment Alert</p>
             <p className="text-sm text-muted-foreground mt-1">Invoice INV-2025-001 is overdue by 27 days. Consider sending a payment reminder.</p>
-            <button className="mt-2 px-4 py-1.5 bg-error text-error-foreground rounded-lg text-xs font-medium transition-smooth hover-lift">
+            <button className="mt-2 px-4 py-1.5 bg-error text-error-foreground rounded-lg text-xs font-medium transition-smooth hover-lift shadow-soft-sm">
               Send Reminder
             </button>
           </div>
         </div>
       )}
-      <div className="bg-card rounded-xl shadow-warm overflow-hidden">
-        <div className="p-4 border-b border-border flex items-center justify-between">
-          <h3 className="font-heading font-semibold text-foreground">Invoice History</h3>
-          <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover-lift active-press">
+      <div className="bg-card rounded-xl shadow-soft-md border border-border overflow-hidden">
+        <div className="p-4 border-b border-border flex items-center justify-between bg-gradient-to-r from-card to-muted/20">
+          <h3 className="font-semibold text-foreground">Invoice History</h3>
+          <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover-lift shadow-soft-sm">
             <Icon name="Plus" size={16} color="currentColor" />
             New Invoice
           </button>
@@ -69,7 +69,7 @@ const PaymentsTab = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-xs text-muted-foreground">{invoice?.id}</span>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 ${config?.color}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 border ${config?.color}`}>
                       <Icon name={config?.icon} size={10} color="currentColor" />
                       {config?.label}
                     </span>
@@ -81,7 +81,7 @@ const PaymentsTab = () => {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-heading font-semibold text-foreground">{formatCurrency(invoice?.amount)}</p>
+                  <p className="font-semibold text-foreground">{formatCurrency(invoice?.amount)}</p>
                   <div className="flex gap-1 mt-1 justify-end">
                     <button className="p-1.5 rounded hover:bg-muted transition-smooth" title="View">
                       <Icon name="Eye" size={14} color="var(--color-muted-foreground)" />

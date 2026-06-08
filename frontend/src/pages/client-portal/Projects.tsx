@@ -27,7 +27,7 @@ const ClientProjects = () => {
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-background">
+    <div className="h-screen overflow-hidden bg-background animate-fade-in">
       <Sidebar />
       <TopBar />
       <main className="md:ml-[240px] h-screen pt-[60px] overflow-y-auto">
@@ -50,12 +50,13 @@ const ClientProjects = () => {
               {projects.map((project) => (
                 <Card 
                   key={project.id} 
-                  className="p-6 hover:shadow-warm-md transition-smooth cursor-pointer border border-border/60 hover:border-primary/30"
+                  hover
                   onClick={() => navigate(`/client-portal/projects/${project.id}`)}
+                  className="p-6"
                 >
                   <div className="flex justify-between items-start mb-4">
-                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center">
-                      <Icon name="Folder" size={20} color="var(--color-primary)" />
+                    <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center shadow-soft-sm">
+                      <Icon name="Folder" size={20} color="white" />
                     </div>
                     <StatusBadge status={project.status} />
                   </div>
@@ -71,7 +72,7 @@ const ClientProjects = () => {
                       </div>
                       <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-primary transition-all duration-500 ease-out" 
+                          className="h-full bg-gradient-to-r from-primary to-indigo-500 transition-all duration-500 ease-out" 
                           style={{ width: `${project.progress}%` }} 
                         />
                       </div>

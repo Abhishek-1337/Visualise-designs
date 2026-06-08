@@ -48,18 +48,18 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({
   }, [clients, searchQuery]);
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col min-w-0 overflow-hidden">
+    <div className="flex-1 min-h-0 flex flex-col min-w-0 overflow-hidden animate-fade-in">
       <div className="px-6 py-6 border-b border-border shrink-0">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-heading font-bold text-foreground">Clients</h1>
+            <h1 className="text-2xl font-bold text-foreground">Clients</h1>
             <p className="text-sm text-muted-foreground mt-1">
               Select a client to view their profile, projects, and conversations.
             </p>
           </div>
           <button
             onClick={onInviteClient}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 shadow-warm-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover-lift shadow-soft-sm"
           >
             <Icon name="UserPlus" size={16} color="currentColor" />
             Invite Client
@@ -72,10 +72,10 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search clients by name, company, or email..."
-            className="w-full pl-9 pr-9 py-2.5 bg-blue-50/50 dark:bg-blue-950/20 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all"
+            className="w-full pl-9 pr-9 py-2.5 bg-muted border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-blue-600 transition-smooth">
+            <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-smooth">
               <Icon name="X" size={14} color="currentColor" />
             </button>
           )}
@@ -87,7 +87,7 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({
           <div className="mb-6 space-y-2">
             <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Pending Invitations</h4>
             {pendingInvites.map((inv) => (
-              <div key={inv.id} className="flex items-center gap-3 bg-card rounded-xl border border-border shadow-warm-sm p-4">
+              <div key={inv.id} className="flex items-center gap-3 bg-card rounded-xl border border-border shadow-soft-sm p-4 hover-lift transition-smooth">
                 <div className="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center">
                   <Icon name="Clock" size={16} color="var(--color-warning)" />
                 </div>
@@ -113,9 +113,9 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({
         )}
 
         {filtered.length === 0 && pendingInvites.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-4">
-              <Icon name="Users" size={28} color="#3B82F6" />
+          <div className="flex flex-col items-center justify-center py-16 animate-fade-in">
+            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
+              <Icon name="Users" size={28} color="var(--color-primary)" />
             </div>
             <p className="text-sm text-muted-foreground">
               {searchQuery ? 'No clients match your search' : 'No clients available'}
@@ -123,7 +123,7 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({
             {!searchQuery && (
               <button
                 onClick={onInviteClient}
-                className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90"
+                className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover-lift shadow-soft-sm"
               >
                 Invite Your First Client
               </button>
@@ -140,7 +140,7 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({
                 onClick={() => onSelectClient(client)}
                 className="flex items-start gap-4 text-left"
               >
-                <AvatarCircle name={client.name} avatar={client.avatar} size={12} />
+                <AvatarCircle name={client.name} avatar={client.avatar} size="md" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-semibold text-foreground truncate">{client.name}</h3>
@@ -149,16 +149,16 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({
                   <p className="text-sm text-muted-foreground truncate">{client.company}</p>
                   <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
-                      <Icon name="Mail" size={12} color="#3B82F6" />
+                      <Icon name="Mail" size={12} color="var(--color-primary)" />
                       {client.email}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Icon name="MapPin" size={12} color="#3B82F6" />
+                      <Icon name="MapPin" size={12} color="var(--color-primary)" />
                       {client.location}
                     </span>
                   </div>
                 </div>
-                <Icon name="ChevronRight" size={16} color="#3B82F6" className="mt-1 flex-shrink-0 opacity-40" />
+                <Icon name="ChevronRight" size={16} color="var(--color-primary)" className="mt-1 flex-shrink-0 opacity-40" />
               </Card>
             ))}
           </div>
@@ -167,7 +167,7 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({
 
       <div className="px-6 py-3 border-t border-border shrink-0">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Icon name="Users" size={14} color="#3B82F6" />
+          <Icon name="Users" size={14} color="var(--color-primary)" />
           <span>{clients.length} client{clients.length !== 1 ? 's' : ''}</span>
           {pendingInvites.length > 0 && (
             <>

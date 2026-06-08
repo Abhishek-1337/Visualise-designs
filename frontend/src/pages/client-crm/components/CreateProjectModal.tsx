@@ -10,6 +10,7 @@ interface CreateProjectModalProps {
   onCreate: (data: any) => void;
   loading: boolean;
   contactId: string;
+  deals?: any[];
 }
 
 const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
@@ -18,6 +19,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
   onCreate,
   loading,
   contactId,
+  deals = [],
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -25,6 +27,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [status, setStatus] = useState('PLANNING');
+  const [selectedDealId, setSelectedDealId] = useState('');
   const [members, setMembers] = useState<any[]>([]);
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([]);
   const [fetchLoading, setFetchLoading] = useState(false);
@@ -38,10 +41,17 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       setStartDate('');
       setEndDate('');
       setStatus('PLANNING');
+      setSelectedDealId('');
       setSelectedMemberIds([]);
       fetchMembers();
     }
   }, [isOpen]);
+
+  const availableDeals = deals.filter((deal) =>
+    deal?.contactId === contactId &&
+    deal?.status !== 'CONVERTED_TO_PROJECT' &&
+    !deal?.project
+  );
 
   const fetchMembers = async () => {
     try {
@@ -70,8 +80,18 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       endDate: endDate || undefined,
       status,
       contactId,
+      dealId: selectedDealId || undefined,
       memberIds: selectedMemberIds,
     });
+  };
+
+  const handleDealChange = (dealId: string) => {
+    setSelectedDealId(dealId);
+    const deal = availableDeals.find((item) => item.id === dealId);
+    if (!deal) return;
+    if (!name.trim()) setName(deal.title || '');
+    if (!description.trim()) setDescription(deal.description || '');
+    if (!budget.trim() && deal.value) setBudget(String(deal.value));
   };
 
   const toggleMember = (id: string) => {
@@ -81,13 +101,13 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-background/60 backdrop-blur-xl" onClick={onClose}>
       <div
-        className="bg-card rounded-xl shadow-warm-2xl w-full max-w-lg border border-border overflow-hidden flex flex-col max-h-[90vh]"
+        className="bg-card rounded-xl shadow-soft-2xl w-full max-w-lg border border-border overflow-hidden flex flex-col max-h-[90vh] animate-fade-in"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <h2 className="font-heading font-semibold text-lg text-foreground">Create New Project</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-gradient-to-r from-card to-muted/20">
+          <h2 className="font-semibold text-lg text-foreground">Create New Project</h2>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-muted transition-smooth">
             <Icon name="X" size={18} color="currentColor" />
           </button>
@@ -101,8 +121,27 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Website Redesign"
-              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1.5">Linked Deal (Optional)</label>
+            <select
+              value={selectedDealId}
+              onChange={(e) => handleDealChange(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            >
+              <option value="">No linked deal</option>
+              {availableDeals.map((deal) => (
+                <option key={deal.id} value={deal.id}>
+                  {deal.title} {deal.value ? `- $${Number(deal.value).toLocaleString()}` : ''}
+                </option>
+              ))}
+            </select>
+            {availableDeals.length === 0 && (
+              <p className="mt-1.5 text-xs text-muted-foreground">No unlinked deals found for this client.</p>
+            )}
           </div>
 
           <div>
@@ -112,7 +151,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe the project goals..."
               rows={3}
-              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 resize-none"
+              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
             />
           </div>
 
@@ -124,7 +163,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
                 placeholder="5000"
-                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
             <div>
@@ -132,7 +171,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
               >
                 <option value="PLANNING">Planning</option>
                 <option value="ACTIVE">Active</option>
@@ -148,7 +187,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
             <div>
@@ -157,7 +196,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
           </div>
@@ -176,10 +215,10 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                       type="checkbox"
                       checked={selectedMemberIds.includes(member.id)}
                       onChange={() => toggleMember(member.id)}
-                      className="rounded border-border text-blue-600 focus:ring-blue-500"
+                      className="rounded border-border text-primary focus:ring-primary/30"
                     />
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-[10px] font-bold text-blue-600">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
                         {member.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
                       </div>
                       <span className="text-sm text-foreground">{member.name}</span>
@@ -191,7 +230,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
           </div>
         </form>
 
-        <div className="p-6 border-t border-border flex gap-3">
+        <div className="p-6 border-t border-border flex gap-3 bg-muted/20">
           <Button variant="outline" onClick={onClose} className="flex-1">Cancel</Button>
           <Button
             onClick={handleSubmit}

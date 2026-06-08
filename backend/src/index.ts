@@ -16,6 +16,9 @@ import inviteRoutes from './routes/invite.routes';
 import crmRoutes from './routes/crm.routes';
 import seedRoutes from './routes/seed.routes';
 import messageRoutes from './routes/message.routes';
+import fileRoutes from './routes/file.routes';
+import invoiceRoutes from './routes/invoice.routes';
+import notificationRoutes from './routes/notification.routes';
 import { createSocketServer } from './socket';
 
 // Initialize Passport config
@@ -73,6 +76,9 @@ app.use('/api/v1/invites', inviteRoutes);
 app.use('/api/v1', crmRoutes); // Handles /contacts, /deals, /projects, /tasks, /activities, /dashboard
 app.use('/api/v1/seed', seedRoutes);
 app.use('/api/v1/messages', messageRoutes);
+app.use('/api/v1/files', fileRoutes);
+app.use('/api/v1/invoices', invoiceRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 
 // 404 handler
 app.use((_req, res) => {

@@ -1,20 +1,23 @@
 import React from 'react';
 import Icon from '../AppIcon';
+import { cn } from '../../utils/cn';
 
 interface EmptyStateProps {
-  icon: string;
+  icon?: string;
   title: string;
   description?: string;
-  iconSize?: number;
+  action?: React.ReactNode;
+  className?: string;
 }
 
-const EmptyState: React.FC<EmptyStateProps> = ({ icon, title, description, iconSize = 24 }) => (
-  <div className="flex flex-col items-center justify-center py-12 text-center">
-    <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-3">
-      <Icon name={icon} size={iconSize} color="#3B82F6" />
+const EmptyState: React.FC<EmptyStateProps> = ({ icon = 'Inbox', title, description, action, className }) => (
+  <div className={cn("flex flex-col items-center justify-center text-center py-16 px-6", className)}>
+    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mb-5 ring-1 ring-primary/10">
+      <Icon name={icon} size={28} className="text-primary/60" />
     </div>
-    <p className="text-sm text-muted-foreground">{title}</p>
-    {description && <p className="text-xs text-muted-foreground/60 mt-1">{description}</p>}
+    <h3 className="text-lg font-semibold text-foreground mb-1.5">{title}</h3>
+    {description && <p className="text-sm text-muted-foreground max-w-sm mb-6 leading-relaxed">{description}</p>}
+    {action && <div>{action}</div>}
   </div>
 );
 

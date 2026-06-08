@@ -99,8 +99,11 @@ const AcceptInvite = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-warm-offwhite to-indigo-50/30 flex items-center justify-center">
+        <div className="animate-fade-in">
+          <div className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-sm text-muted-foreground">Verifying invitation...</p>
+        </div>
       </div>
     );
   }
@@ -111,8 +114,8 @@ const AcceptInvite = () => {
         <Helmet>
           <title>Invalid Invitation - Visualise CRM</title>
         </Helmet>
-        <div className="min-h-screen bg-background flex items-center justify-center p-4">
-          <div className="bg-card rounded-xl shadow-warm-lg p-8 max-w-md w-full text-center">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-warm-offwhite to-indigo-50/30 flex items-center justify-center p-4">
+          <div className="bg-card border border-border rounded-xl shadow-soft-lg p-8 max-w-md w-full text-center animate-fade-in">
             <div className="w-16 h-16 bg-error/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <Icon name="XCircle" size={32} color="var(--color-error)" />
             </div>
@@ -120,7 +123,7 @@ const AcceptInvite = () => {
             <p className="text-muted-foreground mb-6">{error}</p>
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90">
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 shadow-soft-sm">
               <Icon name="ArrowLeft" size={16} color="currentColor" />
               Go to Login
             </Link>
@@ -135,10 +138,10 @@ const AcceptInvite = () => {
       <Helmet>
         <title>Accept Invitation - Visualise CRM</title>
       </Helmet>
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-warm-offwhite to-indigo-50/30 flex items-center justify-center p-4">
+        <div className="w-full max-w-md animate-fade-in">
           <div className="text-center mb-8">
-            <div className="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-200/50">
               <Icon name="Sparkles" size={30} color="var(--color-accent)" />
             </div>
             <h1 className="font-heading font-bold text-2xl text-foreground">Accept Invitation</h1>
@@ -147,14 +150,14 @@ const AcceptInvite = () => {
             </p>
           </div>
 
-          <div className="bg-card rounded-xl shadow-warm-lg p-6 sm:p-8">
-            <div className="mb-6 p-4 bg-muted rounded-lg">
+          <div className="bg-card border border-border rounded-xl shadow-soft-lg p-6 sm:p-8">
+            <div className="mb-6 p-4 bg-gradient-to-r from-indigo-50/50 to-slate-50 rounded-lg border border-indigo-100/50">
               <div className="flex items-center gap-3 mb-2">
-                <Icon name="Mail" size={16} color="var(--color-muted-foreground)" />
+                <Icon name="Mail" size={16} color="var(--color-primary)" />
                 <span className="text-sm text-foreground font-medium">{invite?.email}</span>
               </div>
               <div className="flex items-center gap-3">
-                <Icon name="UserCheck" size={16} color="var(--color-muted-foreground)" />
+                <Icon name="UserCheck" size={16} color="var(--color-primary)" />
                 <span className="text-sm text-muted-foreground">
                   Role: <span className="font-medium text-foreground">{roleLabels[invite?.role] || invite?.role}</span>
                 </span>
@@ -196,8 +199,8 @@ const AcceptInvite = () => {
                       <span className="text-xs text-muted-foreground">Password strength</span>
                       <span className="text-xs font-medium">{strength.label}</span>
                     </div>
-                    <div className="h-1 bg-muted rounded-full overflow-hidden">
-                      <div className={`h-full transition-all ${strength.color}`} style={{ width: `${(strength.strength / 4) * 100}%` }} />
+                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div className={`h-full transition-all rounded-full ${strength.color}`} style={{ width: `${(strength.strength / 4) * 100}%` }} />
                     </div>
                   </div>
                 )}
@@ -225,7 +228,7 @@ const AcceptInvite = () => {
                 <label htmlFor="showPassword" className="text-xs text-muted-foreground">Show password</label>
               </div>
 
-              <Button type="submit" variant="default" size="lg" fullWidth loading={submitting} iconName="UserPlus" iconPosition="left">
+              <Button type="submit" variant="default" size="lg" fullWidth loading={submitting} iconName="UserPlus" iconPosition="left" className="bg-gradient-primary">
                 Accept Invitation & Set Up Account
               </Button>
             </form>
@@ -234,7 +237,7 @@ const AcceptInvite = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
               Already have an account?{' '}
-              <Link to="/login" className="text-primary hover:text-primary/80 font-medium transition-smooth hover:underline">Sign In</Link>
+              <Link to="/login" className="text-primary hover:text-primary/80 font-medium transition-smooth">Sign In</Link>
             </p>
           </div>
         </div>

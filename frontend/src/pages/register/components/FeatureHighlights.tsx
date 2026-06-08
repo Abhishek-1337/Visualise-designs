@@ -39,10 +39,10 @@ const FeatureHighlights = () => {
         {features?.map((feature, index) => (
           <div
             key={index}
-            className="bg-card rounded-lg md:rounded-xl p-4 md:p-5 lg:p-6 border border-border hover-lift transition-smooth"
+            className="bg-card border border-border rounded-xl p-4 md:p-5 lg:p-6 hover-lift transition-smooth"
           >
             <div className="flex items-start gap-3 md:gap-4">
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-indigo-50 to-indigo-50/50 border border-indigo-100/50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Icon name={feature?.icon} size={20} color="var(--color-primary)" />
               </div>
               <div className="flex-1 min-w-0">
@@ -57,10 +57,10 @@ const FeatureHighlights = () => {
           </div>
         ))}
       </div>
-      <div className="bg-accent/10 rounded-lg md:rounded-xl p-4 md:p-5 lg:p-6 border border-accent/20">
+      <div className="bg-gradient-to-br from-amber-50 to-amber-50/30 rounded-xl p-4 md:p-5 lg:p-6 border border-amber-200/50">
         <div className="flex items-start gap-3 md:gap-4">
-          <div className="w-10 h-10 md:w-12 md:h-12 bg-accent/20 rounded-lg flex items-center justify-center flex-shrink-0">
-            <Icon name="Shield" size={20} color="var(--color-accent)" />
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Icon name="Shield" size={20} color="#D97706" />
           </div>
           <div className="flex-1 min-w-0">
             <h4 className="text-base md:text-lg font-heading font-semibold text-foreground mb-1">

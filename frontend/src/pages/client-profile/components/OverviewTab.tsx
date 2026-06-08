@@ -33,8 +33,8 @@ const OverviewTab = ({ client }) => {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
       <div className="xl:col-span-2 space-y-6">
-        <div className="bg-card rounded-xl shadow-warm p-6">
-          <h3 className="text-lg font-heading font-semibold text-foreground mb-4 flex items-center gap-2">
+        <div className="bg-card rounded-xl shadow-soft-md border border-border p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
             <Icon name="Clock" size={20} color="var(--color-primary)" />
             Client Timeline
           </h3>
@@ -56,8 +56,8 @@ const OverviewTab = ({ client }) => {
           </div>
         </div>
 
-        <div className="bg-card rounded-xl shadow-warm p-6">
-          <h3 className="text-lg font-heading font-semibold text-foreground mb-4 flex items-center gap-2">
+        <div className="bg-card rounded-xl shadow-soft-md border border-border p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
             <Icon name="StickyNote" size={20} color="var(--color-primary)" />
             Team Notes
           </h3>
@@ -67,7 +67,7 @@ const OverviewTab = ({ client }) => {
               onChange={(e) => setNewNote(e?.target?.value)}
               placeholder="Add a note about this client..."
               rows={3}
-              className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
+              className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
             />
             <button
               onClick={handleAddNote}
@@ -102,8 +102,8 @@ const OverviewTab = ({ client }) => {
         </div>
       </div>
       <div className="space-y-6">
-        <div className="bg-card rounded-xl shadow-warm p-6">
-          <h3 className="text-lg font-heading font-semibold text-foreground mb-4">Client Details</h3>
+        <div className="bg-card rounded-xl shadow-soft-md border border-border p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Client Details</h3>
           <div className="space-y-3">
             {[
               { label: 'Industry', value: client?.industry || 'Architecture', icon: 'Building2' },
@@ -125,13 +125,13 @@ const OverviewTab = ({ client }) => {
           </div>
         </div>
 
-        <div className="bg-card rounded-xl shadow-warm p-6">
-          <h3 className="text-lg font-heading font-semibold text-foreground mb-4">Key Milestones</h3>
+        <div className="bg-card rounded-xl shadow-soft-md border border-border p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Key Milestones</h3>
           <div className="space-y-3">
             {[
               { label: 'Phase 1 Concepts', progress: 75, color: 'bg-primary' },
-              { label: 'Client Approvals', progress: 50, color: 'bg-accent' },
-              { label: 'Final Deliverables', progress: 20, color: 'bg-success' }
+              { label: 'Client Approvals', progress: 50, color: 'bg-amber-500' },
+              { label: 'Final Deliverables', progress: 20, color: 'bg-emerald-500' }
             ]?.map((milestone) => (
               <div key={milestone?.label}>
                 <div className="flex justify-between text-xs mb-1">

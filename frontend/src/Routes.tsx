@@ -24,6 +24,7 @@ import ClientProjectDetails from './pages/client-portal/ProjectDetails';
 import SettingsConfiguration from './pages/settings-configuration';
 import TenantSignup from './pages/tenant-signup';
 import AcceptInvite from './pages/accept-invite';
+import Payments from './pages/payments';
 import type { Role } from './types';
 
 const BUSINESS_ROLES: Role[] = ['ADMIN', 'MANAGER', 'EMPLOYEE'];
@@ -69,6 +70,7 @@ const Routes = () => {
           <Route path="/client-messaging" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><ClientMessaging /></ProtectedRoute>} />
           <Route path="/client-crm" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><ClientCRM /></ProtectedRoute>} />
           <Route path="/settings-configuration" element={<ProtectedRoute allowedRoles={ADMIN_MANAGER_ROLES}><SettingsConfiguration /></ProtectedRoute>} />
+          <Route path="/payments" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><Payments /></ProtectedRoute>} />
           
           <Route path="*" element={<NotFound />} />
         </RouterRoutes>

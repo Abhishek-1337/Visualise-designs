@@ -22,8 +22,8 @@ const AnalyticsSidebar = ({ stats }) => {
 
   return (
     <div className="space-y-4">
-      <div className="bg-card rounded-xl shadow-warm p-5">
-        <h3 className="font-heading font-semibold text-foreground mb-4 flex items-center gap-2">
+      <div className="bg-card rounded-xl shadow-soft-md border border-border p-5">
+        <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
           <Icon name="BarChart2" size={18} color="var(--color-primary)" />
           Communication Analytics
         </h3>
@@ -34,17 +34,17 @@ const AnalyticsSidebar = ({ stats }) => {
             { label: 'Follow-ups', value: stats?.followUps || '7', icon: 'RefreshCw' },
             { label: 'Pending', value: stats?.pending || '3', icon: 'AlertCircle' }
           ]?.map((item) => (
-            <div key={item?.label} className="bg-muted/50 rounded-lg p-3 text-center">
+            <div key={item?.label} className="bg-muted/50 rounded-lg p-3 text-center border border-border/50">
               <Icon name={item?.icon} size={16} color="var(--color-primary)" className="mx-auto mb-1" />
-              <p className="text-lg font-heading font-bold text-foreground">{item?.value}</p>
+              <p className="text-lg font-bold text-foreground">{item?.value}</p>
               <p className="text-xs text-muted-foreground">{item?.label}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="bg-card rounded-xl shadow-warm p-5">
-        <h3 className="font-heading font-semibold text-foreground mb-4">Relationship Health</h3>
+      <div className="bg-card rounded-xl shadow-soft-md border border-border p-5">
+        <h3 className="font-semibold text-foreground mb-4">Relationship Health</h3>
         <div className="flex items-center gap-4 mb-4">
           <div className="relative w-16 h-16 flex-shrink-0">
             <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
@@ -62,8 +62,8 @@ const AnalyticsSidebar = ({ stats }) => {
         </div>
       </div>
 
-      <div className="bg-card rounded-xl shadow-warm p-5">
-        <h3 className="font-heading font-semibold text-foreground mb-4">By Type</h3>
+      <div className="bg-card rounded-xl shadow-soft-md border border-border p-5">
+        <h3 className="font-semibold text-foreground mb-4">By Type</h3>
         <div className="space-y-3">
           {typeBreakdown?.map((item) => (
             <div key={item?.type} className="flex items-center gap-3">
@@ -84,8 +84,8 @@ const AnalyticsSidebar = ({ stats }) => {
         </div>
       </div>
 
-      <div className="bg-card rounded-xl shadow-warm p-5">
-        <h3 className="font-heading font-semibold text-foreground mb-4">Most Active Clients</h3>
+      <div className="bg-card rounded-xl shadow-soft-md border border-border p-5">
+        <h3 className="font-semibold text-foreground mb-4">Most Active Clients</h3>
         <div className="space-y-3">
           {topClients?.map((client, idx) => (
             <div key={client?.name} className="flex items-center gap-3">

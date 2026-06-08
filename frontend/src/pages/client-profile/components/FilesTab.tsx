@@ -20,7 +20,7 @@ const FilesTab = () => {
   const formatDate = (date) => date?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -29,18 +29,18 @@ const FilesTab = () => {
           isDragging ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
         }`}
       >
-        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+        <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full flex items-center justify-center mx-auto mb-3">
           <Icon name="Upload" size={24} color="var(--color-primary)" />
         </div>
         <p className="font-medium text-foreground mb-1">Drop files here or click to upload</p>
         <p className="text-sm text-muted-foreground">Supports PDF, DOCX, ZIP, PNG, JPG up to 100MB</p>
-        <button className="mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover-lift active-press">
+        <button className="mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover-lift shadow-soft-sm">
           Browse Files
         </button>
       </div>
-      <div className="bg-card rounded-xl shadow-warm overflow-hidden">
+      <div className="bg-card rounded-xl shadow-soft-md border border-border overflow-hidden">
         <div className="p-4 border-b border-border flex items-center justify-between">
-          <h3 className="font-heading font-semibold text-foreground">All Files ({files?.length})</h3>
+          <h3 className="font-semibold text-foreground">All Files ({files?.length})</h3>
           <div className="flex gap-2">
             {['All', 'Contracts', 'Assets', 'Deliverables']?.map((filter) => (
               <button key={filter} className="px-3 py-1 text-xs rounded-full bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-smooth">
@@ -63,7 +63,7 @@ const FilesTab = () => {
                   <span className="text-xs text-muted-foreground">{formatDate(file?.uploadedAt)}</span>
                 </div>
               </div>
-              <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${categoryColors?.[file?.category] || 'bg-muted text-muted-foreground'}`}>
+              <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize border ${categoryColors?.[file?.category] || 'bg-muted text-muted-foreground'}`}>
                 {file?.category}
               </span>
               <div className="flex gap-1">
