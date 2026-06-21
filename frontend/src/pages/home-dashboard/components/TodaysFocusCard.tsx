@@ -75,10 +75,7 @@ const TodaysFocusCard = () => {
             <p className="text-xs md:text-sm text-muted-foreground mt-0.5">{new Date()?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs md:text-sm font-medium text-foreground data-text">{completedCount}/{totalCount} completed</span>
-          <Button variant="ghost" size="sm" iconName="Plus" iconPosition="left">Add Task</Button>
-        </div>
+        <span className="text-xs md:text-sm font-medium text-foreground data-text">{completedCount}/{totalCount} completed</span>
       </div>
       {totalCount > 0 && (
         <div className="mb-5 md:mb-6">

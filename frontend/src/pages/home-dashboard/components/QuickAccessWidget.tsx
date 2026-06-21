@@ -1,157 +1,89 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
-import Image from '../../../components/AppImage';
+import { projectService, activityService } from '../../../services';
 
 const QuickAccessWidget = () => {
-  const recentInteractions = [
-  {
-    id: 1,
-    client: "Al Maktoum Properties",
-    avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_14cd28b20-1763293428165.png",
-    avatarAlt: "Professional headshot of Middle Eastern businessman with short black hair wearing navy suit and red tie",
-    type: "call",
-    message: "Discussed final render revisions for Marina Tower project",
-    timestamp: new Date(Date.now() - 3600000),
-    status: "completed"
-  },
-  {
-    id: 2,
-    client: "Kensington Estates",
-    avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_164575629-1763297045093.png",
-    avatarAlt: "Professional headshot of British woman with blonde hair in elegant black blazer",
-    type: "email",
-    message: "Sent updated penthouse interior renders with lighting adjustments",
-    timestamp: new Date(Date.now() - 7200000),
-    status: "sent"
-  },
-  {
-    id: 3,
-    client: "Marina Bay Developments",
-    avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_1139e8212-1763295319278.png",
-    avatarAlt: "Professional headshot of Asian businessman with glasses wearing charcoal suit",
-    type: "meeting",
-    message: "Contract review meeting scheduled for tomorrow at 2 PM SGT",
-    timestamp: new Date(Date.now() - 10800000),
-    status: "scheduled"
-  }];
+  const [projects, setProjects] = useState<any[]>([]);
+  const [activities, setActivities] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  const projectUpdates = [
-  {
-    id: 1,
-    project: "Dubai Marina Tower",
-    client: "Al Maktoum Properties",
-    progress: 85,
-    status: "on-track",
-    milestone: "Final render approval",
-    dueDate: "2026-01-05"
-  },
-  {
-    id: 2,
-    project: "London Penthouse",
-    client: "Kensington Estates",
-    progress: 60,
-    status: "in-progress",
-    milestone: "Interior lighting refinement",
-    dueDate: "2026-01-08"
-  },
-  {
-    id: 3,
-    project: "Singapore Office Complex",
-    client: "Marina Bay Developments",
-    progress: 40,
-    status: "at-risk",
-    milestone: "Exterior facade modeling",
-    dueDate: "2026-01-03"
-  }];
-
-
-  const teamActivity = [
-  {
-    id: 1,
-    member: "Sarah Chen",
-    avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_18a713e78-1763297858426.png",
-    avatarAlt: "Professional headshot of Asian woman with long black hair wearing white blouse",
-    action: "completed render review",
-    project: "Dubai Marina Tower",
-    timestamp: new Date(Date.now() - 1800000)
-  },
-  {
-    id: 2,
-    member: "Marcus Rodriguez",
-    avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_115906522-1763299231172.png",
-    avatarAlt: "Professional headshot of Hispanic man with short brown hair wearing blue shirt",
-    action: "updated project timeline",
-    project: "NYC Residential Tower",
-    timestamp: new Date(Date.now() - 3600000)
-  },
-  {
-    id: 3,
-    member: "Emily Watson",
-    avatar: "https://img.rocket.new/generatedImages/rocket_gen_img_17784c577-1763297418164.png",
-    avatarAlt: "Professional headshot of Caucasian woman with red hair wearing green blazer",
-    action: "sent client proposal",
-    project: "Tokyo Office Complex",
-    timestamp: new Date(Date.now() - 5400000)
-  }];
-
-
-  const getInteractionIcon = (type) => {
-    switch (type) {
-      case 'call':
-        return 'Phone';
-      case 'email':
-        return 'Mail';
-      case 'meeting':
-        return 'Video';
-      default:
-        return 'MessageSquare';
+  const loadData = async () => {
+    try {
+      const [pRes, aRes] = await Promise.allSettled([
+        projectService.getAll({ limit: '3' }),
+        activityService.getRecent(),
+      ]);
+      if (pRes.status === 'fulfilled') setProjects(pRes.value.data.projects || []);
+      if (aRes.status === 'fulfilled') setActivities(aRes.value.data.activities || aRes.value.data || []);
+    } catch {
+      // silent fail
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getStatusColor = (status) => {
+  const formatTimeAgo = (date: string | Date) => {
+    const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
+    if (seconds < 60) return 'Just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+  };
+
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'on-track':
-        return 'bg-success/10 text-success border-success/20';
-      case 'in-progress':
-        return 'bg-accent/10 text-accent border-accent/20';
-      case 'at-risk':
-        return 'bg-error/10 text-error border-error/20';
-      default:
-        return 'bg-muted text-muted-foreground border-border';
+      case 'ACTIVE': return 'bg-success/10 text-success border-success/20';
+      case 'ON_HOLD': return 'bg-warning/10 text-warning border-warning/20';
+      case 'COMPLETED': return 'bg-accent/10 text-accent border-accent/20';
+      default: return 'bg-muted text-muted-foreground border-border';
     }
   };
 
-  const formatTimeAgo = (date: Date | string) => {
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
-    const seconds = Math.floor((new Date().getTime() - dateObj.getTime()) / 1000);
-    const intervals = {
-      hour: 3600,
-      minute: 60
-    };
-
-    if (seconds < intervals?.minute) {
-      return 'Just now';
-    } else if (seconds < intervals?.hour) {
-      const minutes = Math.floor(seconds / intervals?.minute);
-      return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
-    } else {
-      const hours = Math.floor(seconds / intervals?.hour);
-      return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+  const getActivityIcon = (type?: string) => {
+    switch (type) {
+      case 'CALL': return 'Phone';
+      case 'EMAIL': return 'Mail';
+      case 'MEETING': return 'Video';
+      default: return 'MessageSquare';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="bg-card rounded-lg shadow-soft-lg p-5 md:p-6 border border-border/50 animate-pulse">
+            <div className="h-6 bg-muted rounded w-2/3 mb-4" />
+            <div className="space-y-3">
+              <div className="h-16 bg-muted rounded" />
+              <div className="h-16 bg-muted rounded" />
+              <div className="h-16 bg-muted rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Recent Activity */}
       <div className="bg-card rounded-lg shadow-soft-lg p-5 md:p-6 transition-smooth hover-lift border border-border/50">
         <div className="flex items-center justify-between mb-5 md:mb-6">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Icon name="MessageSquare" size={18} color="var(--color-primary)" />
+              <Icon name="Activity" size={18} color="var(--color-primary)" />
             </div>
             <h3 className="text-base md:text-lg font-heading font-semibold text-foreground">
-              Recent Interactions
+              Recent Activity
             </h3>
           </div>
           <Link to="/lead-client-flow">
@@ -162,48 +94,39 @@ const QuickAccessWidget = () => {
         </div>
 
         <div className="space-y-3 md:space-y-4">
-          {recentInteractions?.map((interaction) =>
-          <div
-            key={interaction?.id}
-            className="p-3 rounded-lg border border-border bg-background hover:border-primary/30 hover:shadow-soft-sm transition-smooth">
-
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-card">
-                  <Image
-                  src={interaction?.avatar}
-                  alt={interaction?.avatarAlt}
-                  className="w-full h-full object-cover" />
-
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2 mb-1">
-                    <h4 className="text-sm font-medium text-foreground truncate">
-                      {interaction?.client}
-                    </h4>
-                    <Icon
-                    name={getInteractionIcon(interaction?.type)}
-                    size={14}
-                    color="var(--color-muted-foreground)" />
-
+          {activities.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
+          ) : (
+            activities.slice(0, 5).map((activity: any, i: number) => (
+              <div
+                key={activity.id || i}
+                className="p-3 rounded-lg border border-border bg-background hover:border-primary/30 hover:shadow-soft-sm transition-smooth"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Icon name={getActivityIcon(activity.type)} size={14} color="var(--color-primary)" />
                   </div>
-                  <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-                    {interaction?.message}
-                  </p>
-                  <span className="text-xs text-muted-foreground">
-                    {formatTimeAgo(interaction?.timestamp)}
-                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-foreground line-clamp-2">{activity.description || activity.message}</p>
+                    <span className="text-xs text-muted-foreground">
+                      {activity.user?.name && <>{activity.user.name} · </>}
+                      {formatTimeAgo(activity.createdAt || activity.timestamp)}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))
           )}
         </div>
 
         <Link to="/lead-client-flow" className="block mt-5">
           <button className="w-full py-2 text-sm text-primary hover:text-primary/80 font-medium transition-smooth">
-            View All Interactions →
+            View All Activity →
           </button>
         </Link>
       </div>
+
+      {/* Project Updates */}
       <div className="bg-card rounded-lg shadow-soft-lg p-5 md:p-6 transition-smooth hover-lift border border-border/50">
         <div className="flex items-center justify-between mb-5 md:mb-6">
           <div className="flex items-center gap-3">
@@ -222,48 +145,44 @@ const QuickAccessWidget = () => {
         </div>
 
         <div className="space-y-3 md:space-y-4">
-          {projectUpdates?.map((project) =>
-          <div
-            key={project?.id}
-            className="p-3 rounded-lg border border-border bg-background hover:border-accent/30 hover:shadow-soft-sm transition-smooth">
-
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-medium text-foreground truncate">
-                    {project?.project}
-                  </h4>
-                  <p className="text-xs text-muted-foreground truncate mt-0.5">
-                    {project?.client}
-                  </p>
+          {projects.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">No projects yet</p>
+          ) : (
+            projects.map((project: any) => {
+              const clientName = project.contact
+                ? `${project.contact.firstName} ${project.contact.lastName}`
+                : 'Unknown';
+              return (
+                <div
+                  key={project.id}
+                  className="p-3 rounded-lg border border-border bg-background hover:border-accent/30 hover:shadow-soft-sm transition-smooth"
+                >
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-foreground truncate">{project.name}</h4>
+                      <p className="text-xs text-muted-foreground truncate mt-0.5">{clientName}</p>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium border whitespace-nowrap ${getStatusColor(project.status)}`}>
+                      {project.status?.replace('_', ' ')}
+                    </span>
+                  </div>
+                  <div className="mb-2">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                      <span>Progress</span>
+                      <span className="font-medium data-text">{project.progress || 0}%</span>
+                    </div>
+                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div className="h-full bg-accent transition-smooth" style={{ width: `${project.progress || 0}%` }} />
+                    </div>
+                  </div>
+                  {project.endDate && (
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground">Due {new Date(project.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                    </div>
+                  )}
                 </div>
-                <span className={`
-                  px-2 py-0.5 rounded text-xs font-medium border whitespace-nowrap
-                  ${getStatusColor(project?.status)}
-                `}>
-                  {project?.status?.replace('-', ' ')}
-                </span>
-              </div>
-
-              <div className="mb-2">
-                <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                  <span>Progress</span>
-                  <span className="font-medium data-text">{project?.progress}%</span>
-                </div>
-                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                  <div
-                  className="h-full bg-accent transition-smooth"
-                  style={{ width: `${project?.progress}%` }} />
-
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground truncate">{project?.milestone}</span>
-                <span className="text-muted-foreground whitespace-nowrap ml-2">
-                  Due {new Date(project.dueDate)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                </span>
-              </div>
-            </div>
+              );
+            })
           )}
         </div>
 
@@ -273,6 +192,8 @@ const QuickAccessWidget = () => {
           </button>
         </Link>
       </div>
+
+      {/* Team Activity */}
       <div className="bg-card rounded-lg shadow-soft-lg p-5 md:p-6 transition-smooth hover-lift border border-border/50">
         <div className="flex items-center justify-between mb-5 md:mb-6">
           <div className="flex items-center gap-3">
@@ -291,37 +212,30 @@ const QuickAccessWidget = () => {
         </div>
 
         <div className="space-y-3 md:space-y-4">
-          {teamActivity?.map((activity) =>
-          <div
-            key={activity?.id}
-            className="p-3 rounded-lg border border-border bg-background hover:border-secondary/30 hover:shadow-soft-sm transition-smooth">
-
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-card">
-                  <Image
-                  src={activity?.avatar}
-                  alt={activity?.avatarAlt}
-                  className="w-full h-full object-cover" />
-
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-medium text-foreground mb-1">
-                    {activity?.member}
-                  </h4>
-                  <p className="text-xs text-muted-foreground mb-1">
-                    {activity?.action}
-                  </p>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs text-muted-foreground truncate">
-                      {activity?.project}
-                    </span>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {formatTimeAgo(activity?.timestamp)}
-                    </span>
+          {activities.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
+          ) : (
+            activities.slice(0, 5).map((activity: any, i: number) => (
+              <div
+                key={activity.id || i}
+                className="p-3 rounded-lg border border-border bg-background hover:border-secondary/30 hover:shadow-soft-sm transition-smooth"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0 text-xs font-bold text-secondary">
+                    {activity.user?.name
+                      ? activity.user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+                      : '??'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-foreground">
+                      {activity.user?.name && <span className="font-medium">{activity.user.name} </span>}
+                      {activity.description || activity.message || 'performed an action'}
+                    </p>
+                    <span className="text-xs text-muted-foreground">{formatTimeAgo(activity.createdAt || activity.timestamp)}</span>
                   </div>
                 </div>
               </div>
-            </div>
+            ))
           )}
         </div>
 
@@ -331,8 +245,8 @@ const QuickAccessWidget = () => {
           </button>
         </Link>
       </div>
-    </div>);
-
+    </div>
+  );
 };
 
 export default QuickAccessWidget;

@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '../../../store';
 import Icon from '../../../components/AppIcon';
-import Button from '../../../components/ui/Button';
 import { fetchFinancial } from '../../../store/slices/projectSlice';
 
 const MoneySnapshotCard = () => {
@@ -56,7 +55,6 @@ const MoneySnapshotCard = () => {
             <p className="text-xs md:text-sm text-muted-foreground mt-0.5">Financial overview</p>
           </div>
         </div>
-        <Button variant="outline" size="sm" iconName="TrendingUp" iconPosition="left">View Reports</Button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-5 md:mb-6">
         <div className="bg-primary/5 rounded-lg p-3 md:p-4 border border-primary/10">
@@ -108,9 +106,7 @@ const MoneySnapshotCard = () => {
           })
         )}
       </div>
-      <div className="mt-5 md:mt-6 pt-5 md:pt-6 border-t border-border">
-        <Button variant="outline" fullWidth iconName="ArrowRight" iconPosition="right">View All Financial Records</Button>
-      </div>
+
     </div>
   );
 };
