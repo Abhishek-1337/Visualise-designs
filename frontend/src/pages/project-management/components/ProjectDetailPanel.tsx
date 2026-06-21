@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 import { Checkbox } from '../../../components/ui/Checkbox';
 
 const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('timeline');
 
   const tabs = [
@@ -248,7 +250,13 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
           <Button variant="outline" fullWidth onClick={onClose}>
             Close
           </Button>
-          <Button variant="default" fullWidth iconName="ExternalLink" iconPosition="right">
+          <Button
+            variant="default"
+            fullWidth
+            iconName="ExternalLink"
+            iconPosition="right"
+            onClick={() => navigate(`/project-management/${project?.id}`)}
+          >
             Open Full View
           </Button>
         </div>

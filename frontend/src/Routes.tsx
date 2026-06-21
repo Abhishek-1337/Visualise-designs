@@ -8,6 +8,7 @@ import ProtectedRoute from 'components/ProtectedRoute';
 import NotFound from 'pages/NotFound';
 import AuthCallback from 'pages/AuthCallback';
 import ProjectManagement from './pages/project-management';
+import ProjectManagementDetails from './pages/project-management/ProjectDetails';
 import HomeDashboard from './pages/home-dashboard';
 import TeamWorkspace from './pages/team-workspace';
 import Login from './pages/login';
@@ -63,6 +64,7 @@ const Routes = () => {
           <Route path="/client-portal/messages" element={<ProtectedRoute allowedRoles={['CLIENT']}><ClientMessaging /></ProtectedRoute>} />
           
           <Route path="/project-management" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><ProjectManagement /></ProtectedRoute>} />
+          <Route path="/project-management/:id" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><ProjectManagementDetails /></ProtectedRoute>} />
           <Route path="/team-workspace" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><TeamWorkspace /></ProtectedRoute>} />
           <Route path="/lead-client-flow" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><LeadClientFlow /></ProtectedRoute>} />
           <Route path="/client-profile" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><ClientProfile /></ProtectedRoute>} />
