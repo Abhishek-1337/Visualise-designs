@@ -133,6 +133,7 @@ const ClientCRM = () => {
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [showChatPanel, setShowChatPanel] = useState(false);
+  const [chatCollapsed, setChatCollapsed] = useState(false);
   const [messages, setMessages] = useState<Record<string, Message[]>>({});
   const [clients, setClients] = useState<Client[]>([]);
   const [projectsByClient, setProjectsByClient] = useState<Record<string, any[]>>({});
@@ -327,6 +328,10 @@ const ClientCRM = () => {
     [selectedProjectId, socket]
   );
 
+  const handleToggleChat = useCallback(() => {
+    setChatCollapsed((prev) => !prev);
+  }, []);
+
   const handleCloseChat = useCallback(() => {
     setShowChatPanel(false);
   }, []);
@@ -438,14 +443,32 @@ const ClientCRM = () => {
                 />
               </div>
 
-              <div className={`${showChatPanel ? 'flex' : 'hidden'} lg:flex min-h-0`}>
-                <ProjectChatPanel
-                  project={selectedProject}
-                  messages={currentMessages}
-                  onSend={handleSend}
-                  onClose={handleCloseChat}
-                />
-              </div>
+              {chatCollapsed ? (
+                <div className={`${showChatPanel ? 'flex' : 'hidden'} lg:flex flex-shrink-0`}>
+                  <button
+                    onClick={handleToggleChat}
+                    className="w-10 flex flex-col items-center justify-center gap-2 bg-card border-l border-border hover:bg-muted transition-smooth group"
+                    title="Expand chat"
+                  >
+                    <Icon name="ChevronLeft" size={18} className="text-muted-foreground group-hover:text-foreground transition-smooth" />
+                    {selectedProject && (
+                      <span className="text-[10px] font-medium text-muted-foreground group-hover:text-foreground transition-smooth [writing-mode:vertical-lr] tracking-widest uppercase">
+                        {selectedProject?.name}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <div className={`${showChatPanel ? 'flex' : 'hidden'} lg:flex min-h-0`}>
+                  <ProjectChatPanel
+                    project={selectedProject}
+                    messages={currentMessages}
+                    onSend={handleSend}
+                    onClose={handleCloseChat}
+                    onToggleCollapse={handleToggleChat}
+                  />
+                </div>
+              )}
             </>
           )}
         </div>

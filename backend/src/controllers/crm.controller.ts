@@ -628,15 +628,23 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
 export const updateTask = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
+    const { title, description, priority, status, dueDate, assignedToId, contactId, projectId } = req.body;
     await prisma.task.updateMany({
       where: { id: req.params.id as string, tenantId: authReq.user.tenantId },
       data: {
-        ...req.body,
-        dueDate: req.body.dueDate ? new Date(req.body.dueDate) : undefined
+        ...(title !== undefined && { title }),
+        ...(description !== undefined && { description }),
+        ...(priority !== undefined && { priority }),
+        ...(status !== undefined && { status }),
+        ...(dueDate !== undefined && { dueDate: new Date(dueDate) }),
+        ...(assignedToId !== undefined && { assignedToId }),
+        ...(contactId !== undefined && { contactId }),
+        ...(projectId !== undefined && { projectId }),
       }
     });
     res.json({ message: 'Task updated' });
-  } catch {
+  } catch (error) {
+    console.error('Update task error:', error);
     res.status(500).json({ error: 'Failed to update task' });
   }
 };
