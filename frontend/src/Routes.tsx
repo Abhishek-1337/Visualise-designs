@@ -22,6 +22,7 @@ import ClientPortalDashboard from './pages/client-portal';
 import ClientDeals from './pages/client-portal/Deals';
 import ClientProjects from './pages/client-portal/Projects';
 import ClientProjectDetails from './pages/client-portal/ProjectDetails';
+import ClientPortalProfile from './pages/client-portal/Profile';
 import SettingsConfiguration from './pages/settings-configuration';
 import TenantSignup from './pages/tenant-signup';
 import AcceptInvite from './pages/accept-invite';
@@ -34,6 +35,7 @@ const ADMIN_MANAGER_ROLES: Role[] = ['ADMIN', 'MANAGER'];
 
 const HomeDashboardRedirect = () => {
   const { user } = useSelector((state: RootState) => state.auth);
+  console.log(user);
   if (user?.role === 'CLIENT') {
     return <Navigate to="/client-portal" replace />;
   }
@@ -62,6 +64,7 @@ const Routes = () => {
           <Route path="/client-portal/projects" element={<ProtectedRoute allowedRoles={['CLIENT']}><ClientProjects /></ProtectedRoute>} />
           <Route path="/client-portal/projects/:id" element={<ProtectedRoute allowedRoles={['CLIENT']}><ClientProjectDetails /></ProtectedRoute>} />
           <Route path="/client-portal/messages" element={<ProtectedRoute allowedRoles={['CLIENT']}><ClientMessaging /></ProtectedRoute>} />
+          <Route path="/client-portal/profile" element={<ProtectedRoute allowedRoles={['CLIENT']}><ClientPortalProfile /></ProtectedRoute>} />
           
           <Route path="/project-management" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><ProjectManagement /></ProtectedRoute>} />
           <Route path="/project-management/:id" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><ProjectManagementDetails /></ProtectedRoute>} />

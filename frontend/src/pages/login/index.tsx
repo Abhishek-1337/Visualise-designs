@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import type { AppDispatch } from '../../store';
+import { useDispatch, useSelector } from 'react-redux';
+import type { AppDispatch, RootState } from '../../store';
 import Icon from '../../components/AppIcon';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
@@ -38,12 +38,15 @@ const Login = () => {
 
   useEffect(() => {
     authService.getOAuthConfig().then((res) => setOauthConfig(res.data)).catch(() => {});
-    
-    const token = localStorage.getItem('authToken');
-    if (token) {
+  }, []);
+
+  const redirectByRole = (role?: string) => {
+    if (role === 'CLIENT') {
+      navigate('/client-portal');
+    } else {
       navigate('/home-dashboard');
     }
-  }, [navigate]);
+  };
 
   const validateForm = () => {
     const newErrors: FormErrors = {};
@@ -73,8 +76,8 @@ const Login = () => {
         password: formData.password
       });
 
-      dispatch(login({ token: response.data.token }));
-      navigate('/home-dashboard');
+      dispatch(login({ token: response.data.token, user: response.data.user }));
+      redirectByRole(response.data.user?.role);
     } catch (error: any) {
       const message = error.response?.data?.error || 'Failed to sign in. Please try again.';
       setErrors({ submit: message });

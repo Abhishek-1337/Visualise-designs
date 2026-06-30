@@ -23,9 +23,10 @@ interface ClientListProps {
   selectedClientId: string | number | null;
   onSelectClient: (client: ClientConversation['client']) => void;
   onClose?: () => void;
+  isClientView?: boolean;
 }
 
-const ClientList: React.FC<ClientListProps> = ({ conversations, selectedClientId, onSelectClient, onClose }) => {
+const ClientList: React.FC<ClientListProps> = ({ conversations, selectedClientId, onSelectClient, onClose, isClientView }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const filtered = useMemo(() => {
@@ -53,7 +54,7 @@ const ClientList: React.FC<ClientListProps> = ({ conversations, selectedClientId
       <div className="flex items-center justify-between px-4 py-6 border-b border-border">
         <div className="flex items-center gap-2">
           <Icon name="MessageCircle" size={20} color="var(--color-primary)" />
-          <h2 className="text-base font-semibold text-foreground">Clients</h2>
+          <h2 className="text-base font-semibold text-foreground">{isClientView ? 'Team' : 'Clients'}</h2>
           {unreadCount > 0 && (
             <span className="text-[10px] font-bold text-primary-foreground bg-primary px-1.5 py-0.5 rounded-full leading-none">
               {unreadCount}
@@ -162,7 +163,7 @@ const ClientList: React.FC<ClientListProps> = ({ conversations, selectedClientId
       <div className="px-4 py-3 border-t border-border">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Icon name="Users" size={14} color="var(--color-primary)" />
-          <span>{conversations.length} client{conversations.length !== 1 ? 's' : ''}</span>
+          <span>{conversations.length} {isClientView ? 'team member' : 'client'}{conversations.length !== 1 ? 's' : ''}</span>
         </div>
       </div>
     </div>

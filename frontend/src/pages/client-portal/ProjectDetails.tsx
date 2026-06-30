@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import Sidebar, { TopBar } from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import { Card, StatusBadge, EmptyState } from '../../components/shared';
-import { projectService, messageService, taskService } from '../../services';
+import { projectService, messageService, taskService, fileService } from '../../services';
 import { useSocket } from '../../contexts/SocketContext';
 import type { RootState } from '../../store';
 
@@ -17,6 +17,7 @@ const ClientProjectDetails = () => {
   const [project, setProject] = useState<any>(null);
   const [tasks, setTasks] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
+  const [files, setFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [messageText, setMessageText] = useState('');
@@ -52,12 +53,14 @@ const ClientProjectDetails = () => {
   const fetchProjectData = async (projectId: string) => {
     try {
       setLoading(true);
-      const [pRes, tRes] = await Promise.all([
+      const [pRes, tRes, fRes] = await Promise.all([
         projectService.getById(projectId),
-        taskService.getAll({ projectId })
+        taskService.getAll({ projectId }),
+        fileService.getAll({ projectId })
       ]);
       setProject(pRes.data);
       setTasks(tRes.data.tasks || []);
+      setFiles(fRes.data.files || []);
     } catch (error) {
       console.error('Failed to fetch project data:', error);
     } finally {
@@ -123,7 +126,7 @@ const ClientProjectDetails = () => {
           </div>
 
           <div className="flex gap-6">
-            {['overview', 'tasks', 'chat'].map((tab) => (
+            {['overview', 'tasks', 'files', 'chat'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -180,14 +183,19 @@ const ClientProjectDetails = () => {
                   <h3 className="font-semibold mb-4">Team</h3>
                   <div className="space-y-4">
                     {(project.members || []).map((m: any) => (
-                      <div key={m.id} className="flex items-center gap-3">
+                      <div
+                        key={m.id}
+                        onClick={() => navigate('/client-portal/messages', { state: { selectedUserId: m.id } })}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-all duration-200 group"
+                      >
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center overflow-hidden text-xs font-bold text-primary">
                           {m.avatar ? <img src={m.avatar} alt={m.name} className="w-full h-full object-cover" /> : m.name[0]}
                         </div>
-                        <div>
+                        <div className="flex-1">
                           <p className="text-sm font-medium text-foreground">{m.name}</p>
                           <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{m.role}</p>
                         </div>
+                        <Icon name="MessageSquare" size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-all duration-200" />
                       </div>
                     ))}
                   </div>
@@ -212,6 +220,43 @@ const ClientProjectDetails = () => {
                         </div>
                       </div>
                       <StatusBadge status={task.status} />
+                    </Card>
+                  ))
+                )}
+              </div>
+            )}
+
+            {activeTab === 'files' && (
+              <div className="space-y-3">
+                {files.length === 0 ? (
+                  <EmptyState icon="FolderOpen" title="No files yet" description="Files shared by the team will appear here." />
+                ) : (
+                  files.map((file: any) => (
+                    <Card key={file.id} hover className="p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Icon name={file.mimeType?.startsWith('image') ? 'Image' : 'File'} size={20} color="var(--color-primary)" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground text-sm">{file.originalName}</p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            {file.size ? `${(file.size / 1024).toFixed(1)} KB` : ''}
+                            {file.uploadedBy?.name && ` \u2022 ${file.uploadedBy.name}`}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          const a = window.document.createElement('a');
+                          a.href = `${import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'}/files/${file.id}/download`;
+                          a.target = '_blank';
+                          a.rel = 'noopener noreferrer';
+                          a.click();
+                        }}
+                        className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-all duration-200"
+                      >
+                        <Icon name="Download" size={18} />
+                      </button>
                     </Card>
                   ))
                 )}

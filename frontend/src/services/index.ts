@@ -17,6 +17,7 @@ export const authService = {
 export const userService = {
   getProfile: () => api.get('/users/me'),
   updateProfile: (data) => api.put('/users/me', data),
+  updatePassword: (data) => api.put('/users/me/password', data),
   getAllUsers: (params) => api.get('/users', { params }),
   getUserById: (id) => api.get(`/users/${id}`),
   updateRole: (id, data) => api.patch(`/users/${id}/role`, data),

@@ -41,19 +41,25 @@ export const loginUser = createAsyncThunk('auth/login', async (data: { email: st
   }
 });
 
+const hasToken = !!authService.getToken();
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
     user: null,
     token: authService.getToken(),
     isAuthenticated: false,
-    isLoading: false,
+    isLoading: hasToken,
     error: null,
   },
   reducers: {
     login: (state, action) => {
       state.token = action.payload.token;
       state.isAuthenticated = true;
+      state.isLoading = false;
+      if (action.payload.user) {
+        state.user = action.payload.user;
+      }
       authService.setToken(action.payload.token);
     },
     logout: (state) => {

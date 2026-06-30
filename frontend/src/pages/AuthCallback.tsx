@@ -12,7 +12,16 @@ const AuthCallback = () => {
     const token = searchParams.get('token');
     if (token) {
       dispatch(login({ token }));
-      navigate('/home-dashboard', { replace: true });
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.role === 'CLIENT') {
+          navigate('/client-portal', { replace: true });
+        } else {
+          navigate('/home-dashboard', { replace: true });
+        }
+      } catch {
+        navigate('/home-dashboard', { replace: true });
+      }
     } else {
       navigate('/login', { replace: true });
     }

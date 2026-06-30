@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import Sidebar, { TopBar } from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import ClientList from './components/ClientList';
@@ -23,9 +24,11 @@ interface Message {
 const ClientMessaging = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const { socket, isConnected } = useSocket();
+  const location = useLocation();
+  const locationState = location.state as { selectedUserId?: string } | null;
   const [conversations, setConversations] = useState<ClientConversation[]>([]);
   const [messages, setMessages] = useState<Record<string | number, Message[]>>({});
-  const [selectedClientId, setSelectedClientId] = useState<string | number | null>(null);
+  const [selectedClientId, setSelectedClientId] = useState<string | number | null>(locationState?.selectedUserId || null);
   const [showMobileList, setShowMobileList] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -56,6 +59,25 @@ const ClientMessaging = () => {
             : undefined,
         }));
         setConversations(convs);
+
+        if (locationState?.selectedUserId) {
+          const exists = convs.some((c: ClientConversation) => c.client.id === locationState.selectedUserId);
+          if (!exists && locationState.selectedUserId) {
+            setConversations((prev) => [
+              {
+                client: {
+                  id: locationState.selectedUserId,
+                  name: '',
+                  avatar: undefined,
+                  status: 'offline',
+                  role: undefined,
+                },
+              },
+              ...prev,
+            ]);
+          }
+          fetchMessages(locationState.selectedUserId);
+        }
       } catch (err: any) {
         setError(err.response?.data?.error || 'Failed to load conversations');
         console.error('Failed to load conversations:', err);
@@ -249,6 +271,8 @@ const ClientMessaging = () => {
     [selectedClientId, socket]
   );
 
+  const isClientView = user?.role === 'CLIENT';
+
   return (
     <div className="min-h-screen bg-background animate-fade-in">
       <Sidebar />
@@ -263,6 +287,7 @@ const ClientMessaging = () => {
               selectedClientId={selectedClientId}
               onSelectClient={handleSelectClient}
               onClose={() => setShowMobileList(false)}
+              isClientView={isClientView}
             />
           </div>
 
@@ -273,6 +298,7 @@ const ClientMessaging = () => {
             onToggleClientList={() => setShowMobileList(true)}
             isTyping={!!selectedClientId && typingUsers[selectedClientId as string]}
             onTyping={handleTyping}
+            isClientView={isClientView}
           />
         </div>
       </main>

@@ -29,6 +29,7 @@ interface ChatAreaProps {
   onToggleClientList: () => void;
   isTyping?: boolean;
   onTyping?: (isTyping: boolean) => void;
+  isClientView?: boolean;
 }
 
 const MessageBubble: React.FC<{ message: Message; showSender: boolean }> = ({ message, showSender }) => {
@@ -98,15 +99,17 @@ const DateSeparator: React.FC<{ date: Date }> = ({ date }) => {
   );
 };
 
-const EmptyState: React.FC = () => (
+const EmptyState: React.FC<{ isClientView?: boolean }> = ({ isClientView }) => (
   <div className="flex-1 flex items-center justify-center p-8 animate-fade-in">
     <div className="text-center max-w-sm">
       <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
         <Icon name="MessageSquare" size={36} color="var(--color-primary)" />
       </div>
-      <h3 className="text-xl font-semibold text-foreground mb-2">Welcome to Client Chat</h3>
+      <h3 className="text-xl font-semibold text-foreground mb-2">{isClientView ? 'Chat with Team' : 'Client Chat'}</h3>
       <p className="text-sm text-muted-foreground leading-relaxed">
-        Select a client from the list on the left to view your conversation history and send messages.
+        {isClientView
+          ? 'Select a team member from the list on the left to view your conversation history.'
+          : 'Select a client from the list on the left to view your conversation history and send messages.'}
       </p>
     </div>
   </div>
@@ -123,7 +126,7 @@ const TypingIndicator: React.FC<{ name: string }> = ({ name }) => (
   </div>
 );
 
-const ChatArea: React.FC<ChatAreaProps> = ({ client, messages, onSend, onToggleClientList, isTyping, onTyping }) => {
+const ChatArea: React.FC<ChatAreaProps> = ({ client, messages, onSend, onToggleClientList, isTyping, onTyping, isClientView }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -150,7 +153,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ client, messages, onSend, onToggleC
     return (
       <div className="flex-1 flex flex-col bg-background animate-fade-in">
         <ChatHeader client={null} onToggleClientList={onToggleClientList} />
-        <EmptyState />
+        <EmptyState isClientView={isClientView} />
       </div>
     );
   }
@@ -167,6 +170,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ client, messages, onSend, onToggleC
               </div>
               <h3 className="text-base font-semibold text-foreground mb-1">No messages yet</h3>
               <p className="text-sm text-muted-foreground">Start a conversation with {client.name}</p>
+              {isClientView && <p className="text-xs text-muted-foreground mt-1">This is a member of your service team.</p>}
             </div>
           </div>
         ) : (

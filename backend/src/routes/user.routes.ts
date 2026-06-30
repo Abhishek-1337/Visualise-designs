@@ -8,6 +8,7 @@ router.use(authenticateToken);
 router.get('/me', userController.getProfile);
 router.put('/me', userController.updateProfile);
 router.get('/', authorize('ADMIN', 'MANAGER'), userController.getAllUsers);
+router.put('/me/password', userController.changePassword);
 router.get('/:id', userController.getUserById);
 router.patch('/:id/role', authorize('ADMIN'), userController.updateUserRole);
 router.patch('/:id/deactivate', authorize('ADMIN'), userController.deactivateUser);

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import bcrypt from 'bcryptjs';
 import prisma from '../config/database';
 import { AuthenticatedRequest } from '../types';
 
@@ -40,6 +41,45 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     res.json(user);
   } catch {
     res.status(500).json({ error: 'Failed to update profile' });
+  }
+};
+
+export const changePassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const authReq = req as AuthenticatedRequest;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      res.status(400).json({ error: 'Current password and new password are required' });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      res.status(400).json({ error: 'New password must be at least 6 characters' });
+      return;
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: authReq.user.id } });
+    if (!user || !user.password) {
+      res.status(400).json({ error: 'Cannot change password for OAuth-only accounts' });
+      return;
+    }
+
+    const isValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isValid) {
+      res.status(400).json({ error: 'Current password is incorrect' });
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    await prisma.user.update({
+      where: { id: authReq.user.id },
+      data: { password: hashedPassword },
+    });
+
+    res.json({ message: 'Password updated successfully' });
+  } catch {
+    res.status(500).json({ error: 'Failed to update password' });
   }
 };
 

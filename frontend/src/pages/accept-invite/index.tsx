@@ -71,7 +71,11 @@ const AcceptInvite = () => {
     try {
       const res = await inviteService.accept(token!, { name: name.trim(), password });
       authService.setToken(res.data.token);
-      navigate('/home-dashboard');
+      if (res.data.user?.role === 'CLIENT') {
+        navigate('/client-portal');
+      } else {
+        navigate('/home-dashboard');
+      }
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to accept invitation');
     } finally {

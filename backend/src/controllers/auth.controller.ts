@@ -89,15 +89,37 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    const userRole = role || 'EMPLOYEE';
+
     const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        role: role || 'EMPLOYEE',
+        role: userRole,
         tenantId
       }
     });
+
+    if (userRole === 'CLIENT') {
+      const nameParts = name.trim().split(/\s+/);
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      const existingContact = await prisma.contact.findUnique({ where: { email } });
+      if (!existingContact) {
+        await prisma.contact.create({
+          data: {
+            firstName,
+            lastName,
+            email,
+            tenantId: tenantId as string,
+            ownerId: user.id,
+            status: 'ACTIVE' as const,
+          },
+        });
+      }
+    }
 
     const token = jwt.sign(
       { userId: user.id, email: user.email, role: user.role as Role },

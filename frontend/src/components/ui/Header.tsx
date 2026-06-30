@@ -1,11 +1,12 @@
-import React, { useState, createContext, useContext, useMemo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, createContext, useContext, useMemo, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../../store';
 import type { Role } from '../../types';
 import Icon from '../AppIcon';
 import { logout } from '../../store/slices/authSlice';
 import ThemeToggle from '../ThemeToggle';
+import { notificationService } from '../../services';
 
 interface NavItem {
   label: string;
@@ -138,7 +139,7 @@ export const Sidebar: React.FC = () => {
           {isUserMenuOpen && (
             <div className="absolute bottom-full left-2 right-2 mb-2 bg-card border border-border rounded-xl shadow-soft-xl z-[1010] p-1.5 animate-scale-in">
               <Link
-                to="/settings-configuration"
+                to={user?.role === 'CLIENT' ? '/client-portal/profile' : '/settings-configuration'}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-smooth hover:bg-muted text-sm text-foreground"
                 onClick={() => setIsUserMenuOpen(false)}
               >
@@ -182,8 +183,53 @@ export const Sidebar: React.FC = () => {
 export const TopBar: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const { setIsMobileOpen } = useSidebarContext();
+  const navigate = useNavigate();
   const userName = user?.name || 'User';
   const userInitial = userName?.charAt(0)?.toUpperCase() || 'U';
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (user?.role !== 'CLIENT') return;
+    const fetchNotifs = async () => {
+      try {
+        const res = await notificationService.getAll({ limit: '10' });
+        setNotifications(res.data.notifications || []);
+        setUnreadCount(res.data.unreadCount || 0);
+      } catch {}
+    };
+    fetchNotifs();
+    const interval = setInterval(fetchNotifs, 30000);
+    return () => clearInterval(interval);
+  }, [user?.role]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleMarkAsRead = async (id: string) => {
+    try {
+      await notificationService.markAsRead(id);
+      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    } catch {}
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await notificationService.markAllAsRead();
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch {}
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[900] h-[64px] bg-card/80 backdrop-blur-lg border-b border-border flex items-center justify-between px-4 lg:px-6">
@@ -206,6 +252,62 @@ export const TopBar: React.FC = () => {
             {user.role}
           </span>
         )}
+
+        {user?.role === 'CLIENT' && (
+          <div className="relative" ref={notifRef}>
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative p-2 rounded-lg hover:bg-muted transition-smooth"
+            >
+              <Icon name="Bell" size={20} color="currentColor" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-error text-[10px] font-bold text-white px-1">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </button>
+
+            {showNotifications && (
+              <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-xl shadow-soft-xl animate-scale-in overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                  <h3 className="text-sm font-semibold text-foreground">Notifications</h3>
+                  {unreadCount > 0 && (
+                    <button onClick={handleMarkAllAsRead} className="text-xs text-primary hover:underline font-medium">
+                      Mark all read
+                    </button>
+                  )}
+                </div>
+                <div className="max-h-80 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="p-8 text-center text-sm text-muted-foreground">No notifications yet</div>
+                  ) : (
+                    notifications.map((n: any) => (
+                      <div
+                        key={n.id}
+                        onClick={() => { if (!n.isRead) handleMarkAsRead(n.id); }}
+                        className={`px-4 py-3 border-b border-border/50 cursor-pointer transition-smooth hover:bg-muted/50 ${
+                          !n.isRead ? 'bg-primary/[0.02]' : ''
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          {!n.isRead && <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />}
+                          <div className={!n.isRead ? '' : 'ml-5'}>
+                            <p className="text-sm font-medium text-foreground">{n.title}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{n.description}</p>
+                            <p className="text-[10px] text-muted-foreground mt-1">
+                              {new Date(n.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold text-sm">
           {user?.avatar ? (
             <img src={user.avatar} alt={userName} className="w-8 h-8 rounded-full object-cover" />
