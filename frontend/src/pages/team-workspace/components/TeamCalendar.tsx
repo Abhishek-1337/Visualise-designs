@@ -1,38 +1,36 @@
 import React, { useState } from 'react';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  addDays,
+  addMonths,
+  subMonths,
+  isSameMonth,
+  isSameDay,
+  isToday,
+} from 'date-fns';
+import Icon from '../../../components/AppIcon';
 
-import Button from '../../../components/ui/Button';
-
-const TeamCalendar = ({ events }) => {
+const TeamCalendar = ({ events = [] }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)?.getDate();
-  const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)?.getDay();
+  const monthStart = startOfMonth(currentDate);
+  const monthEnd = endOfMonth(monthStart);
+  const calendarStart = startOfWeek(monthStart);
+  const calendarEnd = endOfWeek(monthEnd);
 
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const days: Date[] = [];
+  let day = calendarStart;
+  while (day <= calendarEnd) {
+    days.push(day);
+    day = addDays(day, 1);
+  }
 
-  const handlePrevMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-  };
-
-  const handleNextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
-  };
-
-  const getEventsForDay = (day) => {
-    return events?.filter(event => {
-      const eventDate = new Date(event.date);
-      return eventDate?.getDate() === day &&
-             eventDate?.getMonth() === currentDate?.getMonth() &&
-             eventDate?.getFullYear() === currentDate?.getFullYear();
-    });
-  };
-
-  const isToday = (day) => {
-    const today = new Date();
-    return day === today?.getDate() &&
-           currentDate?.getMonth() === today?.getMonth() &&
-           currentDate?.getFullYear() === today?.getFullYear();
-  };
+  const getEventsForDay = (date: Date) =>
+    events.filter((event: any) => isSameDay(new Date(event.date), date));
 
   return (
     <div className="bg-card border border-border rounded-xl shadow-soft-sm p-4 md:p-5 lg:p-6">
@@ -41,64 +39,62 @@ const TeamCalendar = ({ events }) => {
           Team Calendar
         </h2>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            iconName="ChevronLeft"
-            iconSize={18}
-            onClick={handlePrevMonth}
-          />
+          <button
+            onClick={() => setCurrentDate(subMonths(currentDate, 1))}
+            className="p-1.5 rounded-lg hover:bg-muted transition-smooth text-muted-foreground hover:text-foreground"
+          >
+            <Icon name="ChevronLeft" size={18} color="currentColor" />
+          </button>
           <span className="text-sm md:text-base font-medium text-foreground px-2 md:px-4 whitespace-nowrap">
-            {monthNames?.[currentDate?.getMonth()]} {currentDate?.getFullYear()}
+            {format(currentDate, 'MMMM yyyy')}
           </span>
-          <Button
-            variant="outline"
-            size="icon"
-            iconName="ChevronRight"
-            iconSize={18}
-            onClick={handleNextMonth}
-          />
+          <button
+            onClick={() => setCurrentDate(addMonths(currentDate, 1))}
+            className="p-1.5 rounded-lg hover:bg-muted transition-smooth text-muted-foreground hover:text-foreground"
+          >
+            <Icon name="ChevronRight" size={18} color="currentColor" />
+          </button>
         </div>
       </div>
+
       <div className="grid grid-cols-7 gap-1 md:gap-2 mb-2">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']?.map((day) => (
-          <div key={day} className="text-center text-xs md:text-sm font-medium text-muted-foreground py-2">
-            {day}
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
+          <div key={d} className="text-center text-xs md:text-sm font-medium text-muted-foreground py-2">
+            {d}
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-1 md:gap-2">
-        {Array.from({ length: firstDayOfMonth })?.map((_, index) => (
-          <div key={`empty-${index}`} className="aspect-square" />
-        ))}
 
-        {Array.from({ length: daysInMonth })?.map((_, index) => {
-          const day = index + 1;
-          const dayEvents = getEventsForDay(day);
-          const today = isToday(day);
+      <div className="grid grid-cols-7 gap-1 md:gap-2">
+        {days.map((date, idx) => {
+          const dayEvents = getEventsForDay(date);
+          const today = isToday(date);
+          const sameMonth = isSameMonth(date, currentDate);
 
           return (
             <div
-              key={day}
+              key={idx}
               className={`
-                aspect-square p-1 md:p-2 rounded-lg transition-smooth cursor-pointer
-                ${today ? 'bg-primary text-primary-foreground shadow-soft-sm' : 'bg-background hover:bg-muted border border-border/50'}
+                aspect-square rounded-lg transition-smooth cursor-pointer flex flex-col items-center justify-center
+                ${today ? 'bg-primary text-primary-foreground shadow-soft-sm' : ''}
+                ${!today && sameMonth ? 'bg-background hover:bg-muted border border-border/50 text-foreground' : ''}
+                ${!sameMonth ? 'opacity-40' : 'text-foreground'}
               `}
             >
-              <div className="text-xs md:text-sm font-medium mb-1">{day}</div>
-              {dayEvents?.length > 0 && (
+              <span className="text-xs md:text-sm font-medium leading-none">{format(date, 'd')}</span>
+              {dayEvents.length > 0 && (
                 <div className="space-y-0.5">
-                  {dayEvents?.slice(0, 2)?.map((event, idx) => (
+                  {dayEvents.slice(0, 2).map((event: any, idx: number) => (
                     <div
                       key={idx}
                       className={`w-full h-1.5 rounded-full ${
-                        event?.type === 'meeting' ? 'bg-accent' :
-                        event?.type === 'deadline'? 'bg-error' : 'bg-success'
+                        event.type === 'meeting' ? 'bg-accent' :
+                        event.type === 'deadline' ? 'bg-error' : 'bg-success'
                       }`}
                     />
                   ))}
-                  {dayEvents?.length > 2 && (
-                    <div className="text-[10px] text-muted-foreground">+{dayEvents?.length - 2}</div>
+                  {dayEvents.length > 2 && (
+                    <div className="text-[10px] text-muted-foreground">+{dayEvents.length - 2}</div>
                   )}
                 </div>
               )}
@@ -106,6 +102,7 @@ const TeamCalendar = ({ events }) => {
           );
         })}
       </div>
+
       <div className="mt-4 md:mt-6 pt-4 border-t border-border">
         <div className="flex items-center gap-4 md:gap-6 flex-wrap">
           <div className="flex items-center gap-2">
