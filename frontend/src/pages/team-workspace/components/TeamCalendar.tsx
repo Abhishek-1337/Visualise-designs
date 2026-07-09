@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Button from '../../../components/ui/Button';
 
 const TeamCalendar = ({ events }) => {
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 11, 31));
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)?.getDate();
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)?.getDay();
@@ -28,7 +28,7 @@ const TeamCalendar = ({ events }) => {
   };
 
   const isToday = (day) => {
-    const today = new Date(2025, 11, 31);
+    const today = new Date();
     return day === today?.getDate() &&
            currentDate?.getMonth() === today?.getMonth() &&
            currentDate?.getFullYear() === today?.getFullYear();

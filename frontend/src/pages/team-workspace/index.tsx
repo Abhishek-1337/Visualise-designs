@@ -1,53 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
 import Sidebar, { TopBar } from '../../components/ui/Header';
+import Icon from '../../components/AppIcon';
+import Card from '../../components/shared/Card';
+import ActionButton from '../../components/shared/ActionButton';
+import EmptyState from '../../components/shared/EmptyState';
 import TeamMemberCard from './components/TeamMemberCard';
-import WorkloadChart from './components/WorkloadChart';
 import ActivityFeed from './components/ActivityFeed';
-import TeamOverviewStats from './components/TeamOverviewStats';
 import TeamCalendar from './components/TeamCalendar';
-import FilterPanel from './components/FilterPanel';
-import { userService, activityService } from '../../services';
+import { userService, activityService, inviteService } from '../../services';
+
+interface Member {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  avatar: string;
+  isActive: boolean;
+  lastLogin: string;
+  createdAt: string;
+}
 
 const ROLE_LABELS: Record<string, string> = {
-  ADMIN: 'Administrator',
+  ADMIN: 'Admin',
   MANAGER: 'Manager',
   EMPLOYEE: 'Employee',
   CLIENT: 'Client',
 };
 
-const STATUSES = ['available', 'busy', 'offline'];
-
-const mapUserToMember = (user: any, index: number) => ({
-  id: user.id,
-  name: user.name,
-  role: ROLE_LABELS[user.role] || user.role,
-  avatar: user.avatar || '',
-  avatarAlt: user.name,
-  status: STATUSES[index % STATUSES.length],
-  workloadPercentage: 50 + ((index * 17) % 45),
-  activeProjects: 2 + (index % 4),
-  upcomingDeadlines: 1 + (index % 3),
-  currentProjects: [],
-});
-
-const mapActivity = (act: any) => ({
-  id: act.id,
-  type: act.type === 'task_completed' ? 'completion' : act.type === 'project_created' ? 'milestone' : 'collaboration',
-  title: act.description?.substring(0, 60) || act.type,
-  description: act.description || '',
-  timestamp: act.createdAt,
-  userAvatar: act.user?.avatar || '',
-  userAvatarAlt: act.user?.name || '',
-  userName: act.user?.name || 'System',
-  projectName: '',
-});
-
 const TeamWorkspace = () => {
-  const [filters, setFilters] = useState({ project: 'all', skill: 'all', deadline: 'all' });
-  const [members, setMembers] = useState<any[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [roleFilter, setRoleFilter] = useState('all');
+
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('EMPLOYEE');
+  const [sending, setSending] = useState(false);
+  const [inviteError, setInviteError] = useState('');
+  const [inviteSuccess, setInviteSuccess] = useState('');
 
   useEffect(() => {
     loadData();
@@ -60,8 +53,18 @@ const TeamWorkspace = () => {
         userService.getAllUsers({ limit: '50' }),
         activityService.getAll({}),
       ]);
-      setMembers((usersRes.data.users || []).map(mapUserToMember));
-      setActivities((activitiesRes.data.activities || []).map(mapActivity));
+      setMembers(usersRes.data.users || []);
+      setActivities((activitiesRes.data.activities || []).map((act: any) => ({
+        id: act.id,
+        type: act.type === 'task_completed' ? 'completion' : act.type === 'project_created' ? 'milestone' : 'collaboration',
+        title: act.description?.substring(0, 60) || act.type,
+        description: act.description || '',
+        timestamp: act.createdAt,
+        userAvatar: act.user?.avatar || '',
+        userAvatarAlt: act.user?.name || '',
+        userName: act.user?.name || 'System',
+        projectName: '',
+      })));
     } catch {
       console.error('Failed to load team data');
     } finally {
@@ -69,87 +72,269 @@ const TeamWorkspace = () => {
     }
   };
 
-  const stats = {
-    totalMembers: members.length,
-    activeProjects: members.reduce((s, m) => s + (m.activeProjects || 0), 0),
-    tasksThisWeek: 0,
-    upcomingDeadlines: members.reduce((s, m) => s + (m.upcomingDeadlines || 0), 0),
-  };
-
-  const workloadData = members.map((m) => ({
-    name: m.name,
-    workload: m.workloadPercentage,
-    capacity: 100,
-  }));
-
-  const filteredMembers = members.filter((m) => {
-    if (filters.project !== 'all' && !m.currentProjects.includes(filters.project)) return false;
+  const activeMembers = members.filter((m) => m.isActive !== false);
+  const filteredMembers = activeMembers.filter((m) => {
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      if (!m.name?.toLowerCase().includes(q) && !m.email?.toLowerCase().includes(q)) return false;
+    }
+    if (roleFilter !== 'all' && m.role !== roleFilter) return false;
     return true;
   });
 
-  const handleAssignTask = (member: any) => console.log('Assign task to', member.name);
-  const handleViewDetails = (member: any) => console.log('View details', member.name);
-  const handleMessage = (member: any) => console.log('Message', member.name);
+  const stats = {
+    totalMembers: activeMembers.length,
+    managers: activeMembers.filter((m) => m.role === 'MANAGER').length,
+    employees: activeMembers.filter((m) => m.role === 'EMPLOYEE').length,
+    admins: activeMembers.filter((m) => m.role === 'ADMIN').length,
+  };
 
-  return (
-    <>
-      <Helmet>
-        <title>Team Workspace - Visualise CRM</title>
-        <meta name="description" content="Collaborative team workspace for architectural visualization projects" />
-      </Helmet>
-      <div className="min-h-screen bg-background">
+  const handleSendInvite = async () => {
+    if (!inviteEmail) return;
+    setSending(true);
+    setInviteError('');
+    setInviteSuccess('');
+    try {
+      const res = await inviteService.create({ email: inviteEmail, role: inviteRole });
+      setInviteSuccess(`Invitation sent! Link: ${res.data.inviteUrl}`);
+    } catch (err: any) {
+      setInviteError(err.response?.data?.error || 'Failed to send invitation');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="h-screen overflow-hidden bg-background">
         <Sidebar />
         <TopBar />
-        <main className="md:ml-[260px] pt-[60px]">
-          <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10 animate-fade-in">
-            <div className="mb-6 md:mb-8 lg:mb-10">
-              <h1 className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-2">
-                Team Workspace
-              </h1>
-              <p className="text-base md:text-lg text-muted-foreground">
-                Collaborate, assign tasks, and track team progress
-              </p>
-            </div>
-
-            {loading ? (
-              <div className="flex items-center justify-center h-[40vh]">
-                <div className="text-center">
-                  <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                  <p className="text-muted-foreground">Loading team data...</p>
-                </div>
-              </div>
-            ) : (
-              <>
-                <TeamOverviewStats stats={stats} />
-                <FilterPanel filters={filters} onFilterChange={setFilters} onReset={() => setFilters({ project: 'all', skill: 'all', deadline: 'all' })} />
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                  <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                    {filteredMembers.map((member) => (
-                      <TeamMemberCard
-                        key={member.id}
-                        member={member}
-                        onAssignTask={handleAssignTask}
-                        onViewDetails={handleViewDetails}
-                        onMessage={handleMessage}
-                      />
-                    ))}
-                  </div>
-                  <div className="space-y-6">
-                    <WorkloadChart data={workloadData} />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <div className="lg:col-span-2">
-                    <ActivityFeed activities={activities.slice(0, 20)} />
-                  </div>
-                  <TeamCalendar events={[]} />
-                </div>
-              </>
-            )}
+        <main className="md:ml-[240px] h-screen pt-[60px] flex items-center justify-center">
+          <div className="text-center animate-fade-in">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading team data...</p>
           </div>
         </main>
       </div>
-    </>
+    );
+  }
+
+  return (
+    <div className="h-screen overflow-hidden bg-background animate-fade-in">
+      <Sidebar />
+      <TopBar />
+      <main className="md:ml-[240px] h-screen pt-[60px] flex flex-col overflow-hidden">
+        <div className="px-6 py-4 border-b border-border shrink-0">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-foreground">Team</h1>
+              <p className="text-sm text-muted-foreground">{activeMembers.length} members</p>
+            </div>
+            <ActionButton icon="UserPlus" onClick={() => setShowInviteModal(true)}>
+              Invite Member
+            </ActionButton>
+          </div>
+        </div>
+
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          <div className="p-6 space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card variant="elevated" padding="lg" className="shadow-soft-md">
+                <div className="flex items-center gap-3 text-primary mb-2">
+                  <Icon name="Users" size={20} color="currentColor" />
+                  <span className="text-sm font-medium">Total Members</span>
+                </div>
+                <p className="text-3xl font-bold text-foreground">{stats.totalMembers}</p>
+              </Card>
+              <Card variant="elevated" padding="lg" className="shadow-soft-md">
+                <div className="flex items-center gap-3 text-accent mb-2">
+                  <Icon name="UserCheck" size={20} color="currentColor" />
+                  <span className="text-sm font-medium">Managers</span>
+                </div>
+                <p className="text-3xl font-bold text-foreground">{stats.managers}</p>
+              </Card>
+              <Card variant="elevated" padding="lg" className="shadow-soft-md">
+                <div className="flex items-center gap-3 text-emerald-600 mb-2">
+                  <Icon name="Briefcase" size={20} color="currentColor" />
+                  <span className="text-sm font-medium">Employees</span>
+                </div>
+                <p className="text-3xl font-bold text-foreground">{stats.employees}</p>
+              </Card>
+              <Card variant="elevated" padding="lg" className="shadow-soft-md">
+                <div className="flex items-center gap-3 text-violet-600 mb-2">
+                  <Icon name="Shield" size={20} color="currentColor" />
+                  <span className="text-sm font-medium">Admins</span>
+                </div>
+                <p className="text-3xl font-bold text-foreground">{stats.admins}</p>
+              </Card>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="relative flex-1 max-w-md">
+                <Icon name="Search" size={16} color="var(--color-muted-foreground)" className="absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search by name or email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+              <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+                {['all', 'ADMIN', 'MANAGER', 'EMPLOYEE'].map((role) => (
+                  <button
+                    key={role}
+                    onClick={() => setRoleFilter(role)}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-smooth ${
+                      roleFilter === role
+                        ? 'bg-card text-foreground shadow-soft-sm border border-border'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {role === 'all' ? 'All' : ROLE_LABELS[role]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {filteredMembers.length === 0 ? (
+              <Card variant="bordered" padding="lg">
+                <EmptyState icon="Users" title="No members found" description="Try adjusting your search or filters." />
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                {filteredMembers.map((member) => (
+                  <TeamMemberCard
+                    key={member.id}
+                    member={member}
+                    onViewDetails={() => setSelectedMember(member)}
+                  />
+                ))}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <ActivityFeed activities={activities.slice(0, 15)} />
+              </div>
+              <div className="space-y-6">
+                <TeamCalendar events={[]} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {showInviteModal && (
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-background/60 backdrop-blur-xl" onClick={() => setShowInviteModal(false)}>
+          <div className="bg-card rounded-xl shadow-soft-2xl w-full max-w-md border border-border animate-fade-in" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+              <h2 className="font-semibold text-lg text-foreground">Invite Team Member</h2>
+              <button onClick={() => setShowInviteModal(false)} className="p-1.5 rounded-lg hover:bg-muted transition-smooth">
+                <Icon name="X" size={18} color="currentColor" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Email Address</label>
+                <input
+                  type="email"
+                  placeholder="colleague@company.com"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Role</label>
+                <select
+                  value={inviteRole}
+                  onChange={(e) => setInviteRole(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                >
+                  <option value="ADMIN">Admin</option>
+                  <option value="MANAGER">Manager</option>
+                  <option value="EMPLOYEE">Employee</option>
+                </select>
+              </div>
+              {inviteError && <p className="text-xs text-error">{inviteError}</p>}
+              {inviteSuccess && (
+                <div className="p-3 bg-success/10 border border-success/20 rounded-lg">
+                  <p className="text-xs text-success break-all">{inviteSuccess}</p>
+                </div>
+              )}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setShowInviteModal(false)}
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-border text-foreground text-sm font-medium hover:bg-muted transition-smooth"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendInvite}
+                  disabled={sending || !inviteEmail.trim()}
+                  className="flex-1 px-4 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-smooth shadow-soft-sm"
+                >
+                  {sending ? 'Sending...' : 'Send Invite'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedMember && (
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-background/60 backdrop-blur-xl" onClick={() => setSelectedMember(null)}>
+          <div className="bg-card rounded-xl shadow-soft-2xl w-full max-w-md border border-border animate-fade-in" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+              <h2 className="font-semibold text-lg text-foreground">Member Details</h2>
+              <button onClick={() => setSelectedMember(null)} className="p-1.5 rounded-lg hover:bg-muted transition-smooth">
+                <Icon name="X" size={18} color="currentColor" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-bold text-primary">
+                  {selectedMember.name?.charAt(0)?.toUpperCase()}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground text-lg">{selectedMember.name}</h3>
+                  <p className="text-sm text-muted-foreground">{selectedMember.email}</p>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 bg-primary/10 text-primary">
+                    {ROLE_LABELS[selectedMember.role] || selectedMember.role}
+                  </span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-xs text-muted-foreground">Status</p>
+                  <p className="text-sm font-medium text-foreground mt-0.5">
+                    {selectedMember.isActive !== false ? 'Active' : 'Inactive'}
+                  </p>
+                </div>
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-xs text-muted-foreground">Last Login</p>
+                  <p className="text-sm font-medium text-foreground mt-0.5">
+                    {selectedMember.lastLogin
+                      ? new Date(selectedMember.lastLogin).toLocaleDateString()
+                      : 'Never'}
+                  </p>
+                </div>
+              </div>
+              <div className="p-3 bg-muted rounded-lg">
+                <p className="text-xs text-muted-foreground">Member Since</p>
+                <p className="text-sm font-medium text-foreground mt-0.5">
+                  {selectedMember.createdAt
+                    ? new Date(selectedMember.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                    : 'N/A'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

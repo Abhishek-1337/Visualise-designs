@@ -33,9 +33,11 @@ const ActivityFeed = ({ activities }: ActivityFeedProps) => {
   };
 
   const formatTimeAgo = (timestamp: string | Date) => {
+    if (!timestamp) return '';
     const now = new Date();
     const activityTime = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
-    const diffInMinutes = Math.floor((now.getTime() - activityTime.getTime()) / (1000 * 60));
+    if (isNaN(activityTime?.getTime())) return '';
+    const diffInMinutes = Math.floor((now.getTime() - activityTime?.getTime()) / (1000 * 60));
 
     if (diffInMinutes < 1) return 'Just now';
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
