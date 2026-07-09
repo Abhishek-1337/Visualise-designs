@@ -183,6 +183,7 @@ model Deal {
   stage           PipelineStage @default(NEW_LEAD)
   expectedCloseDate DateTime?
   closedDate      DateTime?
+  changeRequestNotes String?   @default("")
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 

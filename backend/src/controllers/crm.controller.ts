@@ -169,11 +169,12 @@ export const deleteContact = async (req: Request, res: Response): Promise<void> 
 export const getAllDeals = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
-    const { page = '1', limit = '20', status, stage, assignedTo } = req.query;
+    const { page = '1', limit = '20', status, stage, assignedTo, contactId } = req.query;
     const where: any = { tenantId: authReq.user.tenantId };
     if (status) where.status = status;
     if (stage) where.stage = stage;
     if (assignedTo) where.assignedToId = assignedTo;
+    if (contactId) where.contactId = contactId;
 
     if (authReq.user.role === 'CLIENT') {
       const contact = await prisma.contact.findFirst({
@@ -314,10 +315,14 @@ export const updateDeal = async (req: Request, res: Response): Promise<void> => 
     });
 
     if (stage || status) {
+      let desc = `Deal ${status ? 'status' : 'stage'} changed to ${status || stage}`;
+      if (status === 'CHANGES_REQUESTED' && data.changeRequestNotes) {
+        desc = `Client requested changes: ${data.changeRequestNotes}`;
+      }
       await prisma.activity.create({
         data: {
           type: status ? 'deal_status_changed' : 'deal_stage_changed',
-          description: `Deal ${status ? 'status' : 'stage'} changed to ${status || stage}`,
+          description: desc,
           userId: authReq.user.id,
           dealId: req.params.id as string,
           tenantId: authReq.user.tenantId

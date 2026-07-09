@@ -215,11 +215,25 @@ const ClientCRM = () => {
   const selectedProject = clientProjects.find((p) => String(p.id) === selectedProjectId) || null;
   const currentMessages = selectedProjectId ? (messages[selectedProjectId] || []) : [];
 
+  const loadClientDeals = useCallback(async (contactId: string) => {
+    try {
+      const dealsRes = await dealService.getAll({ limit: '100', contactId });
+      const groupedDeals: Record<string, any[]> = {};
+      for (const d of dealsRes.data.deals || []) {
+        const cid = d.contactId;
+        if (!groupedDeals[cid]) groupedDeals[cid] = [];
+        groupedDeals[cid].push(d);
+      }
+      setDealsByClient(prev => ({ ...prev, ...groupedDeals }));
+    } catch (e) { console.error('Failed to load client deals', e); }
+  }, []);
+
   const handleSelectClient = useCallback((client: Client) => {
     setSelectedClientId(client.id as string);
     setSelectedProjectId(null);
     setShowChatPanel(false);
-  }, []);
+    loadClientDeals(client.id as string);
+  }, [loadClientDeals]);
 
   const fetchProjectMessages = useCallback(async (projectId: string) => {
     try {

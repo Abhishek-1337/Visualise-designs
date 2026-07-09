@@ -135,17 +135,31 @@ const LeadCard = ({ lead, onDragStart, onClick, onQuickAction }: LeadCardProps) 
           <Icon name="Mail" size={14} color="currentColor" />
           <span className="text-xs font-medium">Email</span>
         </button>
-        <button
-          onClick={(e) => {
-            e?.stopPropagation();
-            onQuickAction('view', lead);
-          }}
-          className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-smooth active-press"
-          title="View profile"
-        >
-          <Icon name="Eye" size={14} color="currentColor" />
-          <span className="text-xs font-medium">View</span>
-        </button>
+        {lead.dealStatus === 'DRAFT' ? (
+          <button
+            onClick={(e) => {
+              e?.stopPropagation();
+              onQuickAction('send', lead);
+            }}
+            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-smooth active-press"
+            title="Send deal to client"
+          >
+            <Icon name="Send" size={14} color="currentColor" />
+            <span className="text-xs font-medium">Send</span>
+          </button>
+        ) : (
+          <button
+            onClick={(e) => {
+              e?.stopPropagation();
+              onQuickAction('view', lead);
+            }}
+            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-smooth active-press"
+            title="View profile"
+          >
+            <Icon name="Eye" size={14} color="currentColor" />
+            <span className="text-xs font-medium">View</span>
+          </button>
+        )}
       </div>
     </div>
   );

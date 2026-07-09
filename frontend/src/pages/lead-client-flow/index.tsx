@@ -42,6 +42,7 @@ const mapDealToLead = (deal: any) => ({
   assignedTo: deal.assignedTo?.id || '',
   assignedToName: deal.assignedTo?.name || 'Unassigned',
   dealStage: deal.stage,
+  dealStatus: deal.status,
 });
 
 const LeadClientFlow = () => {
@@ -95,8 +96,18 @@ const LeadClientFlow = () => {
 
   const handleLeadClick = (lead: any) => setSelectedLead(lead);
 
-  const handleQuickAction = (action: string, lead: any) => {
+  const handleQuickAction = async (action: string, lead: any) => {
     if (action === 'view') setSelectedLead(lead);
+    if (action === 'send') {
+      try {
+        await dealService.update(lead.id, { status: 'SENT' });
+        setLeads((prev) =>
+          prev.map((l) => (l.id === lead.id ? { ...l, dealStatus: 'SENT' } : l))
+        );
+      } catch {
+        console.error('Failed to send deal');
+      }
+    }
   };
 
   const handleFilterChange = (filterType: string, value: string) =>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
 import type { Client } from './AllClientsGrid';
 import { AvatarCircle, StatusBadge, ActionButton, ProgressWithLabel, TeamMemberAvatars, EmptyState, Card, CardHeader } from '../../../components/shared';
@@ -48,18 +48,74 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
   onRefresh,
 }) => {
   const [activeTab, setActiveTab] = useState('deals');
+  const [localDeals, setLocalDeals] = useState<any[]>(deals);
   const [convertingDealId, setConvertingDealId] = useState<string | null>(null);
+  const [sendingDealId, setSendingDealId] = useState<string | null>(null);
+  const [editDeal, setEditDeal] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState({ title: '', description: '', value: '', stage: '' });
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  useEffect(() => {
+    setLocalDeals(deals);
+  }, [deals]);
 
   const handleConvertToProject = async (dealId: string) => {
     try {
       setConvertingDealId(dealId);
       await dealService.convertToProject(dealId);
-      if (onRefresh) onRefresh();
+      setLocalDeals((prev) => prev.filter((d) => d.id !== dealId));
       setActiveTab('projects');
     } catch (error) {
       console.error('Failed to convert deal:', error);
     } finally {
       setConvertingDealId(null);
+    }
+  };
+
+  const handleSendToClient = async (dealId: string) => {
+    try {
+      setSendingDealId(dealId);
+      await dealService.update(dealId, { status: 'SENT', changeRequestNotes: '' });
+      setLocalDeals((prev) =>
+        prev.map((d) => (d.id === dealId ? { ...d, status: 'SENT', changeRequestNotes: '' } : d))
+      );
+    } catch (error) {
+      console.error('Failed to send deal:', error);
+    } finally {
+      setSendingDealId(null);
+    }
+  };
+
+  const handleEditDeal = (deal: any) => {
+    setEditDeal(deal);
+    setEditForm({
+      title: deal.title || '',
+      description: deal.description || '',
+      value: String(deal.value || ''),
+      stage: deal.stage || 'NEW_LEAD',
+    });
+  };
+
+  const handleSaveDeal = async () => {
+    if (!editDeal) return;
+    try {
+      setSavingEdit(true);
+      const updated = await dealService.update(editDeal.id, {
+        title: editForm.title,
+        description: editForm.description,
+        value: parseFloat(editForm.value),
+        stage: editForm.stage,
+        status: 'DRAFT',
+        changeRequestNotes: '',
+      });
+      setEditDeal(null);
+      setLocalDeals((prev) =>
+        prev.map((d) => (d.id === editDeal.id ? { ...d, ...(updated.data || updated), changeRequestNotes: '' } : d))
+      );
+    } catch (error) {
+      console.error('Failed to update deal:', error);
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -139,7 +195,7 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
                 <Icon name="Briefcase" size={20} color="currentColor" />
                 <h3 className="font-semibold">Deals</h3>
               </div>
-              <p className="text-3xl font-bold">{deals.length}</p>
+              <p className="text-3xl font-bold">{localDeals.length}</p>
               <p className="text-sm text-muted-foreground">Active proposals and opportunities</p>
             </Card>
             <Card variant="elevated" padding="lg" className="flex flex-col gap-2 shadow-soft-md">
@@ -164,15 +220,15 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
         {activeTab === 'deals' && (
           <Card variant="bordered" padding="lg" className="h-full flex flex-col overflow-hidden">
             <CardHeader
-              title={`Deals (${deals.length})`}
+              title={`Deals (${localDeals.length})`}
               action={<ActionButton icon="Plus" onClick={onNewDeal}>New Deal</ActionButton>}
             />
 
-            {deals.length === 0 ? (
+            {localDeals.length === 0 ? (
               <EmptyState icon="Briefcase" title="No deals yet for this client" />
             ) : (
               <div className="flex-1 min-h-0 space-y-3 overflow-y-auto pr-2">
-                {deals.map((deal) => (
+                {localDeals.map((deal) => (
                   <Card
                     key={deal.id}
                     variant="bordered"
@@ -190,9 +246,32 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
                           <StatusBadge status={deal.status} />
                           <span className="text-xs text-muted-foreground">${deal.value.toLocaleString()}</span>
                         </div>
+                        {deal.status === 'CHANGES_REQUESTED' && deal.changeRequestNotes && (
+                          <div className="flex items-start gap-2 mt-2 p-2.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200/50 dark:border-amber-800/30 rounded-lg max-w-md">
+                            <Icon name="MessageSquare" size={13} color="var(--color-warning)" className="mt-0.5 shrink-0" />
+                            <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">{deal.changeRequestNotes}</p>
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
+                      {(deal.status === 'DRAFT' || deal.status === 'CHANGES_REQUESTED') && (
+                        <button
+                          onClick={() => handleEditDeal(deal)}
+                          className="px-3 py-1.5 bg-muted text-foreground rounded-lg text-xs font-medium hover:bg-muted/80 border border-border transition-smooth"
+                        >
+                          Edit Deal
+                        </button>
+                      )}
+                      {deal.status === 'DRAFT' && (
+                        <button
+                          onClick={() => handleSendToClient(deal.id)}
+                          disabled={sendingDealId === deal.id}
+                          className="px-3 py-1.5 bg-accent text-white rounded-lg text-xs font-medium hover:bg-accent/90 disabled:opacity-50 transition-smooth shadow-soft-sm"
+                        >
+                          {sendingDealId === deal.id ? 'Sending...' : 'Send to Client'}
+                        </button>
+                      )}
                       {deal.status === 'ACCEPTED' && (
                         <button
                           onClick={() => handleConvertToProject(deal.id)}
@@ -312,6 +391,98 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
           </Card>
         )}
       </div>
+
+      {editDeal && (
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-background/60 backdrop-blur-xl" onClick={() => setEditDeal(null)}>
+          <div
+            className="bg-card rounded-xl shadow-soft-2xl w-full max-w-lg border border-border overflow-hidden animate-fade-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-gradient-to-r from-card to-muted/20">
+              <h2 className="font-semibold text-lg text-foreground">Edit Deal</h2>
+              <button onClick={() => setEditDeal(null)} className="p-1.5 rounded-lg hover:bg-muted transition-smooth">
+                <Icon name="X" size={18} color="currentColor" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Deal Title</label>
+                <input
+                  type="text"
+                  required
+                  value={editForm.title}
+                  onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">Description</label>
+                <textarea
+                  rows={3}
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">Budget/Value ($)</label>
+                  <input
+                    type="number"
+                    required
+                    value={editForm.value}
+                    onChange={(e) => setEditForm({ ...editForm, value: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">Stage</label>
+                  <select
+                    value={editForm.stage}
+                    onChange={(e) => setEditForm({ ...editForm, stage: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  >
+                    <option value="NEW_LEAD">New Lead</option>
+                    <option value="QUALIFIED">Qualified</option>
+                    <option value="PROPOSAL_SENT">Proposal Sent</option>
+                    <option value="NEGOTIATION">Negotiation</option>
+                  </select>
+                </div>
+              </div>
+
+              {editDeal?.changeRequestNotes && (
+                <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200/50 dark:border-amber-800/30 rounded-lg">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Icon name="MessageSquare" size={14} color="var(--color-warning)" />
+                    <span className="text-xs font-semibold text-amber-800 dark:text-amber-400">Client Change Request</span>
+                  </div>
+                  <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">{editDeal.changeRequestNotes}</p>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setEditDeal(null)}
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-border text-foreground text-sm font-medium hover:bg-muted transition-smooth"
+                  type="button"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveDeal}
+                  disabled={savingEdit}
+                  className="flex-1 px-4 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-smooth shadow-soft-sm"
+                >
+                  {savingEdit ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
