@@ -177,7 +177,7 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
                     key={deal.id}
                     variant="bordered"
                     padding="md"
-                    className="flex items-center justify-between gap-4 w-full"
+                    className="flex items-center justify-between gap-4 w-full dark:bg-slate-900"
                     hover
                   >
                     <div className="flex items-center gap-4">
@@ -230,7 +230,7 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
                     hover
                     selected={String(project.id) === selectedProjectId}
                     onClick={() => onSelectProject(project)}
-                    className="flex items-start gap-4 w-full cursor-pointer"
+                    className="flex items-start gap-4 w-full cursor-pointer dark:bg-slate-900"
                   >
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                       String(project.id) === selectedProjectId
