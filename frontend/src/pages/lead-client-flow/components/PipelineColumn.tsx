@@ -65,7 +65,7 @@ const PipelineColumn = ({
         </p>
       </div>
       <div
-        className="flex-1 p-3 overflow-y-auto space-y-3 min-h-[400px] scrollbar-thin"
+        className="flex-1 p-3 overflow-y-auto space-y-3 min-h-[400px] scrollbar-hide"
         onDragOver={onDragOver}
         onDrop={(e) => onDrop(e, stage?.id)}
       >

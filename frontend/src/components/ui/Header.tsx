@@ -88,7 +88,7 @@ export const Sidebar: React.FC = () => {
         </button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto py-3 px-3 scrollbar-thin">
+      <nav className="flex-1 overflow-y-auto py-3 px-3 scrollbar-hide">
         <div className="space-y-0.5">
           {navigationItems?.map((item) => {
             const active = isActivePath(item?.path) || isActiveParent(item?.path);

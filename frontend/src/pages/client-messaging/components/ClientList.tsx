@@ -85,7 +85,7 @@ const ClientList: React.FC<ClientListProps> = ({ conversations, selectedClientId
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-thin">
+      <div className="flex-1 overflow-y-auto scrollbar-hide">
         {sorted.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4">
             <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-3">
