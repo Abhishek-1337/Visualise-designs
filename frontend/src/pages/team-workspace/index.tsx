@@ -4,7 +4,6 @@ import Icon from '../../components/AppIcon';
 import Card from '../../components/shared/Card';
 import ActionButton from '../../components/shared/ActionButton';
 import EmptyState from '../../components/shared/EmptyState';
-import TeamMemberCard from './components/TeamMemberCard';
 import ActivityFeed from './components/ActivityFeed';
 import TeamCalendar from './components/TeamCalendar';
 import { userService, activityService, inviteService } from '../../services';
@@ -122,8 +121,8 @@ const TeamWorkspace = () => {
   return (
     <div className="h-screen overflow-hidden bg-background animate-fade-in">
       <Sidebar />
-      <TopBar />
-      <main className="md:ml-[240px] h-screen pt-[60px] flex flex-col overflow-hidden">
+      {/* <TopBar /> */}
+      <main className="md:ml-[240px] h-screen flex flex-col overflow-hidden">
         <div className="px-6 py-4 border-b border-border shrink-0">
           <div className="flex items-center justify-between">
             <div>
@@ -202,14 +201,66 @@ const TeamWorkspace = () => {
                 <EmptyState icon="Users" title="No members found" description="Try adjusting your search or filters." />
               </Card>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                {filteredMembers.map((member) => (
-                  <TeamMemberCard
-                    key={member.id}
-                    member={member}
-                    onViewDetails={() => setSelectedMember(member)}
-                  />
-                ))}
+              <div className="overflow-x-auto rounded-xl border border-border">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-muted/60 border-b border-border">
+                      <th className="text-left px-4 py-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">Name</th>
+                      <th className="text-left px-4 py-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">Email</th>
+                      <th className="text-left px-4 py-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">Role</th>
+                      <th className="text-left px-4 py-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">Status</th>
+                      <th className="text-right px-4 py-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border bg-card">
+                    {filteredMembers.map((member) => {
+                      const roleCategory =
+                        member.role === 'ADMIN' ? 'Admin' :
+                        member.role === 'CLIENT' ? 'Client' :
+                        'Team Member';
+                      const roleBadgeColor =
+                        member.role === 'ADMIN' ? 'bg-violet-100 text-violet-700 border-violet-200' :
+                        member.role === 'CLIENT' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                        'bg-emerald-100 text-emerald-700 border-emerald-200';
+                      return (
+                        <tr key={member.id} className="hover:bg-muted/30 transition-smooth">
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
+                                {member.name?.charAt(0)?.toUpperCase()}
+                              </div>
+                              <span className="font-medium text-foreground truncate max-w-[180px]">
+                                {member.name}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-muted-foreground truncate max-w-[220px]">
+                            {member.email}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${roleBadgeColor}`}>
+                              {roleCategory}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${member.isActive !== false ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${member.isActive !== false ? 'bg-emerald-500' : 'bg-muted-foreground'}`} />
+                              {member.isActive !== false ? 'Active' : 'Inactive'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <button
+                              onClick={() => setSelectedMember(member)}
+                              className="px-3 py-1.5 rounded-md text-xs font-medium text-primary hover:bg-primary/10 transition-smooth"
+                            >
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             )}
 
