@@ -292,7 +292,7 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
   if (!project) {
     return (
       <div className="w-full lg:w-[380px] xl:w-[420px] flex flex-col bg-card border-l border-border">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+        <div className="flex items-center justify-between px-5 py-[0.85rem] border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center">
               <Icon name="MessageSquare" size={18} color="var(--color-primary)" />
@@ -313,7 +313,7 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
 
   return (
     <div className="w-full lg:w-[380px] xl:w-[420px] h-full flex flex-col bg-card border-l border-border min-h-0 animate-fade-in">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+      <div className="flex items-center justify-between px-5 py-[0.85rem] border-b border-border">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
             <Icon name="Folder" size={16} color="var(--color-primary)" />
