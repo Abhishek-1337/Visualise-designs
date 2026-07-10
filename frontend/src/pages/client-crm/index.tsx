@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import Sidebar, { TopBar } from '../../components/ui/Header';
+import Sidebar from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import AllClientsGrid from './components/AllClientsGrid';
@@ -394,8 +394,7 @@ const ClientCRM = () => {
     return (
       <div className="h-screen overflow-hidden bg-background">
         <Sidebar />
-        <TopBar />
-        <main className="md:ml-[240px] h-screen pt-[60px] overflow-hidden">
+        <main className="md:ml-[240px] h-screen overflow-hidden">
           <div className="flex items-center justify-center h-full">
             <div className="text-center max-w-md px-8 animate-fade-in">
               <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-6">
@@ -416,8 +415,7 @@ const ClientCRM = () => {
     return (
       <div className="h-screen overflow-hidden bg-background">
         <Sidebar />
-        <TopBar />
-        <main className="md:ml-[240px] h-screen pt-[60px] flex items-center justify-center">
+        <main className="md:ml-[240px] h-screen flex items-center justify-center">
           <div className="text-center animate-fade-in">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-muted-foreground">Loading clients...</p>
@@ -430,8 +428,7 @@ const ClientCRM = () => {
   return (
     <div className="h-screen overflow-hidden bg-background animate-fade-in">
       <Sidebar />
-      <TopBar />
-      <main className="md:ml-[240px] h-screen pt-[60px] flex flex-col overflow-hidden">
+      <main className="md:ml-[240px] h-screen flex flex-col overflow-hidden">
         <div className="flex-1 min-h-0 flex overflow-hidden">
           {!selectedClientId ? (
             <AllClientsGrid

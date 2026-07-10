@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import Sidebar, { TopBar } from '../../components/ui/Header';
+import Sidebar from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import ClientList from './components/ClientList';
 import ChatArea from './components/ChatArea';
@@ -276,8 +276,7 @@ const ClientMessaging = () => {
   return (
     <div className="min-h-screen bg-background animate-fade-in">
       <Sidebar />
-      <TopBar />
-      <main className="md:ml-[240px] pt-[60px] h-screen flex flex-col">
+      <main className="md:ml-[240px] h-screen flex flex-col">
         <div className="flex-1 flex overflow-hidden">
           <div className={`${
             showMobileList ? 'flex' : 'hidden'

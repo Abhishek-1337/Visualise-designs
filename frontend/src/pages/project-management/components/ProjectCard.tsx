@@ -86,11 +86,17 @@ const ProjectCard = ({ project, onStatusUpdate, onViewDetails }) => {
                   className="w-6 h-6 rounded-full border-2 border-card overflow-hidden bg-muted"
                   title={member?.name}
                 >
-                  <Image
-                    src={member?.avatar}
-                    alt={member?.avatarAlt}
-                    className="w-full h-full object-cover"
-                  />
+                  {member?.avatar ? (
+                    <Image
+                      src={member.avatar}
+                      alt={member.avatarAlt}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-[8px] font-bold text-primary">
+                      {member?.name?.[0]?.toUpperCase() || '?'}
+                    </div>
+                  )}
                 </div>
               ))}
               {project?.teamMembers?.length > 3 && (

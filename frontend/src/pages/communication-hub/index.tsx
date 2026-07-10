@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Sidebar, { TopBar } from '../../components/ui/Header';
+import Sidebar from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import CommunicationFeed from './components/CommunicationFeed';
 import AnalyticsSidebar from './components/AnalyticsSidebar';
@@ -106,8 +106,7 @@ const CommunicationHub = () => {
   return (
     <div className="min-h-screen bg-background animate-fade-in">
       <Sidebar />
-      <TopBar />
-      <main className="md:ml-[260px] pt-[60px]">
+      <main className="md:ml-[260px]">
         <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>

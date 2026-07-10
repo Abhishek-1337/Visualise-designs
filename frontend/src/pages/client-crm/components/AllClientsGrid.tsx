@@ -49,10 +49,10 @@ const AllClientsGrid: React.FC<AllClientsGridProps> = ({
 
   return (
     <div className="flex-1 min-h-0 flex flex-col min-w-0 overflow-hidden animate-fade-in">
-      <div className="px-6 py-6 border-b border-border shrink-0">
+      <div className="px-6 py-6 shrink-0">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Clients</h1>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">Clients</h1>
             <p className="text-sm text-muted-foreground mt-1">
               Select a client to view their profile, projects, and conversations.
             </p>

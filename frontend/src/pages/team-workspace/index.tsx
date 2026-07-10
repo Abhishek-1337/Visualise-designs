@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Sidebar, { TopBar } from '../../components/ui/Header';
+import Sidebar from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import Card from '../../components/shared/Card';
 import ActionButton from '../../components/shared/ActionButton';
@@ -107,8 +107,7 @@ const TeamWorkspace = () => {
     return (
       <div className="h-screen overflow-hidden bg-background">
         <Sidebar />
-        <TopBar />
-        <main className="md:ml-[240px] h-screen pt-[60px] flex items-center justify-center">
+        <main className="md:ml-[240px] h-screen  flex items-center justify-center">
           <div className="text-center animate-fade-in">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <p className="text-muted-foreground">Loading team data...</p>
@@ -121,12 +120,11 @@ const TeamWorkspace = () => {
   return (
     <div className="h-screen overflow-hidden bg-background animate-fade-in">
       <Sidebar />
-      {/* <TopBar /> */}
       <main className="md:ml-[240px] h-screen flex flex-col overflow-hidden">
-        <div className="px-6 py-4 border-b border-border shrink-0">
+        <div className="px-6 py-4 shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-foreground">Team</h1>
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">Team</h1>
               <p className="text-sm text-muted-foreground">{activeMembers.length} members</p>
             </div>
             <ActionButton icon="UserPlus" onClick={() => setShowInviteModal(true)}>

@@ -45,10 +45,16 @@ const SocialProof = () => {
           className="bg-card border border-border rounded-xl p-4 md:p-5 shadow-soft-sm">
 
             <div className="flex items-start gap-3 md:gap-4 mb-3">
+              {testimonial?.avatar ? (
               <Image
-              src={testimonial?.avatar}
-              alt={testimonial?.avatarAlt}
+              src={testimonial.avatar}
+              alt={testimonial.avatarAlt}
               className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover flex-shrink-0 ring-2 ring-border" />
+            ) : (
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 ring-2 ring-border text-base md:text-lg font-bold text-primary">
+                {testimonial?.name?.[0]?.toUpperCase() || '?'}
+              </div>
+            )}
 
               <div className="flex-1 min-w-0">
                 <h4 className="text-sm md:text-base font-semibold text-foreground">

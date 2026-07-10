@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { dealService } from '../../services';
-import Sidebar, { TopBar } from '../../components/ui/Header';
+import Sidebar from '../../components/ui/Header';
 import PipelineColumn from './components/PipelineColumn';
 import FilterBar from './components/FilterBar';
 import LeadDetailModal from './components/LeadDetailModal';
@@ -140,8 +140,7 @@ const LeadClientFlow = () => {
   return (
     <div className="min-h-screen bg-background">
       <Sidebar />
-      <TopBar />
-      <main className="md:ml-[260px] pt-[60px]">
+      <main className="md:ml-[260px]">
         <div className="px-4 lg:px-6 py-4 lg:py-6 animate-fade-in">
           <div className="mb-4 lg:mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">

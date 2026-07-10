@@ -1,12 +1,11 @@
-import React, { useState, createContext, useContext, useMemo, useEffect, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, createContext, useContext, useMemo, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../../store';
 import type { Role } from '../../types';
 import Icon from '../AppIcon';
 import { logout } from '../../store/slices/authSlice';
 import ThemeToggle from '../ThemeToggle';
-import { notificationService } from '../../services';
 
 interface NavItem {
   label: string;
@@ -24,8 +23,8 @@ const navItemConfig: NavItem[] = [
   // { label: 'Clients', path: '/client-profile', icon: 'UserCircle', tooltip: 'Client profiles & details', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
   { label: 'Client Chat', path: '/client-messaging', icon: 'MessageSquare', tooltip: 'Slack-like client messaging', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
   { label: 'Clients', path: '/client-crm', icon: 'UserCog', tooltip: 'Client profiles, projects & chat', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
-  { label: 'Comms', path: '/communication-hub', icon: 'MessageCircle', tooltip: 'Communication hub', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
-  { label: 'Payments', path: '/payments', icon: 'CreditCard', tooltip: 'Invoices & payments', roles: ['ADMIN', 'MANAGER'] },
+  // { label: 'Comms', path: '/communication-hub', icon: 'MessageCircle', tooltip: 'Communication hub', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  // { label: 'Payments', path: '/payments', icon: 'CreditCard', tooltip: 'Invoices & payments', roles: ['ADMIN', 'MANAGER'] },
   
   { label: 'Portal Home', path: '/client-portal', icon: 'LayoutDashboard', tooltip: 'Your collaboration portal', roles: ['CLIENT'] },
   { label: 'My Deals', path: '/client-portal/deals', icon: 'Briefcase', tooltip: 'View your deals', roles: ['CLIENT'] },
@@ -180,145 +179,6 @@ export const Sidebar: React.FC = () => {
   );
 };
 
-export const TopBar: React.FC = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
-  const { setIsMobileOpen } = useSidebarContext();
-  const navigate = useNavigate();
-  const userName = user?.name || 'User';
-  const userInitial = userName?.charAt(0)?.toUpperCase() || 'U';
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const notifRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (user?.role !== 'CLIENT') return;
-    const fetchNotifs = async () => {
-      try {
-        const res = await notificationService.getAll({ limit: '10' });
-        setNotifications(res.data.notifications || []);
-        setUnreadCount(res.data.unreadCount || 0);
-      } catch {}
-    };
-    fetchNotifs();
-    const interval = setInterval(fetchNotifs, 30000);
-    return () => clearInterval(interval);
-  }, [user?.role]);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
-        setShowNotifications(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleMarkAsRead = async (id: string) => {
-    try {
-      await notificationService.markAsRead(id);
-      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
-      setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch {}
-  };
-
-  const handleMarkAllAsRead = async () => {
-    try {
-      await notificationService.markAllAsRead();
-      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-      setUnreadCount(0);
-    } catch {}
-  };
-
-  return (
-    <header className="fixed top-0 left-0 right-0 z-[900] h-[64px] bg-card/80 backdrop-blur-lg border-b border-border flex items-center justify-between px-4 lg:px-6">
-      <div className="flex items-center gap-3">
-        <button onClick={() => setIsMobileOpen(true)} className="md:hidden p-2 rounded-lg transition-smooth hover:bg-muted" aria-label="Toggle menu">
-          <Icon name="Menu" size={20} color="currentColor" />
-        </button>
-        <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
-          <Icon name="ChevronRight" size={14} />
-          <span className="font-medium text-foreground">{user?.role === 'CLIENT' ? 'Client Portal' : 'Dashboard'}</span>
-        </div>
-      </div>
-      <div className="flex items-center gap-4">
-        {user?.role && user.role !== 'EMPLOYEE' && (
-          <span className={`hidden sm:inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold tracking-wider uppercase ${
-            user.role === 'ADMIN'
-              ? 'bg-primary/10 text-primary'
-              : 'bg-violet-50 text-violet-700 dark:bg-violet-950/30 dark:text-violet-400'
-          }`}>
-            {user.role}
-          </span>
-        )}
-
-        {user?.role === 'CLIENT' && (
-          <div className="relative" ref={notifRef}>
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="relative p-2 rounded-lg hover:bg-muted transition-smooth"
-            >
-              <Icon name="Bell" size={20} color="currentColor" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-error text-[10px] font-bold text-white px-1">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              )}
-            </button>
-
-            {showNotifications && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-xl shadow-soft-xl animate-scale-in overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                  <h3 className="text-sm font-semibold text-foreground">Notifications</h3>
-                  {unreadCount > 0 && (
-                    <button onClick={handleMarkAllAsRead} className="text-xs text-primary hover:underline font-medium">
-                      Mark all read
-                    </button>
-                  )}
-                </div>
-                <div className="max-h-80 overflow-y-auto">
-                  {notifications.length === 0 ? (
-                    <div className="p-8 text-center text-sm text-muted-foreground">No notifications yet</div>
-                  ) : (
-                    notifications.map((n: any) => (
-                      <div
-                        key={n.id}
-                        onClick={() => { if (!n.isRead) handleMarkAsRead(n.id); }}
-                        className={`px-4 py-3 border-b border-border/50 cursor-pointer transition-smooth hover:bg-muted/50 ${
-                          !n.isRead ? 'bg-primary/[0.02]' : ''
-                        }`}
-                      >
-                        <div className="flex items-start gap-3">
-                          {!n.isRead && <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />}
-                          <div className={!n.isRead ? '' : 'ml-5'}>
-                            <p className="text-sm font-medium text-foreground">{n.title}</p>
-                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{n.description}</p>
-                            <p className="text-[10px] text-muted-foreground mt-1">
-                              {new Date(n.createdAt).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold text-sm">
-          {user?.avatar ? (
-            <img src={user.avatar} alt={userName} className="w-8 h-8 rounded-full object-cover" />
-          ) : (
-            userInitial
-          )}
-        </div>
-        <span className="hidden sm:block text-sm font-medium text-foreground">{userName}</span>
-      </div>
-    </header>
-  );
-};
 
 export default Sidebar;

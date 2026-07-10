@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar, { TopBar } from '../../components/ui/Header';
+import Sidebar from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import { invoiceService, paymentService } from '../../services';
@@ -62,8 +62,7 @@ const Payments = () => {
   return (
     <div className="min-h-screen bg-background">
       <Sidebar />
-      <TopBar />
-      <main className="md:ml-[260px] pt-[60px]">
+      <main className="md:ml-[260px]">
         <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10">
           <div className="mb-6 md:mb-8 animate-fade-in">
             <h1 className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-2">Payments</h1>

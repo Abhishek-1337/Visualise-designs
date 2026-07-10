@@ -177,11 +177,17 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <div className="w-5 h-5 rounded-full overflow-hidden bg-muted ring-2 ring-card">
-                                    <Image
-                                      src={task?.assignee?.avatar}
-                                      alt={task?.assignee?.avatarAlt}
-                                      className="w-full h-full object-cover"
-                                    />
+                                    {task?.assignee?.avatar ? (
+                                      <Image
+                                        src={task.assignee.avatar}
+                                        alt={task.assignee.avatarAlt}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center text-[8px] font-bold text-primary">
+                                        {task?.assignee?.name?.[0]?.toUpperCase() || '?'}
+                                      </div>
+                                    )}
                                   </div>
                                   <span>{task?.assignee?.name}</span>
                                 </div>
@@ -229,11 +235,17 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
                   className="flex items-center gap-4 p-4 bg-background rounded-lg border border-border/50 hover:border-primary/30 hover:shadow-soft-sm transition-smooth"
                 >
                   <div className="w-12 h-12 rounded-full overflow-hidden bg-muted flex-shrink-0 ring-2 ring-card">
-                    <Image
-                      src={member?.avatar}
-                      alt={member?.avatarAlt}
-                      className="w-full h-full object-cover"
-                    />
+                    {member?.avatar ? (
+                      <Image
+                        src={member.avatar}
+                        alt={member.avatarAlt}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-sm font-bold text-primary">
+                        {member?.name?.[0]?.toUpperCase() || '?'}
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-foreground mb-1 line-clamp-1">{member?.name}</h4>

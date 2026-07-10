@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar, { TopBar } from '../../components/ui/Header';
+import Sidebar from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import { Card, StatusBadge, EmptyState } from '../../components/shared';
 import { projectService } from '../../services';
@@ -29,8 +29,7 @@ const ClientProjects = () => {
   return (
     <div className="h-screen overflow-hidden bg-background animate-fade-in">
       <Sidebar />
-      <TopBar />
-      <main className="md:ml-[240px] h-screen pt-[60px] overflow-y-auto">
+      <main className="md:ml-[240px] h-screen overflow-y-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between mb-8">
             <div>

@@ -56,7 +56,7 @@ const ActivityFeed = ({ activities }: ActivityFeedProps) => {
           return (
             <div
               key={activity?.id}
-              className="flex gap-3 md:gap-4 p-3 md:p-4 bg-background rounded-xl border border-border/50 transition-smooth hover:bg-muted/50"
+              className="flex items-center gap-3 md:gap-4 p-3 md:p-4 bg-background rounded-xl border border-border/50 transition-smooth hover:bg-muted/50"
             >
               <div className="flex-shrink-0">
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-card border border-border flex items-center justify-center shadow-soft-sm">
@@ -73,16 +73,22 @@ const ActivityFeed = ({ activities }: ActivityFeedProps) => {
                   </span>
                 </div>
 
-                <p className="text-xs md:text-sm text-muted-foreground line-clamp-2 mb-2">
+                <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
                   {activity?.description}
                 </p>
 
                 <div className="flex items-center gap-2">
-                  <Image
-                    src={activity?.userAvatar}
-                    alt={activity?.userAvatarAlt}
-                    className="w-6 h-6 rounded-full object-cover ring-1 ring-border"
-                  />
+                  {activity?.userAvatar ? (
+                    <Image
+                      src={activity.userAvatar}
+                      alt={activity.userAvatarAlt}
+                      className="w-3 h-3 rounded-full object-cover ring-1 ring-border"
+                    />
+                  ) : (
+                    <div className="w-3 h-3 rounded-full bg-primary/10 flex items-center justify-center text-[5px] font-bold text-primary ring-1 ring-border">
+                      {activity?.userName?.[0]?.toUpperCase() || '?'}
+                    </div>
+                  )}
                   <span className="text-xs text-muted-foreground">{activity?.userName}</span>
                   {activity?.projectName && (
                     <>

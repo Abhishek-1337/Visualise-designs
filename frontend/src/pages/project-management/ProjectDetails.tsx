@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Sidebar, { TopBar } from '../../components/ui/Header';
+import Sidebar from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 import Button from '../../components/ui/Button';
@@ -202,8 +202,7 @@ const ProjectDetails = () => {
     return (
       <div className="min-h-screen bg-background">
         <Sidebar />
-        <TopBar />
-        <main className="md:ml-[240px] pt-[60px]">
+        <main className="md:ml-[240px] ">
           <div className="flex items-center justify-center h-[60vh]">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
@@ -216,8 +215,7 @@ const ProjectDetails = () => {
     return (
       <div className="min-h-screen bg-background">
         <Sidebar />
-        <TopBar />
-        <main className="md:ml-[240px] pt-[60px]">
+        <main className="md:ml-[240px] ">
           <div className="flex items-center justify-center h-[60vh]">
             <p className="text-muted-foreground">Project not found</p>
           </div>
@@ -229,8 +227,7 @@ const ProjectDetails = () => {
   return (
     <div className="min-h-screen bg-background">
       <Sidebar />
-      <TopBar />
-      <main className="md:ml-[240px] pt-[60px]">
+      <main className="md:ml-[240px] ">
         <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10 animate-fade-in">
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">

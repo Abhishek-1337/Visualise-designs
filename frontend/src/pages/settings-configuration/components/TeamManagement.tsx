@@ -192,10 +192,16 @@ const TeamManagement = () => {
               <div className="relative">
                 {member.kind === 'member' ? (
                   <>
-                    <AppImage
-                      src={member?.avatar}
-                      alt={member?.name}
-                      className="w-10 h-10 rounded-full object-cover ring-2 ring-border" />
+                    {member?.avatar ? (
+                      <AppImage
+                        src={member.avatar}
+                        alt={member.name}
+                        className="w-10 h-10 rounded-full object-cover ring-2 ring-border" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center ring-2 ring-border font-semibold text-primary text-sm">
+                        {member?.name?.[0]?.toUpperCase() || '?'}
+                      </div>
+                    )}
                     <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card ${
                       member?.isActive ? 'bg-success' : 'bg-muted-foreground'
                     }`} />

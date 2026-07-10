@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import type { RootState } from '../../store';
-import Sidebar, { TopBar } from '../../components/ui/Header';
+import Sidebar from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import TodaysFocusCard from './components/TodaysFocusCard';
 import MoneySnapshotCard from './components/MoneySnapshotCard';
@@ -115,8 +115,7 @@ const HomeDashboard = () => {
       <div className="flex">
           <Sidebar />
           <div className="w-[240px]"></div>
-          <TopBar />
-          <main className="flex-1 pt-[60px]">
+          <main className="flex-1">
             <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-12 animate-fade-in">
               <div className="mb-8 lg:mb-12">
                 <h1 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-foreground mb-2">

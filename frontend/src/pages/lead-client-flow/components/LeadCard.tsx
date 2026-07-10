@@ -74,11 +74,17 @@ const LeadCard = ({ lead, onDragStart, onClick, onQuickAction }: LeadCardProps) 
       className="bg-background rounded-lg p-4 border border-border cursor-move hover-lift active-press transition-smooth hover:border-primary/30 hover:shadow-soft-sm"
     >
       <div className="flex items-start gap-3 mb-3">
-        <Image
-          src={lead?.avatar}
-          alt={lead?.avatarAlt}
-          className="w-10 h-10 rounded-full object-cover flex-shrink-0 ring-2 ring-card"
-        />
+        {lead?.avatar ? (
+          <Image
+            src={lead.avatar}
+            alt={lead.avatarAlt}
+            className="w-10 h-10 rounded-full object-cover flex-shrink-0 ring-2 ring-card"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 ring-2 ring-card text-base font-bold text-primary">
+            {lead?.clientName?.[0]?.toUpperCase() || '?'}
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <h4 className="font-heading font-semibold text-sm text-foreground truncate">
             {lead?.clientName}

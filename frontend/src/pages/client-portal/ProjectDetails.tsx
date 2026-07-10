@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import Sidebar, { TopBar } from '../../components/ui/Header';
+import Sidebar from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import { Card, StatusBadge, EmptyState } from '../../components/shared';
 import { projectService, messageService, taskService, fileService } from '../../services';
@@ -105,8 +105,7 @@ const ClientProjectDetails = () => {
   return (
     <div className="h-screen overflow-hidden bg-background animate-fade-in">
       <Sidebar />
-      <TopBar />
-      <main className="md:ml-[240px] h-screen pt-[60px] flex flex-col overflow-hidden">
+      <main className="md:ml-[240px] h-screen flex flex-col overflow-hidden">
         {/* Header */}
         <div className="bg-card border-b border-border px-6 py-4 shadow-soft-sm">
           <div className="flex items-center gap-4 mb-4">

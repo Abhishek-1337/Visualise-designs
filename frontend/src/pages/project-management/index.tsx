@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import Sidebar, { TopBar } from '../../components/ui/Header';
+import Sidebar from '../../components/ui/Header';
 import Button from '../../components/ui/Button';
 import ProjectCard from './components/ProjectCard';
 import ProjectDetailPanel from './components/ProjectDetailPanel';
@@ -190,15 +190,14 @@ const ProjectManagement = () => {
       </Helmet>
       <div className="min-h-screen bg-background">
         <Sidebar />
-        <TopBar />
-        <main className="md:ml-[240px] pt-[60px]">
+        <main className="md:ml-[240px]">
           <div className="max-w-[1600px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-10 animate-fade-in">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6 md:mb-8">
               <div>
-                <h1 className="font-heading font-bold text-3xl md:text-4xl lg:text-5xl text-foreground mb-2">
+                <h1 className="font-heading font-bold text-2xl md:text-3xl lg:text-4xl text-foreground mb-2">
                   Project Management
                 </h1>
-                <p className="text-base md:text-lg text-muted-foreground">
+                <p className="text-sm md:text-base text-muted-foreground">
                   Track milestones, manage tasks, and collaborate with your team
                 </p>
               </div>

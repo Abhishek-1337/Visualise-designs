@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Sidebar, { TopBar } from '../../components/ui/Header';
+import Sidebar from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import ClientHeader from './components/ClientHeader';
 import OverviewTab from './components/OverviewTab';
@@ -59,8 +59,7 @@ const ClientProfile = () => {
   return (
     <div className="min-h-screen bg-background animate-fade-in">
       <Sidebar />
-      <TopBar />
-      <main className="md:ml-[260px] pt-[60px]">
+      <main className="md:ml-[260px]">
         <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8">
           <div className="mb-6">
             <button

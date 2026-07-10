@@ -39,11 +39,17 @@ const LeadDetailModal = ({ lead, onClose }) => {
 
         <div className="p-6 space-y-6">
           <div className="flex items-start gap-4">
-            <Image
-              src={lead?.avatar}
-              alt={lead?.avatarAlt}
-              className="w-20 h-20 rounded-full object-cover flex-shrink-0 ring-2 ring-card"
-            />
+            {lead?.avatar ? (
+              <Image
+                src={lead.avatar}
+                alt={lead.avatarAlt}
+                className="w-20 h-20 rounded-full object-cover flex-shrink-0 ring-2 ring-card"
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 ring-2 ring-card text-2xl font-bold text-primary">
+                {lead?.clientName?.[0]?.toUpperCase() || '?'}
+              </div>
+            )}
             <div className="flex-1">
               <h3 className="font-heading font-semibold text-2xl text-foreground mb-1">
                 {lead?.clientName}
