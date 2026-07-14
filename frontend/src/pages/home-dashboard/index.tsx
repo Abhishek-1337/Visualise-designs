@@ -11,19 +11,25 @@ import DailySummaryCard from './components/DailySummaryCard';
 import Button from '../../components/ui/Button';
 import { seedService } from '../../services';
 
-const roleGreetings: Record<string, { title: string; subtitle: string }> = {
+const roleGreetings: Record<string, { name: string; subtitle: string }> = {
   ADMIN: {
-    title: 'Good morning, Admin',
+    name: 'Admin',
     subtitle: 'Your command center — manage your team, projects, and business at a glance.',
   },
   MANAGER: {
-    title: 'Good morning, Manager',
+    name: 'Manager',
     subtitle: 'Track your team\'s progress, client projects, and pipeline updates.',
   },
   EMPLOYEE: {
-    title: 'Good morning',
+    name: '',
     subtitle: 'Here\'s what needs your attention today.',
   },
+};
+
+const getTimeOfDay = (hours: number): string => {
+  if (hours < 12) return 'Good morning';
+  if (hours < 17) return 'Good afternoon';
+  return 'Good evening';
 };
 
 const today = new Date().toLocaleDateString('en-US', {
@@ -37,6 +43,10 @@ const HomeDashboard = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const role = user?.role || 'EMPLOYEE';
   const greeting = roleGreetings[role] || roleGreetings.EMPLOYEE;
+
+  const now = new Date();
+  const timeOfDay = getTimeOfDay(now.getHours());
+  const greetingTitle = greeting.name ? `${timeOfDay}, ${greeting.name}` : timeOfDay;
 
   const [seeding, setSeeding] = useState(false);
   const [seedMsg, setSeedMsg] = useState('');
@@ -78,18 +88,11 @@ const HomeDashboard = () => {
           <div className="max-w-[1400px] mx-auto px-6 py-8 animate-fade-in">
             <div className="flex items-start justify-between mb-8">
               <div>
-                <h1 className="text-2xl font-bold text-foreground">{greeting.title}</h1>
+                <h1 className="text-2xl font-bold text-foreground">{greetingTitle}</h1>
                 <p className="text-sm text-muted-foreground mt-1">{greeting.subtitle}</p>
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-sm text-muted-foreground">{today}</span>
-                {role !== 'EMPLOYEE' && (
-                  <Link to="/team-workspace">
-                    <Button variant="default" size="sm" iconName="UserPlus">
-                      Invite Member
-                    </Button>
-                  </Link>
-                )}
               </div>
             </div>
 
