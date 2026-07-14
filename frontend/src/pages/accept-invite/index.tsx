@@ -105,7 +105,7 @@ const AcceptInvite = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-warm-offwhite to-indigo-50/30 flex items-center justify-center">
         <div className="animate-fade-in">
-          <div className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-sm text-muted-foreground">Verifying invitation...</p>
         </div>
       </div>
@@ -145,7 +145,7 @@ const AcceptInvite = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-warm-offwhite to-indigo-50/30 flex items-center justify-center p-4">
         <div className="w-full max-w-md animate-fade-in">
           <div className="text-center mb-8">
-            <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-200/50">
+            <div className="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-accent/20">
               <Icon name="Sparkles" size={30} color="var(--color-accent)" />
             </div>
             <h1 className="font-heading font-bold text-2xl text-foreground">Accept Invitation</h1>
@@ -155,7 +155,7 @@ const AcceptInvite = () => {
           </div>
 
           <div className="bg-card border border-border rounded-xl shadow-soft-lg p-6 sm:p-8">
-            <div className="mb-6 p-4 bg-gradient-to-r from-indigo-50/50 to-slate-50 rounded-lg border border-indigo-100/50">
+            <div className="mb-6 p-4 bg-muted/50 rounded-lg border border-border">
               <div className="flex items-center gap-3 mb-2">
                 <Icon name="Mail" size={16} color="var(--color-primary)" />
                 <span className="text-sm text-foreground font-medium">{invite?.email}</span>
@@ -232,16 +232,16 @@ const AcceptInvite = () => {
                 <label htmlFor="showPassword" className="text-xs text-muted-foreground">Show password</label>
               </div>
 
-              <Button type="submit" variant="default" size="lg" fullWidth loading={submitting} iconName="UserPlus" iconPosition="left" className="bg-gradient-primary">
+              <Button type="submit" variant="default" size="lg" fullWidth loading={submitting} iconName="UserPlus" iconPosition="left" className="bg-slate-700 dark:text-slate-200">
                 Accept Invitation & Set Up Account
               </Button>
             </form>
           </div>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-slate-800">
               Already have an account?{' '}
-              <Link to="/login" className="text-primary hover:text-primary/80 font-medium transition-smooth">Sign In</Link>
+              <Link to="/login" className="text-blue-700 hover:text-primary/80 font-medium transition-smooth">Sign In</Link>
             </p>
           </div>
         </div>
