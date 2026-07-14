@@ -170,7 +170,7 @@ const Login = () => {
                   onClick={() => handleOAuthLogin(btn.provider)}
                   className={btn.color}
                 >
-                  <Icon name={btn.icon} size={20} />
+                  <Icon name={btn.icon} size={20} className="mr-3" />
                   {btn.label}
                 </Button>
               ))}
@@ -201,7 +201,7 @@ const Login = () => {
                   <p className="text-xs text-destructive/80 whitespace-pre-line">{errors?.submit}</p>
                 </div>
               )}
-              <Button type="submit" variant="default" size="lg" fullWidth loading={isLoading} iconName="LogIn" iconPosition="right" className="bg-gradient-primary">
+              <Button type="submit" variant="default" size="lg" fullWidth loading={isLoading} iconName="LogIn" iconPosition="right" className="bg-slate-700 dark:text-slate-200">
                 {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
             </form>

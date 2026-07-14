@@ -218,7 +218,7 @@ const RegistrationForm = () => {
         </div>
       </div>
 
-      <div className="flex items-start gap-3 pt-2">
+      <div className="flex items-center gap-3 pt-2">
         <Checkbox
           checked={formData.agreeToTerms}
           onChange={(e) => handleInputChange('agreeToTerms', (e.target as HTMLInputElement).checked)}
@@ -233,7 +233,7 @@ const RegistrationForm = () => {
         </div>
       </div>
 
-      <Button type="submit" variant="default" size="lg" fullWidth loading={isSubmitting} iconName="UserPlus" iconPosition="left" className="bg-gradient-primary">
+      <Button type="submit" variant="default" size="lg" fullWidth loading={isSubmitting} iconName="UserPlus" iconPosition="left" className="bg-slate-700 dark:text-slate-200">
         Create Account
       </Button>
     </form>

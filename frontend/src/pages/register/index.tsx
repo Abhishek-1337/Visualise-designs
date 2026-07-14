@@ -107,7 +107,7 @@ const Register = () => {
                     onClick={() => handleOAuthLogin(btn.provider)}
                     className={btn.color}
                   >
-                    <Icon name={btn.icon} size={20} />
+                    <Icon name={btn.icon} size={20} className="mr-3" />
                     {btn.label}
                   </Button>
                 ))}
