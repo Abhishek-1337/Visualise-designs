@@ -2,7 +2,7 @@ import React from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const EmptyState = ({ onCreateProject }) => {
+const EmptyState = ({ onCreateProject, canCreateProject = true }) => {
   return (
     <div className="bg-card rounded-lg shadow-soft-lg p-8 md:p-12 lg:p-16 text-center border border-border/50">
       <div className="max-w-md mx-auto">
@@ -16,15 +16,17 @@ const EmptyState = ({ onCreateProject }) => {
           Start tracking your architectural visualization projects by creating your first project or adjust your filters to see existing projects.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button
-            variant="default"
-            size="lg"
-            iconName="Plus"
-            iconPosition="left"
-            onClick={onCreateProject}
-          >
-            Create New Project
-          </Button>
+          {canCreateProject && (
+            <Button
+              variant="default"
+              size="lg"
+              iconName="Plus"
+              iconPosition="left"
+              onClick={onCreateProject}
+            >
+              Create New Project
+            </Button>
+          )}
           <Button
             variant="outline"
             size="lg"

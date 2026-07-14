@@ -478,8 +478,8 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
 export const createProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
-    if (authReq.user.role === 'CLIENT') {
-      res.status(403).json({ error: 'Clients cannot create projects' });
+    if (authReq.user.role === 'CLIENT' || authReq.user.role === 'EMPLOYEE') {
+      res.status(403).json({ error: 'You do not have permission to create projects' });
       return;
     }
     const { name, description, status, budget, contactId, memberIds, startDate, endDate, dealId } = req.body;

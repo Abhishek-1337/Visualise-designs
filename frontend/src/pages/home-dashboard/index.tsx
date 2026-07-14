@@ -8,6 +8,8 @@ import TodaysFocusCard from './components/TodaysFocusCard';
 import MoneySnapshotCard from './components/MoneySnapshotCard';
 import QuickAccessWidget from './components/QuickAccessWidget';
 import DailySummaryCard from './components/DailySummaryCard';
+import MyWorkStatsCard from './components/MyWorkStatsCard';
+import MyProjectsCard from './components/MyProjectsCard';
 import Button from '../../components/ui/Button';
 import { seedService } from '../../services';
 
@@ -46,7 +48,10 @@ const HomeDashboard = () => {
 
   const now = new Date();
   const timeOfDay = getTimeOfDay(now.getHours());
-  const greetingTitle = greeting.name ? `${timeOfDay}, ${greeting.name}` : timeOfDay;
+  const firstName = user?.name?.split(' ')?.[0];
+  const greetingName = greeting.name || firstName || '';
+  const greetingTitle = greetingName ? `${timeOfDay}, ${greetingName}` : timeOfDay;
+  const isEmployee = role === 'EMPLOYEE';
 
   const [seeding, setSeeding] = useState(false);
   const [seedMsg, setSeedMsg] = useState('');
@@ -98,11 +103,11 @@ const HomeDashboard = () => {
 
             <div className="grid grid-cols-2 gap-6 mb-8">
               <TodaysFocusCard />
-              <MoneySnapshotCard />
+              {isEmployee ? <MyProjectsCard /> : <MoneySnapshotCard />}
             </div>
 
             <div className="mb-8">
-              <DailySummaryCard />
+              {isEmployee ? <MyWorkStatsCard /> : <DailySummaryCard />}
             </div>
 
             <div className="mb-8">

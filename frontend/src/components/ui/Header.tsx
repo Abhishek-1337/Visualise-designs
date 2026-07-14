@@ -21,8 +21,8 @@ const navItemConfig: NavItem[] = [
   { label: 'Projects', path: '/project-management', icon: 'FolderKanban', tooltip: 'Track project milestones', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
   { label: 'Team', path: '/team-workspace', icon: 'Users', tooltip: 'Collaborative workspace', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
   // { label: 'Clients', path: '/client-profile', icon: 'UserCircle', tooltip: 'Client profiles & details', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
-  { label: 'Client Chat', path: '/client-messaging', icon: 'MessageSquare', tooltip: 'Slack-like client messaging', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
-  { label: 'Clients', path: '/client-crm', icon: 'UserCog', tooltip: 'Client profiles, projects & chat', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  { label: 'Client Chat', path: '/client-messaging', icon: 'MessageSquare', tooltip: 'Slack-like client messaging', roles: ['ADMIN', 'MANAGER'] },
+  { label: 'Clients', path: '/client-crm', icon: 'UserCog', tooltip: 'Client profiles, projects & chat', roles: ['ADMIN', 'MANAGER'] },
   // { label: 'Comms', path: '/communication-hub', icon: 'MessageCircle', tooltip: 'Communication hub', roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'] },
   // { label: 'Payments', path: '/payments', icon: 'CreditCard', tooltip: 'Invoices & payments', roles: ['ADMIN', 'MANAGER'] },
   

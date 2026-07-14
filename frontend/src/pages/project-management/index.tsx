@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../store';
 import { Helmet } from 'react-helmet';
 import Sidebar from '../../components/ui/Header';
 import Button from '../../components/ui/Button';
@@ -45,6 +47,8 @@ const mapProject = (p: any) => ({
 });
 
 const ProjectManagement = () => {
+  const { user } = useSelector((state: RootState) => state.auth);
+  const canCreateProject = user?.role !== 'EMPLOYEE' && user?.role !== 'CLIENT';
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [filters, setFilters] = useState({
     search: '', status: 'all', client: 'all', sort: 'deadline',
@@ -201,9 +205,11 @@ const ProjectManagement = () => {
                   Track milestones, manage tasks, and collaborate with your team
                 </p>
               </div>
-              <Button variant="default" size="lg" iconName="Plus" iconPosition="left" onClick={handleCreateProject} className="lg:w-auto">
-                New Project
-              </Button>
+              {canCreateProject && (
+                <Button variant="default" size="lg" iconName="Plus" iconPosition="left" onClick={handleCreateProject} className="lg:w-auto">
+                  New Project
+                </Button>
+              )}
             </div>
 
             {loading ? (
@@ -229,7 +235,7 @@ const ProjectManagement = () => {
                     ))}
                   </div>
                 ) : (
-                  <EmptyState onCreateProject={handleCreateProject} />
+                  <EmptyState onCreateProject={handleCreateProject} canCreateProject={canCreateProject} />
                 )}
               </>
             )}
