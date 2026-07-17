@@ -49,7 +49,7 @@ const Routes = () => {
         <ScrollToTop />
         <RouterRoutes>
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* <Route path="/register" element={<Register />} /> */}
           <Route path="/tenant-signup" element={<TenantSignup />} />
           <Route path="/accept-invite" element={<AcceptInvite />} />
           <Route path="/auth/callback" element={<AuthCallback />} />

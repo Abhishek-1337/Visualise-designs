@@ -207,10 +207,10 @@ const Login = () => {
             </form>
 
             <div className="mt-6 pt-6 border-t border-border space-y-3">
-              <p className="text-center text-sm text-muted-foreground">
+              {/* <p className="text-center text-sm text-muted-foreground">
                 Don't have an account?{' '}
                 <Link to="/register" className="font-medium text-amber-600 hover:text-amber-700 transition-smooth">Create Account</Link>
-              </p>
+              </p> */}
               <p className="text-center text-sm text-muted-foreground">
                 Want to register your company?{' '}
                 <Link to="/tenant-signup" className="font-medium text-primary hover:text-primary/80 transition-smooth">Sign up as Studio</Link>
