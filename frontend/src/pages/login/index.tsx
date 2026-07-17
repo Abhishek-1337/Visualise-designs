@@ -94,9 +94,9 @@ const Login = () => {
   ];
 
   const oauthButtons = [
-    { provider: 'google', label: 'Sign in with Google', icon: 'Chrome', color: 'bg-slate-200 text-foreground border-border hover:bg-muted hover:border-foreground/20 transition-colors', enabled: oauthConfig?.google?.enabled !== false },
-    { provider: 'github', label: 'Sign in with GitHub', icon: 'Github', color: 'bg-foreground text-background border-foreground hover:bg-foreground/90 hover:text-slate-300 hover:border-foreground/90 transition-colors', enabled: oauthConfig?.github?.enabled !== false },
-    { provider: 'microsoft', label: 'Sign in with Microsoft', icon: 'Monitor', color: 'bg-blue-600 hover:bg-blue-500 text-white border-blue-600 hover:border-blue-500 hover:text-slate-300 transition-colors', enabled: oauthConfig?.microsoft?.enabled !== false }
+    { provider: 'google', label: 'Sign in with Google', icon: 'Chrome', color: 'bg-slate-200 text-foreground border-border hover:bg-muted hover:border-foreground/20 transition-colors dark:text-slate-700 dark:bg-slate-200 dark:hover:bg-slate-300 dark:hover:text-slate-800', enabled: oauthConfig?.google?.enabled !== false },
+    { provider: 'github', label: 'Sign in with GitHub', icon: 'Github', color: 'bg-foreground text-background border-foreground hover:bg-foreground/90 hover:text-slate-300 hover:border-foreground/90 transition-colors dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 dark:border-0', enabled: oauthConfig?.github?.enabled !== false },
+    { provider: 'microsoft', label: 'Sign in with Microsoft', icon: 'Monitor', color: 'bg-blue-600 hover:bg-blue-500 text-white border-blue-600 hover:border-blue-500 hover:text-slate-300 transition-colors dark:hover:text-slate-100 dark:text-slate-200', enabled: oauthConfig?.microsoft?.enabled !== false }
   ];
 
   const handleOAuthLogin = (provider) => {
