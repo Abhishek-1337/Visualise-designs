@@ -121,7 +121,7 @@ const ClientWorkspace: React.FC<ClientWorkspaceProps> = ({
 
   return (
     <div className="flex-1 min-h-0 flex flex-col min-w-0 bg-background overflow-hidden animate-fade-in">
-      <div className="px-6 py-4 border-b border-border shrink-0 bg-slate-800 h-16">
+      <div className="px-6 py-4 border-b border-border shrink-0 dark:bg-slate-800 h-16 bg-white">
         
         <div className="flex items-center p-2 gap-2 text-xs text-muted-foreground">
           <button
