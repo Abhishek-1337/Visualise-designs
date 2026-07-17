@@ -78,7 +78,7 @@ const TodaysFocusCard = () => {
           ))}
         </div>
       ) : localTasks.length === 0 ? (
-        <div className="text-center py-8">
+        <div className="text-center py-8 flex gap-2 justify-center">
           <Icon name="CheckCircle2" size={36} color="var(--color-muted-foreground)" />
           <p className="text-sm text-muted-foreground mt-2">No tasks for today</p>
         </div>
