@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../../store';
 import Icon from '../../../components/AppIcon';
+import { userService } from '../../../services';
 
 const SecuritySettings = () => {
+  const { user } = useSelector((state: RootState) => state.auth);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [sessionTimeout, setSessionTimeout] = useState('8h');
   const [passwordPolicy, setPasswordPolicy] = useState({
@@ -13,6 +17,22 @@ const SecuritySettings = () => {
   });
   const [showPasswordForm, setShowPasswordForm] = useState(false);
 
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  useEffect(() => {
+    if (passwordMessage) {
+      const timer = setTimeout(() => setPasswordMessage(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [passwordMessage]);
+
   const activeSessions = [
     { id: 1, device: 'MacBook Pro', browser: 'Chrome 120', location: 'New York, US', lastActive: 'Now', current: true },
     { id: 2, device: 'iPhone 15', browser: 'Safari Mobile', location: 'New York, US', lastActive: '2 hours ago', current: false },
@@ -20,6 +40,35 @@ const SecuritySettings = () => {
   ];
 
   const securityScore = twoFactorEnabled ? 85 : 60;
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPasswordMessage({ type: 'error', text: 'All password fields are required' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordMessage({ type: 'error', text: 'New passwords do not match' });
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordMessage({ type: 'error', text: 'Password must be at least 6 characters' });
+      return;
+    }
+    try {
+      setChangingPassword(true);
+      setPasswordMessage(null);
+      await userService.updatePassword({ currentPassword, newPassword });
+      setPasswordMessage({ type: 'success', text: 'Password updated successfully' });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      setPasswordMessage({ type: 'error', text: err.response?.data?.error || 'Failed to change password' });
+    } finally {
+      setChangingPassword(false);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -133,19 +182,87 @@ const SecuritySettings = () => {
           ))}
         </div>
         <button
-          onClick={() => setShowPasswordForm(!showPasswordForm)}
+          onClick={() => {
+            setShowPasswordForm(!showPasswordForm);
+            setPasswordMessage(null);
+            if (showPasswordForm) {
+              setCurrentPassword('');
+              setNewPassword('');
+              setConfirmPassword('');
+            }
+          }}
           className="mt-4 flex items-center gap-2 text-sm text-primary font-medium hover:opacity-80 transition-smooth"
         >
           <Icon name="Key" size={14} color="currentColor" />
           Change Password
         </button>
         {showPasswordForm && (
-          <div className="mt-4 space-y-3 p-4 bg-muted/30 rounded-xl border border-border">
-            <input type="password" placeholder="Current password" className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
-            <input type="password" placeholder="New password" className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
-            <input type="password" placeholder="Confirm new password" className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
-            <button className="px-4 py-2 bg-gradient-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 shadow-soft-sm">Update Password</button>
-          </div>
+          <form onSubmit={handleChangePassword} className="mt-4 space-y-3 p-4 bg-muted/30 rounded-xl border border-border">
+            {passwordMessage && (
+              <div className={`px-3 py-2 rounded-lg text-xs font-medium ${
+                passwordMessage.type === 'success'
+                  ? 'bg-success/10 text-success border border-success/20'
+                  : 'bg-error/10 text-error border border-error/20'
+              }`}>
+                {passwordMessage.text}
+              </div>
+            )}
+            <div className="relative">
+              <input
+                type={showCurrentPassword ? 'text' : 'password'}
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Current password"
+                className="w-full px-3 py-2 pr-10 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-smooth"
+              >
+                <Icon name={showCurrentPassword ? 'EyeOff' : 'Eye'} size={14} color="currentColor" />
+              </button>
+            </div>
+            <div className="relative">
+              <input
+                type={showNewPassword ? 'text' : 'password'}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="New password"
+                className="w-full px-3 py-2 pr-10 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-smooth"
+              >
+                <Icon name={showNewPassword ? 'EyeOff' : 'Eye'} size={14} color="currentColor" />
+              </button>
+            </div>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm new password"
+                className="w-full px-3 py-2 pr-10 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-smooth"
+              >
+                <Icon name={showConfirmPassword ? 'EyeOff' : 'Eye'} size={14} color="currentColor" />
+              </button>
+            </div>
+            <button
+              type="submit"
+              disabled={changingPassword || !currentPassword || !newPassword || !confirmPassword}
+              className="px-4 py-2 bg-gradient-primary text-primary-foreground rounded-lg text-sm font-medium transition-smooth hover:opacity-90 shadow-soft-sm disabled:opacity-50"
+            >
+              {changingPassword ? 'Updating...' : 'Update Password'}
+            </button>
+          </form>
         )}
       </div>
       {/* Active Sessions */}
