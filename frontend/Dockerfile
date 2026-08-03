@@ -8,10 +8,15 @@ COPY . .
 RUN npm run build
 
 
-FROM nginx:alpine
-COPY --from=builder /app/frontend/build /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+FROM node:22-alpine
+
+RUN npm install -g serve
+
+COPY --from=builder /app/frontend/build ./build
+
+EXPOSE 4173
+
+CMD ["serve", "-s", "build", "-l", "4173"]
 
 
 ##Old code that I tried
