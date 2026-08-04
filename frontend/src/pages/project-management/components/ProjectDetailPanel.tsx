@@ -9,6 +9,8 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('timeline');
 
+  console.log(project);
+
   const tabs = [
     { id: 'timeline', label: 'Timeline', icon: 'Calendar' },
     { id: 'tasks', label: 'Tasks', icon: 'CheckSquare' },
