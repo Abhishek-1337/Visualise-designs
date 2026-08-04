@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import { StatusBadge, IconButton, EmptyState } from '../../../components/shared';
-import { taskService, userService } from '../../../services';
+import { taskService } from '../../../services';
 
 interface Message {
   id: string | number;
@@ -167,7 +167,6 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
     title: '', description: '', priority: 'MEDIUM', phase: 'Concept', status: 'TODO', dueDate: '', assignedToId: '',
   });
   const [creatingTask, setCreatingTask] = useState(false);
-  const [availableUsers, setAvailableUsers] = useState<any[]>([]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -198,27 +197,13 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
     }
   };
 
-  const handleOpenCreateTask = async () => {
-    try {
-      const res = await userService.getAllUsers({ limit: 100 });
-      const staff = (res.data.users || []).filter((u: any) => u.role !== 'CLIENT');
-      setAvailableUsers(staff);
-    } catch {
-      setAvailableUsers([]);
-    }
+  const handleOpenCreateTask = () => {
     setEditingTask(null);
     setTaskForm({ title: '', description: '', priority: 'MEDIUM', phase: 'Concept', status: 'TODO', dueDate: '', assignedToId: '' });
     setShowCreateTask(true);
   };
 
-  const handleOpenEditTask = async (task: any) => {
-    try {
-      const res = await userService.getAllUsers({ limit: 100 });
-      const staff = (res.data.users || []).filter((u: any) => u.role !== 'CLIENT');
-      setAvailableUsers(staff);
-    } catch {
-      setAvailableUsers([]);
-    }
+  const handleOpenEditTask = (task: any) => {
     setEditingTask(task);
     setTaskForm({
       title: task.title || '',
@@ -409,7 +394,13 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
         <div className="flex-1 flex flex-col min-h-0">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <p className="text-xs text-muted-foreground">{tasks.length} task{tasks.length !== 1 ? 's' : ''}</p>
-            <Button variant="default" size="xs" iconName="Plus" onClick={handleOpenCreateTask}>
+            <Button
+              variant="default"
+              size="xs"
+              iconName="Plus"
+              onClick={handleOpenCreateTask}
+              disabled={!project?.team || project.team.length === 0}
+            >
               New
             </Button>
           </div>
@@ -498,20 +489,22 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
 
       {/* Create Task Modal */}
       {showCreateTask && (
-        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-background/60 backdrop-blur-xl" onClick={() => { setShowCreateTask(false); setTaskForm({ title: '', description: '', priority: 'MEDIUM', phase: 'Concept', dueDate: '', assignedToId: '' }); }}>
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-background/60 backdrop-blur-xl" onClick={() => { setShowCreateTask(false); setTaskForm({ title: '', description: '', priority: 'MEDIUM', phase: 'Concept', status: 'TODO', dueDate: '', assignedToId: '' }); }}>
           <div
             className="bg-card rounded-xl shadow-soft-2xl w-full max-w-md border border-border overflow-hidden animate-fade-in"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-5 py-3.5 border-b border-border bg-gradient-to-r from-card to-muted/20">
               <h2 className="font-semibold text-base text-foreground">{editingTask ? 'Edit Task' : 'Create Task'}</h2>
-              <button onClick={() => { setShowCreateTask(false); setTaskForm({ title: '', description: '', priority: 'MEDIUM', phase: 'Concept', dueDate: '', assignedToId: '' }); }} className="p-1 rounded-lg hover:bg-muted transition-smooth">
+              <button onClick={() => { setShowCreateTask(false); setTaskForm({ title: '', description: '', priority: 'MEDIUM', phase: 'Concept', status: 'TODO', dueDate: '', assignedToId: '' }); }} className="p-1 rounded-lg hover:bg-muted transition-smooth">
                 <Icon name="X" size={16} color="currentColor" />
               </button>
             </div>
             <form onSubmit={handleSaveTask} className="p-5 space-y-3.5">
               <div>
-                <label className="block text-xs font-medium text-foreground mb-1">Title *</label>
+                <label className="block text-xs font-medium text-foreground mb-1">Title 
+                  <span className="text-red-600 text-sm ml-1">*</span>
+                </label>
                 <input
                   required
                   value={taskForm.title}
@@ -577,25 +570,28 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
                     className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-foreground mb-1">Assign To</label>
-                  <select
-                    value={taskForm.assignedToId}
-                    onChange={(e) => setTaskForm(p => ({ ...p, assignedToId: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  >
-                    <option value="">Unassigned</option>
-                    {availableUsers.map((u: any) => (
-                      <option key={u.id} value={u.id}>{u.name}</option>
-                    ))}
-                  </select>
-                </div>
+              <div>
+                <label className="block text-xs font-medium text-foreground mb-1">Assign To 
+                  <span className="text-red-600 text-sm ml-1">*</span>
+                </label>
+                <select
+                  required
+                  value={taskForm.assignedToId}
+                  onChange={(e) => setTaskForm(p => ({ ...p, assignedToId: e.target.value }))}
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                >
+                  <option value="" disabled>Select a member</option>
+                  {(project?.team || []).map((m: any) => (
+                    <option key={m.id || m.name} value={m.id || m.name}>{m.name}</option>
+                  ))}
+                </select>
+              </div>
               </div>
               <div className="flex gap-3 pt-2">
                 <Button variant="outline" className="flex-1" onClick={() => { setShowCreateTask(false); setEditingTask(null); setTaskForm({ title: '', description: '', priority: 'MEDIUM', phase: 'Concept', status: 'TODO', dueDate: '', assignedToId: '' }); }}>
                   Cancel
                 </Button>
-                <Button disabled={creatingTask || !taskForm.title.trim()} className="flex-1">
+                <Button disabled={creatingTask || !taskForm.title.trim() || !taskForm.assignedToId} className="flex-1">
                   {creatingTask ? 'Saving...' : editingTask ? 'Update' : 'Create'}
                 </Button>
               </div>

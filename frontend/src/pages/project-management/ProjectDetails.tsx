@@ -4,7 +4,7 @@ import Sidebar from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import Image from '../../components/AppImage';
 import Button from '../../components/ui/Button';
-import { projectService, taskService, userService } from '../../services';
+import { projectService, taskService } from '../../services';
 
 const PHASES = ['Concept', 'Modeling', 'Rendering', 'Delivery'] as const;
 const PRIORITIES = [
@@ -33,7 +33,6 @@ const ProjectDetails = () => {
     assignedToId: '',
   });
   const [creatingTask, setCreatingTask] = useState(false);
-  const [availableUsers, setAvailableUsers] = useState<any[]>([]);
 
   const tabs = [
     { id: 'timeline', label: 'Timeline', icon: 'Calendar' },
@@ -115,7 +114,7 @@ const ProjectDetails = () => {
       }
       setShowCreateTask(false);
       setEditingTask(null);
-      setTaskForm({ title: '', description: '', priority: 'MEDIUM', phase: 'Concept', dueDate: '', assignedToId: '' });
+      setTaskForm({ title: '', description: '', priority: 'MEDIUM', phase: 'Concept', status: 'TODO', dueDate: '', assignedToId: '' });
       fetchProject(id);
     } catch (error) {
       console.error('Failed to save task:', error);
@@ -124,27 +123,13 @@ const ProjectDetails = () => {
     }
   };
 
-  const handleOpenCreateTask = async () => {
-    try {
-      const res = await userService.getAllUsers({ limit: 100 });
-      const staff = (res.data.users || []).filter((u: any) => u.role !== 'CLIENT');
-      setAvailableUsers(staff);
-    } catch {
-      setAvailableUsers([]);
-    }
+  const handleOpenCreateTask = () => {
     setEditingTask(null);
     setTaskForm({ title: '', description: '', priority: 'MEDIUM', phase: 'Concept', status: 'TODO', dueDate: '', assignedToId: '' });
     setShowCreateTask(true);
   };
 
-  const handleOpenEditTask = async (task: any) => {
-    try {
-      const res = await userService.getAllUsers({ limit: 100 });
-      const staff = (res.data.users || []).filter((u: any) => u.role !== 'CLIENT');
-      setAvailableUsers(staff);
-    } catch {
-      setAvailableUsers([]);
-    }
+  const handleOpenEditTask = (task: any) => {
     setEditingTask(task);
     setTaskForm({
       title: task.title || '',
@@ -441,7 +426,13 @@ const ProjectDetails = () => {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">{allTasks.length} task{allTasks.length !== 1 ? 's' : ''}</p>
-                <Button variant="default" size="sm" iconName="Plus" onClick={handleOpenCreateTask}>
+                <Button
+                  variant="default"
+                  size="sm"
+                  iconName="Plus"
+                  onClick={handleOpenCreateTask}
+                  disabled={!project?.members || project.members.length === 0}
+                >
                   New Task
                 </Button>
               </div>
@@ -651,15 +642,16 @@ const ProjectDetails = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Assign To</label>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">Assign To *</label>
                   <select
+                    required
                     value={taskForm.assignedToId}
                     onChange={(e) => setTaskForm((prev) => ({ ...prev, assignedToId: e.target.value }))}
                     className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                   >
-                    <option value="">Unassigned</option>
-                    {availableUsers.map((u: any) => (
-                      <option key={u.id} value={u.id}>{u.name}</option>
+                    <option value="" disabled>Select a member</option>
+                    {(project?.members || []).map((m: any) => (
+                      <option key={m.id} value={m.id}>{m.name}</option>
                     ))}
                   </select>
                 </div>
@@ -670,7 +662,7 @@ const ProjectDetails = () => {
               <Button variant="outline" onClick={resetTaskForm} className="flex-1">Cancel</Button>
               <Button
                 onClick={handleSaveTask}
-                disabled={creatingTask || !taskForm.title.trim()}
+                disabled={creatingTask || !taskForm.title.trim() || !taskForm.assignedToId}
                 className="flex-1"
               >
                 {creatingTask ? 'Saving...' : editingTask ? 'Update Task' : 'Create Task'}
