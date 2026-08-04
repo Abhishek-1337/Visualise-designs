@@ -84,7 +84,7 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
                     <span className="text-sm font-medium text-muted-foreground">Start Date</span>
                   </div>
                   <p className="font-semibold text-foreground">
-                    {new Date(project.startDate)?.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    {project.startDate ? new Date(project.startDate)?.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : "N/A"}
                   </p>
                 </div>
                 <div className="bg-background rounded-lg p-4 border border-border/50">
@@ -93,7 +93,7 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
                     <span className="text-sm font-medium text-muted-foreground">Deadline</span>
                   </div>
                   <p className="font-semibold text-foreground">
-                    {new Date(project.deadline)?.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    {project.deadline ? new Date(project.deadline)?.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }): "N/A"}
                   </p>
                 </div>
                 <div className="bg-background rounded-lg p-4 border border-border/50">
