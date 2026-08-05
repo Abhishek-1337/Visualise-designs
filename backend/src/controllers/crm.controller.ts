@@ -766,18 +766,31 @@ export const getDashboard = async (req: Request, res: Response): Promise<void> =
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     const where = { tenantId: authReq.user.tenantId };
+    const isAdminOrManager = authReq.user.role === 'ADMIN' || authReq.user.role === 'MANAGER';
+
+    const taskWhere: any = {
+      ...where,
+      status: { not: 'COMPLETED' },
+      OR: [
+        { dueDate: { gte: today, lt: tomorrow } },
+        { dueDate: null }
+      ]
+    };
+
+    // Employees see only their own tasks; Admin/Manager see all team tasks
+    if (!isAdminOrManager) {
+      taskWhere.assignedToId = authReq.user.id;
+    }
 
     const [todaysTasks, recentActivities, stats] = await Promise.all([
       prisma.task.findMany({
-        where: {
-          ...where,
-          assignedToId: authReq.user.id,
-          status: { not: 'COMPLETED' },
-          dueDate: { gte: today, lt: tomorrow }
+        where: taskWhere,
+        include: {
+          contact: { select: { id: true, firstName: true, lastName: true, company: true } },
+          assignedTo: { select: { id: true, name: true, avatar: true } }
         },
-        include: { contact: { select: { id: true, firstName: true, lastName: true } } },
         orderBy: { priority: 'asc' },
-        take: 5
+        take: isAdminOrManager ? 20 : 5
       }),
       prisma.activity.findMany({
         where,
@@ -802,5 +815,128 @@ export const getDashboard = async (req: Request, res: Response): Promise<void> =
     });
   } catch {
     res.status(500).json({ error: 'Failed to fetch dashboard' });
+  }
+};
+
+export const getTaskSummaries = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const authReq = req as AuthenticatedRequest;
+    if (authReq.user.role === 'CLIENT') {
+      res.status(403).json({ error: 'Access denied' });
+      return;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const isAdminOrManager = authReq.user.role === 'ADMIN' || authReq.user.role === 'MANAGER';
+
+    // Get tasks completed today
+    const completedTodayWhere: any = {
+      tenantId: authReq.user.tenantId,
+      status: 'COMPLETED',
+      completedAt: { gte: today, lt: tomorrow }
+    };
+
+    // Get tasks due today OR tasks without a due date (still active)
+    const dueTodayWhere: any = {
+      tenantId: authReq.user.tenantId,
+      status: { not: 'COMPLETED' },
+      OR: [
+        { dueDate: { gte: today, lt: tomorrow } },
+        { dueDate: null }
+      ]
+    };
+
+    // Employees only see their own summaries
+    if (!isAdminOrManager) {
+      completedTodayWhere.assignedToId = authReq.user.id;
+      dueTodayWhere.assignedToId = authReq.user.id;
+    }
+
+    const [completedTasks, dueTasks, allTeamMembers] = await Promise.all([
+      prisma.task.findMany({
+        where: completedTodayWhere,
+        include: {
+          assignedTo: { select: { id: true, name: true, avatar: true } },
+          contact: { select: { id: true, firstName: true, lastName: true, company: true } }
+        }
+      }),
+      prisma.task.findMany({
+        where: dueTodayWhere,
+        include: {
+          assignedTo: { select: { id: true, name: true, avatar: true } },
+          contact: { select: { id: true, firstName: true, lastName: true, company: true } }
+        }
+      }),
+      isAdminOrManager ? prisma.user.findMany({
+        where: { tenantId: authReq.user.tenantId, isActive: true },
+        select: { id: true, name: true, avatar: true }
+      }) : []
+    ]);
+
+    // Group by user
+    const userMap = new Map<string, {
+      user: { id: string; name: string; avatar?: string };
+      completedTasks: any[];
+      pendingTasks: any[];
+      totalCompleted: number;
+      totalPending: number;
+    }>();
+
+    // Initialize all team members for admin/manager view
+    if (isAdminOrManager) {
+      allTeamMembers.forEach(member => {
+        userMap.set(member.id, {
+          user: member,
+          completedTasks: [],
+          pendingTasks: [],
+          totalCompleted: 0,
+          totalPending: 0
+        });
+      });
+    }
+
+    completedTasks.forEach(task => {
+      const userId = task.assignedToId;
+      if (!userMap.has(userId)) {
+        userMap.set(userId, {
+          user: task.assignedTo,
+          completedTasks: [],
+          pendingTasks: [],
+          totalCompleted: 0,
+          totalPending: 0
+        });
+      }
+      const entry = userMap.get(userId)!;
+      entry.completedTasks.push(task);
+      entry.totalCompleted++;
+    });
+
+    dueTasks.forEach(task => {
+      const userId = task.assignedToId;
+      if (!userMap.has(userId)) {
+        userMap.set(userId, {
+          user: task.assignedTo,
+          completedTasks: [],
+          pendingTasks: [],
+          totalCompleted: 0,
+          totalPending: 0
+        });
+      }
+      const entry = userMap.get(userId)!;
+      entry.pendingTasks.push(task);
+      entry.totalPending++;
+    });
+
+    const dailyReport = Array.from(userMap.values()).filter(
+      entry => entry.totalCompleted > 0 || entry.totalPending > 0
+    );
+
+    res.json({ dailyReport });
+  } catch {
+    res.status(500).json({ error: 'Failed to fetch task summaries' });
   }
 };

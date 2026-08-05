@@ -102,12 +102,12 @@ const HomeDashboard = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-6 mb-8">
-              <TodaysFocusCard />
+              <TodaysFocusCard role={role} />
               {isEmployee ? <MyProjectsCard /> : <MoneySnapshotCard />}
             </div>
 
             <div className="mb-8">
-              {isEmployee ? <MyWorkStatsCard /> : <DailySummaryCard />}
+              {isEmployee ? <MyWorkStatsCard /> : <DailySummaryCard role={role} />}
             </div>
 
             <div className="mb-8">

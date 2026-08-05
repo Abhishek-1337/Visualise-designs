@@ -30,6 +30,7 @@ router.put('/projects/:id', crmController.updateProject);
 router.delete('/projects/:id', crmController.deleteProject);
 
 router.get('/tasks', crmController.getAllTasks);
+router.get('/tasks/summary', crmController.getTaskSummaries);
 router.post('/tasks', crmController.createTask);
 router.put('/tasks/:id', crmController.updateTask);
 router.delete('/tasks/:id', crmController.deleteTask);

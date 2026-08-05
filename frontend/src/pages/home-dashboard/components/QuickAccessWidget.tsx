@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
-import { projectService, activityService } from '../../../services';
+import { projectService, activityService, userService } from '../../../services';
 
 const QuickAccessWidget = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,12 +15,14 @@ const QuickAccessWidget = () => {
 
   const loadData = async () => {
     try {
-      const [pRes, aRes] = await Promise.allSettled([
+      const [pRes, aRes, tRes] = await Promise.allSettled([
         projectService.getAll({ limit: '5' }),
         activityService.getRecent(),
+        userService.getAllUsers({ limit: '10' }),
       ]);
       if (pRes.status === 'fulfilled') setProjects(pRes.value.data.projects || []);
       if (aRes.status === 'fulfilled') setActivities(aRes.value.data.activities || aRes.value.data || []);
+      if (tRes.status === 'fulfilled') setTeamMembers(tRes.value.data.users || []);
     } catch {
     } finally {
       setLoading(false);
@@ -85,7 +88,7 @@ const QuickAccessWidget = () => {
             <Icon name="ExternalLink" size={14} color="var(--color-muted-foreground)" />
           </Link>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
           {activities.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
           ) : (
@@ -119,7 +122,7 @@ const QuickAccessWidget = () => {
             <Icon name="ExternalLink" size={14} color="var(--color-muted-foreground)" />
           </Link>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
           {projects.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">No projects yet</p>
           ) : (
@@ -168,26 +171,40 @@ const QuickAccessWidget = () => {
             <Icon name="ExternalLink" size={14} color="var(--color-muted-foreground)" />
           </Link>
         </div>
-        <div className="space-y-2">
-          {activities.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
+        <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
+          {teamMembers.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">No team members</p>
           ) : (
-            activities.slice(0, 4).map((activity: any, i: number) => (
-              <div key={activity.id || i} className="flex items-start gap-3 p-2.5 rounded-lg bg-background border border-border/50">
-                <div className="w-7 h-7 rounded-full bg-secondary/10 flex items-center justify-center shrink-0 text-[10px] font-bold text-secondary">
-                  {activity.user?.name
-                    ? activity.user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
-                    : '??'}
+            teamMembers.slice(0, 5).map((member: any) => {
+              const getRoleColor = (role: string) => {
+                switch (role) {
+                  case 'ADMIN': return 'text-error bg-error/10';
+                  case 'MANAGER': return 'text-warning bg-warning/10';
+                  case 'EMPLOYEE': return 'text-primary bg-primary/10';
+                  default: return 'text-muted-foreground bg-muted';
+                }
+              };
+              return (
+                <div key={member.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-background border border-border/50">
+                  <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center shrink-0">
+                    {member.avatar ? (
+                      <img src={member.avatar} alt={member.name} className="w-8 h-8 rounded-full object-cover" />
+                    ) : (
+                      <span className="text-xs font-bold text-secondary">
+                        {member.name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || '??'}
+                      </span>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-foreground truncate">{member.name}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{member.email}</p>
+                  </div>
+                  <span className={`shrink-0 px-2 py-0.5 rounded text-[10px] font-medium ${getRoleColor(member.role)}`}>
+                    {member.role}
+                  </span>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm text-foreground line-clamp-1">
-                    {activity.user?.name && <span className="font-medium">{activity.user.name} </span>}
-                    {activity.description || activity.message || 'performed an action'}
-                  </p>
-                  <span className="text-[10px] text-muted-foreground">{formatTimeAgo(activity.createdAt || activity.timestamp)}</span>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

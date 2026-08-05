@@ -8,10 +8,15 @@ import { fetchDashboard, updateTaskStatus } from '../../../store/slices/projectS
 
 const PRIORITY_MAP: Record<string, string> = { LOW: 'low', MEDIUM: 'medium', HIGH: 'high', URGENT: 'urgent' };
 
-const TodaysFocusCard = () => {
+interface TodaysFocusCardProps {
+  role?: string;
+}
+
+const TodaysFocusCard = ({ role = 'EMPLOYEE' }: TodaysFocusCardProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const { todaysTasks, isLoading } = useSelector((state: RootState) => state.dashboard as any);
   const [localTasks, setLocalTasks] = React.useState<any[]>([]);
+  const isAdminOrManager = role === 'ADMIN' || role === 'MANAGER';
 
   useEffect(() => {
     dispatch(fetchDashboard());
@@ -19,13 +24,15 @@ const TodaysFocusCard = () => {
 
   useEffect(() => {
     if (todaysTasks?.length) {
-      setLocalTasks(todaysTasks.map((t) => ({
+      setLocalTasks(todaysTasks.map((t: any) => ({
         id: t.id,
         title: t.title,
         client: t.contact?.company || t.contact?.firstName || 'Unknown',
         priority: PRIORITY_MAP[t.priority] || 'medium',
         dueTime: t.dueDate ? new Date(t.dueDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : 'All day',
         completed: t.status === 'COMPLETED',
+        assignee: t.assignedTo?.name || 'Unknown',
+        assigneeId: t.assignedToId,
       })));
     }
   }, [todaysTasks]);
@@ -44,6 +51,20 @@ const TodaysFocusCard = () => {
     }
   };
 
+  // Group tasks by assignee for admin/manager view
+  const groupedTasks = React.useMemo(() => {
+    if (!isAdminOrManager) return null;
+    const groups = new Map<string, { user: string; tasks: typeof localTasks }>();
+    localTasks.forEach(task => {
+      const key = task.assigneeId;
+      if (!groups.has(key)) {
+        groups.set(key, { user: task.assignee, tasks: [] });
+      }
+      groups.get(key)!.tasks.push(task);
+    });
+    return Array.from(groups.values());
+  }, [localTasks, isAdminOrManager]);
+
   const completedCount = localTasks?.filter((t) => t?.completed)?.length;
   const totalCount = localTasks?.length || 0;
   const progressPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
@@ -56,7 +77,9 @@ const TodaysFocusCard = () => {
             <Icon name="Target" size={18} color="var(--color-primary)" />
           </div>
           <div>
-            <h2 className="text-base font-semibold text-foreground">Today's Focus</h2>
+            <h2 className="text-base font-semibold text-foreground">
+              {isAdminOrManager ? "Today's Team Focus" : "Today's Focus"}
+            </h2>
             <p className="text-xs text-muted-foreground">
               {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
             </p>
@@ -82,7 +105,53 @@ const TodaysFocusCard = () => {
           <Icon name="CheckCircle2" size={36} color="var(--color-muted-foreground)" />
           <p className="text-sm text-muted-foreground mt-2">No tasks for today</p>
         </div>
+      ) : isAdminOrManager && groupedTasks ? (
+        // Admin/Manager view: Grouped by assignee
+        <div className="space-y-4 max-h-[400px] overflow-y-auto">
+          {groupedTasks.map((group) => (
+            <div key={group.user} className="rounded-lg border border-border bg-background p-3">
+              <div className="flex items-center gap-2 mb-2 pb-2 border-b border-border/50">
+                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-[10px] font-semibold text-primary">
+                    {group.user.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                  </span>
+                </div>
+                <span className="text-sm font-medium text-foreground">{group.user}</span>
+                <span className="text-xs text-muted-foreground ml-auto">
+                  {group.tasks.filter(t => t.completed).length}/{group.tasks.length}
+                </span>
+              </div>
+              <div className="space-y-2">
+                {group.tasks.map((task) => (
+                  <div
+                    key={task?.id}
+                    className={`flex items-start gap-3 p-2.5 rounded-lg border transition-smooth ${
+                      task?.completed ? 'bg-muted/30 border-border/50' : 'bg-background border-border hover:border-primary/20'
+                    }`}
+                  >
+                    <Checkbox checked={task?.completed} onChange={() => handleTaskToggle(task?.id)} size="default" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className={`text-sm font-medium ${task?.completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                          {task?.title}
+                        </span>
+                        <span className={`shrink-0 px-2 py-0.5 rounded text-[10px] font-medium ${getPriorityColor(task?.priority)}`}>
+                          {task?.priority?.charAt(0)?.toUpperCase() + task?.priority?.slice(1)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                        <span className="truncate">{task?.client}</span>
+                        <span>{task?.dueTime}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
+        // Employee view: Simple list
         <div className="space-y-2">
           {localTasks?.map((task) => (
             <div

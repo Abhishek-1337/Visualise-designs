@@ -4,14 +4,20 @@ import { taskSummaryService } from '../../../services';
 
 interface Summary {
   user: { id: string; name: string; avatar?: string };
-  summaries: { content: string; task: { title: string; status: string } }[];
-  completedTasks: number;
-  totalSummaries: number;
+  completedTasks: { id: string; title: string; contact?: { firstName?: string; lastName?: string; company?: string } }[];
+  pendingTasks: { id: string; title: string; contact?: { firstName?: string; lastName?: string; company?: string } }[];
+  totalCompleted: number;
+  totalPending: number;
 }
 
-const DailySummaryCard = () => {
+interface DailySummaryCardProps {
+  role?: string;
+}
+
+const DailySummaryCard = ({ role = 'EMPLOYEE' }: DailySummaryCardProps) => {
   const [report, setReport] = useState<Summary[]>([]);
   const [loading, setLoading] = useState(true);
+  const isAdminOrManager = role === 'ADMIN' || role === 'MANAGER';
 
   useEffect(() => {
     loadDailySummary();
@@ -44,13 +50,17 @@ const DailySummaryCard = () => {
     <div className="bg-card rounded-xl shadow-warm-md p-6 transition-smooth hover-lift">
       <div className="flex items-center gap-2 mb-6">
         <Icon name="ClipboardCheck" size={20} color="var(--color-primary)" />
-        <h3 className="text-lg font-heading font-semibold text-foreground">Today's Task Summaries</h3>
+        <h3 className="text-lg font-heading font-semibold text-foreground">
+          {isAdminOrManager ? "Today's Task Summaries" : "My Task Summary"}
+        </h3>
       </div>
 
       {report.length === 0 ? (
         <div className="text-center py-8">
           <Icon name="FileText" size={40} color="var(--color-muted-foreground)" className="mx-auto mb-3" />
-          <p className="text-muted-foreground">No summaries submitted yet today</p>
+          <p className="text-muted-foreground">
+            {isAdminOrManager ? "No summaries submitted yet today" : "No tasks completed or due today"}
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -65,30 +75,63 @@ const DailySummaryCard = () => {
                 <div>
                   <p className="text-sm font-medium text-foreground">{item.user.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {item.completedTasks} completed · {item.totalSummaries} tasks
+                    {item.totalCompleted} completed · {item.totalPending} pending
                   </p>
                 </div>
                 <div className="ml-auto flex items-center gap-1">
-                  <span className="text-xs text-muted-foreground">{item.completedTasks}/{item.totalSummaries}</span>
+                  <span className="text-xs text-muted-foreground">{item.totalCompleted}/{item.totalCompleted + item.totalPending}</span>
                   <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
                     <div
                       className="h-full bg-success rounded-full"
-                      style={{ width: `${item.totalSummaries > 0 ? (item.completedTasks / item.totalSummaries) * 100 : 0}%` }}
+                      style={{ width: `${(item.totalCompleted + item.totalPending) > 0 ? (item.totalCompleted / (item.totalCompleted + item.totalPending)) * 100 : 0}%` }}
                     />
                   </div>
                 </div>
               </div>
-              <div className="space-y-2">
-                {item.summaries.map((s, i) => (
-                  <div key={i} className="flex items-start gap-2 text-sm">
-                    <span className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${s.task?.status === 'COMPLETED' ? 'bg-success' : 'bg-warning'}`} />
-                    <div>
-                      <p className="text-foreground">{s.content}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{s.task?.title}</p>
-                    </div>
+
+              {/* Completed tasks */}
+              {item.completedTasks.length > 0 && (
+                <div className="mb-2">
+                  <p className="text-xs font-medium text-success mb-1.5">Completed Today</p>
+                  <div className="space-y-1.5">
+                    {item.completedTasks.map((task) => (
+                      <div key={task.id} className="flex items-start gap-2 text-sm">
+                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-success" />
+                        <div>
+                          <p className="text-foreground">{task.title}</p>
+                          {task.contact && (
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {task.contact.company || `${task.contact.firstName} ${task.contact.lastName}`}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
+
+              {/* Pending tasks */}
+              {item.pendingTasks.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-warning mb-1.5">Due Today</p>
+                  <div className="space-y-1.5">
+                    {item.pendingTasks.map((task) => (
+                      <div key={task.id} className="flex items-start gap-2 text-sm">
+                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-warning" />
+                        <div>
+                          <p className="text-foreground">{task.title}</p>
+                          {task.contact && (
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {task.contact.company || `${task.contact.firstName} ${task.contact.lastName}`}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>

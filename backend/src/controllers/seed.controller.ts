@@ -44,12 +44,13 @@ export const forceSeedData = async (_req: Request, res: Response): Promise<void>
 
 async function seedTenantData(tenantId: string, adminUserId: string) {
   const hashedPassword = await bcrypt.hash('password123', 12);
+  const tenantSuffix = tenantId.slice(0, 8);
 
   const manager = await prisma.user.upsert({
-    where: { email: 'manager@visualise.com' },
+    where: { email: `manager-${tenantSuffix}@visualise.com` },
     update: {},
     create: {
-      email: 'manager@visualise.com',
+      email: `manager-${tenantSuffix}@visualise.com`,
       name: 'Sarah Johnson',
       password: hashedPassword,
       role: 'MANAGER',
@@ -60,10 +61,10 @@ async function seedTenantData(tenantId: string, adminUserId: string) {
   });
 
   const emp1 = await prisma.user.upsert({
-    where: { email: 'employee1@visualise.com' },
+    where: { email: `employee1-${tenantSuffix}@visualise.com` },
     update: {},
     create: {
-      email: 'employee1@visualise.com',
+      email: `employee1-${tenantSuffix}@visualise.com`,
       name: 'Alex Chen',
       password: hashedPassword,
       role: 'EMPLOYEE',
@@ -74,10 +75,10 @@ async function seedTenantData(tenantId: string, adminUserId: string) {
   });
 
   const emp2 = await prisma.user.upsert({
-    where: { email: 'employee2@visualise.com' },
+    where: { email: `employee2-${tenantSuffix}@visualise.com` },
     update: {},
     create: {
-      email: 'employee2@visualise.com',
+      email: `employee2-${tenantSuffix}@visualise.com`,
       name: 'Maria Garcia',
       password: hashedPassword,
       role: 'EMPLOYEE',
@@ -88,10 +89,10 @@ async function seedTenantData(tenantId: string, adminUserId: string) {
   });
 
   const emp3 = await prisma.user.upsert({
-    where: { email: 'employee3@visualise.com' },
+    where: { email: `employee3-${tenantSuffix}@visualise.com` },
     update: {},
     create: {
-      email: 'employee3@visualise.com',
+      email: `employee3-${tenantSuffix}@visualise.com`,
       name: 'James Wilson',
       password: hashedPassword,
       role: 'EMPLOYEE',
@@ -102,10 +103,10 @@ async function seedTenantData(tenantId: string, adminUserId: string) {
   });
 
   const client1 = await prisma.user.upsert({
-    where: { email: 'alexandra@morrisoninteriors.com' },
+    where: { email: `alexandra-${tenantSuffix}@morrisoninteriors.com` },
     update: {},
     create: {
-      email: 'alexandra@morrisoninteriors.com',
+      email: `alexandra-${tenantSuffix}@morrisoninteriors.com`,
       name: 'Alexandra Morrison',
       password: hashedPassword,
       role: 'CLIENT',
@@ -116,10 +117,10 @@ async function seedTenantData(tenantId: string, adminUserId: string) {
   });
 
   const client2 = await prisma.user.upsert({
-    where: { email: 'david@chenassociates.com' },
+    where: { email: `david-${tenantSuffix}@chenassociates.com` },
     update: {},
     create: {
-      email: 'david@chenassociates.com',
+      email: `david-${tenantSuffix}@chenassociates.com`,
       name: 'David Chen',
       password: hashedPassword,
       role: 'CLIENT',
@@ -130,10 +131,10 @@ async function seedTenantData(tenantId: string, adminUserId: string) {
   });
 
   const client3 = await prisma.user.upsert({
-    where: { email: 'priya@sharmadesign.com' },
+    where: { email: `priya-${tenantSuffix}@sharmadesign.com` },
     update: {},
     create: {
-      email: 'priya@sharmadesign.com',
+      email: `priya-${tenantSuffix}@sharmadesign.com`,
       name: 'Priya Sharma',
       password: hashedPassword,
       role: 'CLIENT',
@@ -147,16 +148,16 @@ async function seedTenantData(tenantId: string, adminUserId: string) {
   const users = [adminUserId, manager.id, emp1.id, emp2.id, emp3.id, ...seededClientIds];
 
   const contactsData = [
-    { firstName: 'Alexandra', lastName: 'Morrison', email: 'alexandra@morrisoninteriors.com', phone: '+1 (555) 123-4567', company: 'Morrison Interiors', jobTitle: 'CEO', status: 'ACTIVE' as const, country: 'USA', value: 150000 },
-    { firstName: 'David', lastName: 'Chen', email: 'david@chenassociates.com', phone: '+1 (555) 234-5678', company: 'Chen & Associates', jobTitle: 'Director', status: 'VIP' as const, country: 'USA', value: 250000 },
-    { firstName: 'Priya', lastName: 'Sharma', email: 'priya@sharmadesign.com', phone: '+1 (555) 345-6789', company: 'Sharma Design Studio', jobTitle: 'Owner', status: 'ACTIVE' as const, country: 'USA', value: 180000 },
-    { firstName: 'Marcus', lastName: 'Johnson', email: 'marcus@johnsondev.com', phone: '+1 (555) 456-7890', company: 'Johnson Development', jobTitle: 'VP Development', status: 'ACTIVE' as const, country: 'USA', value: 320000 },
-    { firstName: 'Elena', lastName: 'Vasquez', email: 'elena@vasquezarch.com', phone: '+1 (555) 567-8901', company: 'Vasquez Architecture', jobTitle: 'Principal Architect', status: 'VIP' as const, country: 'USA', value: 420000 },
-    { firstName: 'Robert', lastName: 'Kim', email: 'robert@kimconstruction.com', phone: '+1 (555) 678-9012', company: 'Kim Construction', jobTitle: 'Project Manager', status: 'ACTIVE' as const, country: 'USA', value: 95000 },
-    { firstName: 'Sarah', lastName: 'Williams', email: 'sarah@williamscreative.com', phone: '+1 (555) 789-0123', company: 'Williams Creative', jobTitle: 'Creative Director', status: 'INACTIVE' as const, country: 'USA', value: 75000 },
-    { firstName: 'James', lastName: 'Rodriguez', email: 'james@rodriguezrealty.com', phone: '+1 (555) 890-1234', company: 'Rodriguez Realty', jobTitle: 'Broker', status: 'ACTIVE' as const, country: 'USA', value: 210000 },
-    { firstName: 'Emily', lastName: 'Thompson', email: 'emily@thompsonco.com', phone: '+1 (555) 901-2345', company: 'Thompson & Co.', jobTitle: 'Managing Partner', status: 'PROSPECT' as const, country: 'USA', value: 60000 },
-    { firstName: 'Michael', lastName: 'Park', email: 'michael@parkdev.com', phone: '+1 (555) 012-3456', company: 'Park Developments', jobTitle: 'CEO', status: 'ACTIVE' as const, country: 'USA', value: 280000 },
+    { firstName: 'Alexandra', lastName: 'Morrison', email: `alexandra-${tenantSuffix}@morrisoninteriors.com`, phone: '+1 (555) 123-4567', company: 'Morrison Interiors', jobTitle: 'CEO', status: 'ACTIVE' as const, country: 'USA', value: 150000 },
+    { firstName: 'David', lastName: 'Chen', email: `david-${tenantSuffix}@chenassociates.com`, phone: '+1 (555) 234-5678', company: 'Chen & Associates', jobTitle: 'Director', status: 'VIP' as const, country: 'USA', value: 250000 },
+    { firstName: 'Priya', lastName: 'Sharma', email: `priya-${tenantSuffix}@sharmadesign.com`, phone: '+1 (555) 345-6789', company: 'Sharma Design Studio', jobTitle: 'Owner', status: 'ACTIVE' as const, country: 'USA', value: 180000 },
+    { firstName: 'Marcus', lastName: 'Johnson', email: `marcus-${tenantSuffix}@johnsondev.com`, phone: '+1 (555) 456-7890', company: 'Johnson Development', jobTitle: 'VP Development', status: 'ACTIVE' as const, country: 'USA', value: 320000 },
+    { firstName: 'Elena', lastName: 'Vasquez', email: `elena-${tenantSuffix}@vasquezarch.com`, phone: '+1 (555) 567-8901', company: 'Vasquez Architecture', jobTitle: 'Principal Architect', status: 'VIP' as const, country: 'USA', value: 420000 },
+    { firstName: 'Robert', lastName: 'Kim', email: `robert-${tenantSuffix}@kimconstruction.com`, phone: '+1 (555) 678-9012', company: 'Kim Construction', jobTitle: 'Project Manager', status: 'ACTIVE' as const, country: 'USA', value: 95000 },
+    { firstName: 'Sarah', lastName: 'Williams', email: `sarah-${tenantSuffix}@williamscreative.com`, phone: '+1 (555) 789-0123', company: 'Williams Creative', jobTitle: 'Creative Director', status: 'INACTIVE' as const, country: 'USA', value: 75000 },
+    { firstName: 'James', lastName: 'Rodriguez', email: `james-${tenantSuffix}@rodriguezrealty.com`, phone: '+1 (555) 890-1234', company: 'Rodriguez Realty', jobTitle: 'Broker', status: 'ACTIVE' as const, country: 'USA', value: 210000 },
+    { firstName: 'Emily', lastName: 'Thompson', email: `emily-${tenantSuffix}@thompsonco.com`, phone: '+1 (555) 901-2345', company: 'Thompson & Co.', jobTitle: 'Managing Partner', status: 'PROSPECT' as const, country: 'USA', value: 60000 },
+    { firstName: 'Michael', lastName: 'Park', email: `michael-${tenantSuffix}@parkdev.com`, phone: '+1 (555) 012-3456', company: 'Park Developments', jobTitle: 'CEO', status: 'ACTIVE' as const, country: 'USA', value: 280000 },
   ];
 
   const contacts = await Promise.all(
@@ -240,18 +241,18 @@ async function seedTenantData(tenantId: string, adminUserId: string) {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   const tasksData = [
-    { title: 'Review homepage mockups', priority: 'HIGH' as const, status: 'IN_PROGRESS' as const, dueDate: new Date(today.getTime() + 1 * 86400000), contactIdx: 0, projectIdx: 0, assignedIdx: 1 },
-    { title: 'Finalize color palette', priority: 'MEDIUM' as const, status: 'TODO' as const, dueDate: new Date(today.getTime() + 2 * 86400000), contactIdx: 1, projectIdx: 1, assignedIdx: 2 },
+    { title: 'Review homepage mockups', priority: 'HIGH' as const, status: 'IN_PROGRESS' as const, dueDate: today, contactIdx: 0, projectIdx: 0, assignedIdx: 1 },
+    { title: 'Finalize color palette', priority: 'MEDIUM' as const, status: 'TODO' as const, dueDate: today, contactIdx: 1, projectIdx: 1, assignedIdx: 2 },
     { title: 'Prepare Q3 budget forecast', priority: 'HIGH' as const, status: 'TODO' as const, dueDate: new Date(today.getTime() + 3 * 86400000), contactIdx: null, projectIdx: null, assignedIdx: 0 },
-    { title: 'Client presentation slides', priority: 'URGENT' as const, status: 'IN_PROGRESS' as const, dueDate: new Date(today.getTime() + 0.5 * 86400000), contactIdx: 2, projectIdx: 3, assignedIdx: 2 },
-    { title: 'Site inspection report', priority: 'MEDIUM' as const, status: 'COMPLETED' as const, dueDate: new Date(today.getTime() - 1 * 86400000), contactIdx: 4, projectIdx: 5, assignedIdx: 0 },
+    { title: 'Client presentation slides', priority: 'URGENT' as const, status: 'IN_PROGRESS' as const, dueDate: today, contactIdx: 2, projectIdx: 3, assignedIdx: 2 },
+    { title: 'Site inspection report', priority: 'MEDIUM' as const, status: 'COMPLETED' as const, dueDate: new Date(today.getTime() - 1 * 86400000), contactIdx: 4, projectIdx: 5, assignedIdx: 0, completedAt: today },
     { title: 'Update project timeline', priority: 'HIGH' as const, status: 'IN_PROGRESS' as const, dueDate: new Date(today.getTime() + 5 * 86400000), contactIdx: 7, projectIdx: 6, assignedIdx: 1 },
     { title: 'Draft contract for new deal', priority: 'HIGH' as const, status: 'TODO' as const, dueDate: new Date(today.getTime() + 4 * 86400000), contactIdx: 3, projectIdx: null, assignedIdx: 0 },
     { title: 'Mobile app wireframes', priority: 'MEDIUM' as const, status: 'TODO' as const, dueDate: new Date(today.getTime() + 7 * 86400000), contactIdx: 0, projectIdx: 2, assignedIdx: 3 },
-    { title: 'Team standup notes', priority: 'LOW' as const, status: 'COMPLETED' as const, dueDate: today, contactIdx: null, projectIdx: null, assignedIdx: 0 },
-    { title: 'Review vendor proposals', priority: 'MEDIUM' as const, status: 'TODO' as const, dueDate: new Date(today.getTime() + 2 * 86400000), contactIdx: 4, projectIdx: 5, assignedIdx: 2 },
+    { title: 'Team standup notes', priority: 'LOW' as const, status: 'COMPLETED' as const, dueDate: today, contactIdx: null, projectIdx: null, assignedIdx: 0, completedAt: today },
+    { title: 'Review vendor proposals', priority: 'MEDIUM' as const, status: 'TODO' as const, dueDate: today, contactIdx: 4, projectIdx: 5, assignedIdx: 2 },
     { title: 'Interior material selections', priority: 'HIGH' as const, status: 'IN_PROGRESS' as const, dueDate: new Date(today.getTime() + 6 * 86400000), contactIdx: 2, projectIdx: 3, assignedIdx: 4 },
-    { title: 'Structural engineering review', priority: 'URGENT' as const, status: 'TODO' as const, dueDate: new Date(today.getTime() + 1 * 86400000), contactIdx: 4, projectIdx: 5, assignedIdx: 0 },
+    { title: 'Structural engineering review', priority: 'URGENT' as const, status: 'TODO' as const, dueDate: today, contactIdx: 4, projectIdx: 5, assignedIdx: 0 },
   ];
 
   const tasks = await Promise.all(
