@@ -26,12 +26,7 @@ const ProjectCard = ({ project, onStatusUpdate, onViewDetails }) => {
 
   return (
     <div className="bg-card rounded-lg shadow-soft-md hover-lift transition-smooth border border-border/50 overflow-hidden group">
-      <div className="relative h-40 md:h-48 lg:h-56 overflow-hidden bg-gradient-to-br from-muted to-muted/50">
-        <Image
-          src={project?.coverImage}
-          alt={project?.coverImageAlt}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
+      <div className="relative overflow-hidden bg-gradient-to-br from-muted to-muted/50">
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
         <div className="absolute top-3 right-3 flex gap-2">
           <span className={`px-3 py-1 rounded-full text-xs font-medium border shadow-soft-sm ${getStatusColor(project?.status)}`}>
