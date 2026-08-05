@@ -435,6 +435,7 @@ export const getAllProjects = async (req: Request, res: Response): Promise<void>
           contact: { select: { id: true, firstName: true, lastName: true, email: true, company: true } },
           members: { select: { id: true, name: true, avatar: true } },
           deal: { select: { id: true, title: true, value: true, status: true } },
+          tasks: true,
           _count: { select: { tasks: true } }
         }
       }),

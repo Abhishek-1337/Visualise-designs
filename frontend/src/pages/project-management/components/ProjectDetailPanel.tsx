@@ -9,8 +9,6 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('timeline');
 
-  console.log(project);
-
   const tabs = [
     { id: 'timeline', label: 'Timeline', icon: 'Calendar' },
     { id: 'tasks', label: 'Tasks', icon: 'CheckSquare' },
@@ -141,8 +139,8 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
 
           {activeTab === 'tasks' && (
             <div className="space-y-6">
-              {['Concept', 'Modeling', 'Rendering', 'Delivery']?.map((phase) => {
-                const phaseTasks = project?.tasks?.filter(task => task?.phase === phase);
+              {['Concept', 'Modeling', 'Rendering', 'TODO']?.map((phase) => {
+                const phaseTasks = project?.tasks?.filter(task => task?.status === phase);
                 if (phaseTasks?.length === 0) return null;
 
                 return (
@@ -175,7 +173,7 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
                               <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                                 <div className="flex items-center gap-1">
                                   <Icon name="Calendar" size={14} />
-                                  <span>{new Date(task.dueDate)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                                  <span>{task.dueDate ? new Date(task.dueDate)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : "N/A"}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <div className="w-5 h-5 rounded-full overflow-hidden bg-muted ring-2 ring-card">

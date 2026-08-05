@@ -39,7 +39,7 @@ const mapProject = (p: any) => ({
     avatarAlt: m.name,
   })),
   milestones: [],
-  tasks: [],
+  tasks: p.tasks,
   files: [],
   contact: p.contact,
   deal: p.deal,
@@ -112,7 +112,7 @@ const ProjectManagement = () => {
   };
 
   const filteredProjects = useMemo(() => {
-    let result = [...projects];
+    let result = JSON.parse(JSON.stringify(projects));
     if (filters.search) {
       const q = filters.search.toLowerCase();
       result = result.filter((p) =>
