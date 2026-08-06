@@ -145,7 +145,7 @@ const TaskCard: React.FC<{ task: any; onEdit?: (task: any) => void }> = ({ task,
             }`}>
               {task.status?.replace('_', ' ') || 'TODO'}
             </span>
-            {task.assignedTo && <span>{task.assignedTo.name}</span>}
+            {task.assignedTo ? <span>{task.assignedTo.name}</span> : <span className="text-muted-foreground italic">No one assigned</span>}
           </div>
         </div>
       </div>

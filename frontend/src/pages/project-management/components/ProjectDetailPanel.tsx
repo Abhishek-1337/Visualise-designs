@@ -176,20 +176,26 @@ const ProjectDetailPanel = ({ project, onClose, onTaskUpdate }) => {
                                   <span>{task.dueDate ? new Date(task.dueDate)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : "N/A"}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <div className="w-5 h-5 rounded-full overflow-hidden bg-muted ring-2 ring-card">
-                                    {task?.assignee?.avatar ? (
-                                      <Image
-                                        src={task.assignee.avatar}
-                                        alt={task.assignee.avatarAlt}
-                                        className="w-full h-full object-cover"
-                                      />
-                                    ) : (
-                                      <div className="w-full h-full flex items-center justify-center text-[8px] font-bold text-primary">
-                                        {task?.assignee?.name?.[0]?.toUpperCase() || '?'}
+                                  {task?.assignedTo ? (
+                                    <>
+                                      <div className="w-5 h-5 rounded-full overflow-hidden bg-muted ring-2 ring-card">
+                                        {task.assignedTo.avatar ? (
+                                          <Image
+                                            src={task.assignedTo.avatar}
+                                            alt={task.assignedTo.name}
+                                            className="w-full h-full object-cover"
+                                          />
+                                        ) : (
+                                          <div className="w-full h-full flex items-center justify-center text-[8px] font-bold text-primary">
+                                            {task.assignedTo.name?.[0]?.toUpperCase() || '?'}
+                                          </div>
+                                        )}
                                       </div>
-                                    )}
-                                  </div>
-                                  <span>{task?.assignee?.name}</span>
+                                      <span>{task.assignedTo.name}</span>
+                                    </>
+                                  ) : (
+                                    <span className="text-muted-foreground italic">No one assigned</span>
+                                  )}
                                 </div>
                               </div>
                             </div>

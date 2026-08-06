@@ -435,7 +435,7 @@ export const getAllProjects = async (req: Request, res: Response): Promise<void>
           contact: { select: { id: true, firstName: true, lastName: true, email: true, company: true } },
           members: { select: { id: true, name: true, avatar: true } },
           deal: { select: { id: true, title: true, value: true, status: true } },
-          tasks: true,
+          tasks: { include: { assignedTo: { select: { id: true, name: true, avatar: true } } } },
           _count: { select: { tasks: true } }
         }
       }),
@@ -457,7 +457,7 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
         contact: { select: { id: true, firstName: true, lastName: true, email: true, company: true } },
         deal: { select: { id: true, title: true, value: true, status: true } },
         members: { select: { id: true, name: true, avatar: true } },
-        tasks: { orderBy: { createdAt: 'desc' }, take: 10 },
+        tasks: { orderBy: { createdAt: 'desc' }, take: 10, include: { assignedTo: { select: { id: true, name: true, avatar: true } } } },
         activities: { orderBy: { createdAt: 'desc' }, take: 10, include: { user: { select: { id: true, name: true } } } }
       }
     });

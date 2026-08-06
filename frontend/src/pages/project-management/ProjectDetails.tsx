@@ -761,8 +761,10 @@ const TimelineSection = ({ title, icon, color, tasks, getPriorityColor, onEditTa
             {task.dueDate && (
               <span>{new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
             )}
-            {task.assignedTo && (
+            {task.assignedTo ? (
               <span>{task.assignedTo.name}</span>
+            ) : (
+              <span className="text-muted-foreground italic">No one assigned</span>
             )}
             <span className={`px-1 py-0.5 rounded text-[10px] font-medium uppercase ${task.status === 'COMPLETED' ? 'text-success bg-success/10' : 'text-muted-foreground bg-muted'}`}>
               {task.status?.replace('_', ' ') || 'TODO'}
