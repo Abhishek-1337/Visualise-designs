@@ -399,7 +399,7 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
               size="xs"
               iconName="Plus"
               onClick={handleOpenCreateTask}
-              disabled={!project?.team || project.team.length === 0}
+              disabled={!project}
             >
               New
             </Button>
@@ -571,11 +571,8 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
                   />
                 </div>
               <div>
-                <label className="block text-xs font-medium text-foreground mb-1">Assign To 
-                  <span className="text-red-600 text-sm ml-1">*</span>
-                </label>
+                <label className="block text-xs font-medium text-foreground mb-1">Assign To</label>
                 <select
-                  required
                   value={taskForm.assignedToId}
                   onChange={(e) => setTaskForm(p => ({ ...p, assignedToId: e.target.value }))}
                   className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
@@ -591,7 +588,7 @@ const ProjectChatPanel: React.FC<ProjectChatPanelProps> = ({ project, messages, 
                 <Button variant="outline" className="flex-1" onClick={() => { setShowCreateTask(false); setEditingTask(null); setTaskForm({ title: '', description: '', priority: 'MEDIUM', phase: 'Concept', status: 'TODO', dueDate: '', assignedToId: '' }); }}>
                   Cancel
                 </Button>
-                <Button disabled={creatingTask || !taskForm.title.trim() || !taskForm.assignedToId} className="flex-1">
+                <Button disabled={creatingTask || !taskForm.title.trim()} className="flex-1">
                   {creatingTask ? 'Saving...' : editingTask ? 'Update' : 'Create'}
                 </Button>
               </div>

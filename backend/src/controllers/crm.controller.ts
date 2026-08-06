@@ -615,30 +615,13 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
     }
     const { title, description, priority, dueDate, contactId, projectId, assignedToId } = req.body;
 
-    if (!assignedToId) {
-      res.status(400).json({ error: 'Please assign a project member to this task' });
-      return;
-    }
-
     if (projectId) {
       const project = await prisma.project.findFirst({
         where: { id: projectId, tenantId: authReq.user.tenantId },
-        include: { members: { select: { id: true } } }
       });
 
       if (!project) {
         res.status(404).json({ error: 'Project not found' });
-        return;
-      }
-
-      if (project.members.length === 0) {
-        res.status(400).json({ error: 'Project has no members. Add members before creating tasks.' });
-        return;
-      }
-
-      const isMember = project.members.some((m) => m.id === assignedToId);
-      if (!isMember) {
-        res.status(400).json({ error: 'Assigned user is not a member of this project' });
         return;
       }
     }
