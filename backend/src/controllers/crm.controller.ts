@@ -83,6 +83,11 @@ export const getContactById = async (req: Request, res: Response): Promise<void>
       return;
     }
 
+    if (!(await can(authReq.user, 'contact.view_all')) && contact.ownerId !== authReq.user.id) {
+      res.status(403).json({ error: 'Not authorized to view this contact' });
+      return;
+    }
+
     res.json(contact);
   } catch {
     res.status(500).json({ error: 'Failed to fetch contact' });
@@ -763,6 +768,17 @@ export const getActivities = async (req: Request, res: Response): Promise<void> 
     if (dealId) where.dealId = dealId;
     if (projectId) where.projectId = projectId;
 
+    if (contactId && !(await can(authReq.user, 'contact.view_all'))) {
+      const contact = await prisma.contact.findFirst({
+        where: { id: contactId as string, tenantId: authReq.user.tenantId, ownerId: authReq.user.id },
+        select: { id: true }
+      });
+      if (!contact) {
+        res.status(403).json({ error: 'Not authorized to view activities for this contact' });
+        return;
+      }
+    }
+
     const activities = await prisma.activity.findMany({
       where,
       take: 50,
@@ -784,8 +800,14 @@ export const getCRMStats = async (req: Request, res: Response): Promise<void> =>
     }
     const where = { tenantId: authReq.user.tenantId };
     const activeStatuses: any[] = ['DRAFT', 'SENT', 'CHANGES_REQUESTED', 'ACCEPTED'];
+
+    const contactWhere: any = { ...where, isArchived: false };
+    if (!(await can(authReq.user, 'contact.view_all'))) {
+      contactWhere.ownerId = authReq.user.id;
+    }
+
     const [contacts, deals, projects, tasks] = await Promise.all([
-      prisma.contact.count({ where: { ...where, isArchived: false } }),
+      prisma.contact.count({ where: contactWhere }),
       prisma.deal.count({ where: { ...where, status: { in: activeStatuses } } }),
       prisma.project.count({ where: { ...where, status: 'ACTIVE' } }),
       prisma.task.count({ where: { ...where, status: 'TODO' } })
