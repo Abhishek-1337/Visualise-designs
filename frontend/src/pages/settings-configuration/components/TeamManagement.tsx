@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../../store';
 import { userService, inviteService } from '../../../services';
 import Icon from '../../../components/AppIcon';
 import AppImage from '../../../components/AppImage';
+import RolePermissions from './RolePermissions';
 
 const roleColors = {
   ADMIN: 'bg-primary/10 text-primary',
@@ -25,6 +28,8 @@ const inviteStatusColors = {
 };
 
 const TeamManagement = () => {
+  const { user } = useSelector((state: RootState) => state.auth);
+  const isAdmin = user?.role === 'ADMIN';
   const [members, setMembers] = useState([]);
   const [invites, setInvites] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
@@ -257,6 +262,12 @@ const TeamManagement = () => {
           </div>
         )}
       </div>
+
+      {isAdmin && (
+        <div className="pt-6 border-t border-border">
+          <RolePermissions />
+        </div>
+      )}
     </div>);
 };
 

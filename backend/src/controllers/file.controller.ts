@@ -4,8 +4,33 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import prisma from '../config/database';
 import { AuthenticatedRequest } from '../types';
+import { can, canActOnRecord } from '../services/permission.service';
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';
+
+/** Resolves the Contact record linked to a CLIENT user's own email, if any. */
+async function getClientContactId(tenantId: string, email: string): Promise<string | undefined> {
+  const contact = await prisma.contact.findFirst({ where: { email, tenantId } });
+  return contact?.id;
+}
+
+/** Whether a CLIENT (identified by their own contact id) may see/download a given file. */
+async function isFileVisibleToClient(
+  tenantId: string,
+  clientContactId: string | undefined,
+  file: { contactId: string | null; projectId: string | null }
+): Promise<boolean> {
+  if (!clientContactId) return false;
+  if (file.contactId === clientContactId) return true;
+  if (file.projectId) {
+    const project = await prisma.project.findFirst({
+      where: { id: file.projectId, tenantId, contactId: clientContactId },
+      select: { id: true },
+    });
+    return !!project;
+  }
+  return false;
+}
 
 export const uploadFile = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -16,7 +41,26 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
+    if (!(await can(authReq.user, 'file.upload'))) {
+      res.status(403).json({ error: 'Not authorized to upload files' });
+      return;
+    }
+
     const { contactId, projectId, description } = req.body;
+
+    // If a CLIENT is granted upload access, they may only attach files to their own contact/project.
+    if (authReq.user.role === 'CLIENT') {
+      const clientContactId = await getClientContactId(authReq.user.tenantId, authReq.user.email);
+      const visible = await isFileVisibleToClient(authReq.user.tenantId, clientContactId, {
+        contactId: contactId || null,
+        projectId: projectId || null,
+      });
+      if (!visible) {
+        res.status(403).json({ error: 'Not authorized to upload to this contact/project' });
+        return;
+      }
+    }
+
     const key = `${uuidv4()}-${file.originalname}`;
     const destPath = path.join(UPLOAD_DIR, key);
 
@@ -70,12 +114,10 @@ export const getAllFiles = async (req: Request, res: Response): Promise<void> =>
     if (projectId) where.projectId = projectId;
 
     if (authReq.user.role === 'CLIENT') {
-      const contact = await prisma.contact.findFirst({
-        where: { email: authReq.user.email, tenantId: authReq.user.tenantId },
-      });
+      const clientContactId = await getClientContactId(authReq.user.tenantId, authReq.user.email);
       where.OR = [
-        { contactId: contact?.id || 'none' },
-        { projectId: { not: null, project: { contactId: contact?.id || 'none' } } },
+        { contactId: clientContactId || 'none' },
+        { projectId: { not: null, project: { contactId: clientContactId || 'none' } } },
       ];
     }
 
@@ -119,6 +161,14 @@ export const getFileById = async (req: Request, res: Response): Promise<void> =>
       return;
     }
 
+    if (authReq.user.role === 'CLIENT') {
+      const clientContactId = await getClientContactId(authReq.user.tenantId, authReq.user.email);
+      if (!(await isFileVisibleToClient(authReq.user.tenantId, clientContactId, file))) {
+        res.status(403).json({ error: 'Not authorized to view this file' });
+        return;
+      }
+    }
+
     res.json(file);
   } catch {
     res.status(500).json({ error: 'Failed to fetch file' });
@@ -135,6 +185,14 @@ export const downloadFile = async (req: Request, res: Response): Promise<void> =
     if (!file) {
       res.status(404).json({ error: 'File not found' });
       return;
+    }
+
+    if (authReq.user.role === 'CLIENT') {
+      const clientContactId = await getClientContactId(authReq.user.tenantId, authReq.user.email);
+      if (!(await isFileVisibleToClient(authReq.user.tenantId, clientContactId, file))) {
+        res.status(403).json({ error: 'Not authorized to download this file' });
+        return;
+      }
     }
 
     const filePath = path.join(UPLOAD_DIR, file.key);
@@ -158,6 +216,12 @@ export const deleteFile = async (req: Request, res: Response): Promise<void> => 
 
     if (!file) {
       res.status(404).json({ error: 'File not found' });
+      return;
+    }
+
+    const isOwnUpload = file.uploadedById === authReq.user.id;
+    if (!(await canActOnRecord(authReq.user, 'file.delete_any', 'file.delete_own', isOwnUpload))) {
+      res.status(403).json({ error: 'Not authorized to delete this file' });
       return;
     }
 

@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../config/database';
 import { AuthenticatedRequest, JwtPayload, Role } from '../types';
+import { can } from '../services/permission.service';
 
 type RoleType = 'ADMIN' | 'MANAGER' | 'EMPLOYEE' | 'CLIENT';
 
@@ -12,6 +13,12 @@ const INVITE_EXPIRY_DAYS = 7;
 export const createInvite = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
+
+    if (!(await can(authReq.user, 'contact.create'))) {
+      res.status(403).json({ error: 'Not authorized to invite team members' });
+      return;
+    }
+
     const { email, role } = req.body;
 
     if (!email) {

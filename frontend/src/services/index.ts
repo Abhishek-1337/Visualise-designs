@@ -125,6 +125,11 @@ export const inviteService = {
   cancel: (id) => api.patch(`/invites/${id}/cancel`),
 };
 
+export const permissionService = {
+  getAll: () => api.get('/permissions'),
+  update: (updates) => api.put('/permissions', { updates }),
+};
+
 export const fileService = {
   getAll: (params) => api.get('/files', { params }),
   getById: (id) => api.get(`/files/${id}`),

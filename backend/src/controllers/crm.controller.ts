@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../config/database';
 import { AuthenticatedRequest } from '../types';
+import { can, canActOnRecord } from '../services/permission.service';
 
 /**
  * CONTACTS
@@ -27,7 +28,7 @@ export const getAllContacts = async (req: Request, res: Response): Promise<void>
       ];
     }
 
-    if (authReq.user.role === 'EMPLOYEE') {
+    if (!(await can(authReq.user, 'contact.view_all'))) {
       where.ownerId = authReq.user.id;
     }
 
@@ -62,6 +63,10 @@ export const getAllContacts = async (req: Request, res: Response): Promise<void>
 export const getContactById = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
+    if (authReq.user.role === 'CLIENT') {
+      res.status(403).json({ error: 'Access denied' });
+      return;
+    }
     const contact = await prisma.contact.findFirst({
       where: { id: req.params.id as string, tenantId: authReq.user.tenantId },
       include: {
@@ -87,6 +92,10 @@ export const getContactById = async (req: Request, res: Response): Promise<void>
 export const createContact = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
+    if (!(await can(authReq.user, 'contact.create'))) {
+      res.status(403).json({ error: 'Not authorized to create contacts' });
+      return;
+    }
     const { firstName, lastName, email, phone, company, jobTitle, status, country, notes, value } = req.body;
 
     const contact = await prisma.contact.create({
@@ -132,7 +141,8 @@ export const updateContact = async (req: Request, res: Response): Promise<void> 
       res.status(404).json({ error: 'Contact not found' });
       return;
     }
-    if (authReq.user.role === 'EMPLOYEE' && contact.ownerId !== authReq.user.id) {
+    const isOwner = contact.ownerId === authReq.user.id;
+    if (!(await canActOnRecord(authReq.user, 'contact.update_any', 'contact.update_own', isOwner))) {
       res.status(403).json({ error: 'Not authorized' });
       return;
     }
@@ -151,9 +161,21 @@ export const updateContact = async (req: Request, res: Response): Promise<void> 
 export const deleteContact = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
-    await prisma.contact.updateMany({ 
-      where: { id: req.params.id as string, tenantId: authReq.user.tenantId }, 
-      data: { isArchived: true } 
+    const contact = await prisma.contact.findFirst({
+      where: { id: req.params.id as string, tenantId: authReq.user.tenantId }
+    });
+    if (!contact) {
+      res.status(404).json({ error: 'Contact not found' });
+      return;
+    }
+    const isOwner = contact.ownerId === authReq.user.id;
+    if (!(await canActOnRecord(authReq.user, 'contact.delete_any', 'contact.delete_own', isOwner))) {
+      res.status(403).json({ error: 'Not authorized' });
+      return;
+    }
+    await prisma.contact.update({
+      where: { id: contact.id },
+      data: { isArchived: true }
     });
     res.json({ message: 'Contact archived' });
   } catch {
@@ -239,8 +261,8 @@ export const getDealById = async (req: Request, res: Response): Promise<void> =>
 export const createDeal = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
-    if (authReq.user.role === 'CLIENT') {
-      res.status(403).json({ error: 'Clients cannot create deals' });
+    if (!(await can(authReq.user, 'deal.create'))) {
+      res.status(403).json({ error: 'Not authorized to create deals' });
       return;
     }
     const { title, description, value, stage, contactId, assignedToId } = req.body;
@@ -307,6 +329,12 @@ export const updateDeal = async (req: Request, res: Response): Promise<void> => 
       delete data.title;
       delete data.assignedToId;
       delete data.contactId;
+    } else {
+      const isAssigned = deal.assignedToId === authReq.user.id;
+      if (!(await canActOnRecord(authReq.user, 'deal.update_any', 'deal.update_assigned', isAssigned))) {
+        res.status(403).json({ error: 'Not authorized' });
+        return;
+      }
     }
 
     const updated = await prisma.deal.update({
@@ -348,6 +376,11 @@ export const convertDealToProject = async (req: Request, res: Response): Promise
 
     if (!deal) {
       res.status(404).json({ error: 'Deal not found' });
+      return;
+    }
+
+    if (!(await can(authReq.user, 'project.create'))) {
+      res.status(403).json({ error: 'Not authorized to convert deals to projects' });
       return;
     }
 
@@ -398,6 +431,10 @@ export const convertDealToProject = async (req: Request, res: Response): Promise
 export const deleteDeal = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
+    if (!(await can(authReq.user, 'deal.delete_any'))) {
+      res.status(403).json({ error: 'Not authorized to delete deals' });
+      return;
+    }
     await prisma.deal.deleteMany({ where: { id: req.params.id as string, tenantId: authReq.user.tenantId } });
     res.json({ message: 'Deal deleted' });
   } catch {
@@ -479,7 +516,7 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
 export const createProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
-    if (authReq.user.role === 'CLIENT' || authReq.user.role === 'EMPLOYEE') {
+    if (!(await can(authReq.user, 'project.create'))) {
       res.status(403).json({ error: 'You do not have permission to create projects' });
       return;
     }
@@ -546,8 +583,22 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
 export const updateProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
-    await prisma.project.updateMany({
+    const project = await prisma.project.findFirst({
       where: { id: req.params.id as string, tenantId: authReq.user.tenantId },
+      select: { id: true, members: { select: { id: true } } }
+    });
+    if (!project) {
+      res.status(404).json({ error: 'Project not found' });
+      return;
+    }
+    const isMember = project.members.some((m) => m.id === authReq.user.id);
+    if (!(await canActOnRecord(authReq.user, 'project.update_any', 'project.update_member', isMember))) {
+      res.status(403).json({ error: 'Not authorized' });
+      return;
+    }
+
+    await prisma.project.update({
+      where: { id: project.id },
       data: {
         ...req.body,
         budget: req.body.budget ? parseFloat(req.body.budget) : undefined
@@ -562,6 +613,10 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
 export const deleteProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
+    if (!(await can(authReq.user, 'project.delete_any'))) {
+      res.status(403).json({ error: 'Not authorized to delete projects' });
+      return;
+    }
     await prisma.project.deleteMany({ where: { id: req.params.id as string, tenantId: authReq.user.tenantId } });
     res.json({ message: 'Project deleted' });
   } catch {
@@ -609,8 +664,8 @@ export const getAllTasks = async (req: Request, res: Response): Promise<void> =>
 export const createTask = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
-    if (authReq.user.role === 'CLIENT') {
-      res.status(403).json({ error: 'Clients cannot create tasks' });
+    if (!(await can(authReq.user, 'task.create'))) {
+      res.status(403).json({ error: 'Not authorized to create tasks' });
       return;
     }
     const { title, description, priority, dueDate, contactId, projectId, assignedToId } = req.body;
@@ -646,6 +701,19 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
 export const updateTask = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
+    const task = await prisma.task.findFirst({
+      where: { id: req.params.id as string, tenantId: authReq.user.tenantId }
+    });
+    if (!task) {
+      res.status(404).json({ error: 'Task not found' });
+      return;
+    }
+    const isAssigned = task.assignedToId === authReq.user.id;
+    if (!(await canActOnRecord(authReq.user, 'task.update_any', 'task.update_assigned', isAssigned))) {
+      res.status(403).json({ error: 'Not authorized' });
+      return;
+    }
+
     const { title, description, priority, status, dueDate, assignedToId, contactId, projectId } = req.body;
     await prisma.task.updateMany({
       where: { id: req.params.id as string, tenantId: authReq.user.tenantId },
@@ -670,6 +738,10 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
 export const deleteTask = async (req: Request, res: Response): Promise<void> => {
   try {
     const authReq = req as AuthenticatedRequest;
+    if (!(await can(authReq.user, 'task.delete_any'))) {
+      res.status(403).json({ error: 'Not authorized to delete tasks' });
+      return;
+    }
     await prisma.task.deleteMany({ where: { id: req.params.id as string, tenantId: authReq.user.tenantId } });
     res.json({ message: 'Task deleted' });
   } catch {

@@ -19,6 +19,7 @@ import messageRoutes from './routes/message.routes';
 import fileRoutes from './routes/file.routes';
 import invoiceRoutes from './routes/invoice.routes';
 import notificationRoutes from './routes/notification.routes';
+import permissionRoutes from './routes/permission.routes';
 import { createSocketServer } from './socket';
 
 // Initialize Passport config
@@ -79,6 +80,7 @@ app.use('/api/v1/messages', messageRoutes);
 app.use('/api/v1/files', fileRoutes);
 app.use('/api/v1/invoices', invoiceRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/permissions', permissionRoutes);
 
 // 404 handler
 app.use((_req, res) => {

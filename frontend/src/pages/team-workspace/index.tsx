@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../store';
 import Sidebar from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
 import Card from '../../components/shared/Card';
@@ -6,7 +8,7 @@ import ActionButton from '../../components/shared/ActionButton';
 import EmptyState from '../../components/shared/EmptyState';
 import ActivityFeed from './components/ActivityFeed';
 import TeamCalendar from './components/TeamCalendar';
-import { userService, activityService, inviteService } from '../../services';
+import { userService, activityService, inviteService, permissionService } from '../../services';
 
 interface Member {
   id: string;
@@ -27,12 +29,14 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const TeamWorkspace = () => {
+  const { user } = useSelector((state: RootState) => state.auth);
   const [members, setMembers] = useState<Member[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [roleFilter, setRoleFilter] = useState('all');
+  const [canInvite, setCanInvite] = useState(false);
 
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -43,7 +47,22 @@ const TeamWorkspace = () => {
 
   useEffect(() => {
     loadData();
+    checkInvitePermission();
   }, []);
+
+  const checkInvitePermission = async () => {
+    if (user?.role === 'ADMIN') {
+      setCanInvite(true);
+      return;
+    }
+    try {
+      const res = await permissionService.getAll();
+      const matrix = res.data.matrix;
+      setCanInvite(!!matrix?.[user?.role]?.['contact.create']);
+    } catch {
+      setCanInvite(false);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -127,9 +146,11 @@ const TeamWorkspace = () => {
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">Team</h1>
               <p className="text-sm text-muted-foreground">{activeMembers.length} members</p>
             </div>
-            <ActionButton icon="UserPlus" onClick={() => setShowInviteModal(true)}>
-              Invite Member
-            </ActionButton>
+            {canInvite && (
+              <ActionButton icon="UserPlus" onClick={() => setShowInviteModal(true)}>
+                Invite Member
+              </ActionButton>
+            )}
           </div>
         </div>
 

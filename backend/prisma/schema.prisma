@@ -83,7 +83,7 @@ enum PaymentStatus {
 
 model Tenant {
   id              String        @id @default(uuid())
-  companyName     String    
+  companyName     String
   users           User[]
   contacts        Contact[]
   deals           Deal[]
@@ -96,8 +96,26 @@ model Tenant {
   notifications   Notification[]
   invoices        Invoice[]
   payments        Payment[]
+  rolePermissions RolePermission[]
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+}
+
+// Tenant-scoped override of the default role -> action permission matrix.
+// Only ADMIN-editable; the ADMIN role itself is never stored here (always fully permitted).
+model RolePermission {
+  id        String   @id @default(uuid())
+  role      Role
+  action    String
+  allowed   Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, role, action])
+  @@index([tenantId])
 }
 
 // Models
