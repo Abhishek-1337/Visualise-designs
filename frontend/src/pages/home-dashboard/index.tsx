@@ -120,10 +120,10 @@ const HomeDashboard = () => {
                   <Icon name="FolderKanban" size={16} />
                   Projects
                 </Link>
-                <Link to="/lead-client-flow" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-smooth">
+                {/* <Link to="/lead-client-flow" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-smooth">
                   <Icon name="Kanban" size={16} />
                   Pipeline
-                </Link>
+                </Link> */}
                 <Link to="/team-workspace" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-smooth">
                   <Icon name="Users" size={16} />
                   Team

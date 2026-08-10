@@ -180,12 +180,12 @@ const TodaysFocusCard = ({ role = 'EMPLOYEE' }: TodaysFocusCardProps) => {
         </div>
       )}
 
-      <Link
+      {/* <Link
         to="/lead-client-flow"
         className="mt-5 block text-center text-sm text-primary hover:text-primary/80 font-medium transition-smooth"
       >
         View all tasks &rarr;
-      </Link>
+      </Link> */}
     </div>
   );
 };

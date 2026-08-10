@@ -84,9 +84,9 @@ const QuickAccessWidget = () => {
             </div>
             <h3 className="text-sm font-semibold text-foreground">Activity</h3>
           </div>
-          <Link to="/lead-client-flow">
+          {/* <Link to="/lead-client-flow">
             <Icon name="ExternalLink" size={14} color="var(--color-muted-foreground)" />
-          </Link>
+          </Link> */}
         </div>
         <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
           {activities.length === 0 ? (

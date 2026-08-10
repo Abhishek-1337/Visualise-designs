@@ -13,7 +13,7 @@ import HomeDashboard from './pages/home-dashboard';
 import TeamWorkspace from './pages/team-workspace';
 import Login from './pages/login';
 import Register from './pages/register';
-import LeadClientFlow from './pages/lead-client-flow';
+// import LeadClientFlow from './pages/lead-client-flow';
 import ClientProfile from './pages/client-profile';
 import CommunicationHub from './pages/communication-hub';
 import ClientMessaging from './pages/client-messaging';
@@ -69,7 +69,7 @@ const Routes = () => {
           <Route path="/project-management" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><ProjectManagement /></ProtectedRoute>} />
           <Route path="/project-management/:id" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><ProjectManagementDetails /></ProtectedRoute>} />
           <Route path="/team-workspace" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><TeamWorkspace /></ProtectedRoute>} />
-          <Route path="/lead-client-flow" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><LeadClientFlow /></ProtectedRoute>} />
+          {/* <Route path="/lead-client-flow" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><LeadClientFlow /></ProtectedRoute>} /> */}
           <Route path="/client-profile" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><ClientProfile /></ProtectedRoute>} />
           <Route path="/communication-hub" element={<ProtectedRoute allowedRoles={BUSINESS_ROLES}><CommunicationHub /></ProtectedRoute>} />
           <Route path="/client-messaging" element={<ProtectedRoute allowedRoles={ADMIN_MANAGER_ROLES}><ClientMessaging /></ProtectedRoute>} />

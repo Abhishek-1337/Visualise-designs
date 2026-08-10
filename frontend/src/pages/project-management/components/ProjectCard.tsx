@@ -45,13 +45,10 @@ const ProjectCard = ({ project, onStatusUpdate, onViewDetails }) => {
             <h3 className="font-heading font-semibold text-lg md:text-xl text-foreground mb-1 line-clamp-1">
               {project?.name}
             </h3>
-            <Link
-              to="/lead-client-flow"
-              className="text-sm text-muted-foreground hover:text-primary transition-smooth inline-flex items-center gap-1"
-            >
+            <span className="text-sm text-slate-400/90 inline-flex items-center gap-1">
               <Icon name="Building2" size={14} />
               <span className="line-clamp-1">{project?.clientName}</span>
-            </Link>
+            </span>
           </div>
           <button
             onClick={() => onViewDetails(project)}
