@@ -96,10 +96,9 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
     if (role) where.role = role;
     if (isActive !== undefined) where.isActive = isActive === 'true';
 
-    // Employees should not see CLIENT users in the team directory
-    if (authReq.user.role === 'EMPLOYEE') {
-      where.role = role && role !== 'CLIENT' ? role : { not: 'CLIENT' };
-    }
+    // This endpoint powers the Team directory, not client management —
+    // clients are viewed/managed via the client-crm route instead.
+    where.role = role && role !== 'CLIENT' ? role : { not: 'CLIENT' };
 
     const [users, total] = await Promise.all([
       prisma.user.findMany({
